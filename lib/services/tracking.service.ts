@@ -56,17 +56,8 @@ export class TrackingService {
     const db = await getDb();
     const collection = db.collection<TrackedItemDocument>("tracked_items");
 
-    const existing = await collection.findOne({
-      userId: userObjectId,
-      tmdbId,
-      mediaType,
-    });
-
-    if (existing) {
-      return existing;
-    }
-
-    const doc: TrackedItemDocument = {
+    const now = new Date();
+    const docToInsert: Omit<TrackedItemDocument, "_id"> = {
       userId: userObjectId,
       tmdbId,
       mediaType,
@@ -77,12 +68,26 @@ export class TrackingService {
       minimalSnapshot: snapshot,
       lastSeenAiredEpisode: null,
       watchedEpisodes: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
     };
 
-    const res = await collection.insertOne(doc);
-    return { ...doc, _id: res.insertedId };
+    const result = await collection.findOneAndUpdate(
+      {
+        userId: userObjectId,
+        tmdbId,
+        mediaType,
+      },
+      {
+        $setOnInsert: docToInsert,
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+      }
+    );
+
+    return result as TrackedItemDocument;
   }
 
   /**

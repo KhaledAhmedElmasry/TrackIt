@@ -59,6 +59,8 @@ export function getMongoClientPromise(): Promise<MongoClient> {
   }
 }
 
+let indexesEnsured = false;
+
 /**
  * Convenience helper to obtain the target database instance.
  * Reuses the cached MongoClient and defaults to the configured database name.
@@ -68,5 +70,18 @@ export function getMongoClientPromise(): Promise<MongoClient> {
 export async function getDb(dbName?: string): Promise<Db> {
   const client = await getMongoClientPromise();
   const name = dbName || process.env.MONGODB_DB_NAME || "watchtrack";
-  return client.db(name);
+  const db = client.db(name);
+
+  if (!indexesEnsured) {
+    indexesEnsured = true;
+    import("./init-indexes")
+      .then((m) => m.ensureIndexes(db))
+      .catch((err) => {
+        console.warn("Failed to ensure indexes automatically:", err);
+        indexesEnsured = false;
+      });
+  }
+
+  return db;
 }
+
