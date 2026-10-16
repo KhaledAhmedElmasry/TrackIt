@@ -23,6 +23,7 @@ export interface AuthenticatedUser {
   email: string;
   isVerified: boolean;
   ntfyTopic: string;
+  barkKey?: string;
   hasTmdbKey: boolean;
   hasGeminiKey: boolean;
   createdAt: Date;
@@ -107,6 +108,7 @@ export async function getSessionContext(tokenOverride?: string): Promise<Session
         email: user.email,
         isVerified: user.isVerified,
         ntfyTopic: user.ntfyTopic,
+        barkKey: user.barkKey || "",
         hasTmdbKey: Boolean(user.keys?.tmdb?.encrypted),
         hasGeminiKey: Boolean(user.keys?.gemini?.encrypted),
         createdAt: user.createdAt,

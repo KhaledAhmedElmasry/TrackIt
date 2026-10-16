@@ -14,6 +14,7 @@ export interface UserProfile {
   email: string;
   isVerified: boolean;
   ntfyTopic: string;
+  barkKey?: string;
   hasTmdbKey: boolean;
   hasGeminiKey: boolean;
   createdAt: string;

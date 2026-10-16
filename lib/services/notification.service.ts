@@ -57,7 +57,8 @@ export class NotificationService {
     // 2. Bark push (optional)
     if (barkKey && barkKey.trim().length > 0) {
       try {
-        const cleanBarkKey = barkKey.trim();
+        let cleanBarkKey = barkKey.trim();
+        cleanBarkKey = cleanBarkKey.replace(/^https?:\/\/api\.day\.app\//, "").replace(/^\/+|\/+$/g, "");
         const barkUrl = new URL(`https://api.day.app/${cleanBarkKey}`);
         barkUrl.pathname += `/${encodeURIComponent(title)}/${encodeURIComponent(message)}`;
         if (clickUrl) {

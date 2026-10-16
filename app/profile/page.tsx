@@ -68,6 +68,62 @@ export default function ProfilePage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  // Bark Push Key State
+  const [barkKeyInput, setBarkKeyInput] = useState(user?.barkKey || "");
+  const [isSavingBarkKey, setIsSavingBarkKey] = useState(false);
+  const [barkFeedback, setBarkFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.barkKey !== undefined) {
+      setBarkKeyInput(user.barkKey);
+    }
+  }, [user?.barkKey]);
+
+  const handleSaveBarkKey = async () => {
+    if (!barkKeyInput.trim()) return;
+    setIsSavingBarkKey(true);
+    setBarkFeedback(null);
+    try {
+      const res = await fetch("/api/user/bark", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ barkKey: barkKeyInput.trim() }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        await refreshUser();
+        setBarkFeedback("Bark key saved! Test notification will now alert Bark.");
+      } else {
+        alert(json.error || "Failed to save Bark key");
+      }
+    } catch {
+      alert("Failed to save Bark key");
+    } finally {
+      setIsSavingBarkKey(false);
+    }
+  };
+
+  const handleDeleteBarkKey = async () => {
+    if (!confirm("Remove Bark key?")) return;
+    setIsSavingBarkKey(true);
+    setBarkFeedback(null);
+    try {
+      const res = await fetch("/api/user/bark", { method: "DELETE" });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setBarkKeyInput("");
+        await refreshUser();
+        setBarkFeedback("Bark key removed.");
+      } else {
+        alert(json.error || "Failed to remove Bark key");
+      }
+    } catch {
+      alert("Failed to remove Bark key");
+    } finally {
+      setIsSavingBarkKey(false);
+    }
+  };
+
   // Test Push & Data Management State
   const [isSendingTestPush, setIsSendingTestPush] = useState(false);
   const [testPushFeedback, setTestPushFeedback] = useState<string | null>(null);
@@ -508,41 +564,102 @@ export default function ProfilePage() {
       <section className="space-y-3">
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-[#ffd60a]" />
-          <h2 className="text-base font-bold text-white">Push Notifications (ntfy.sh)</h2>
+          <h2 className="text-base font-bold text-white">Push Notifications (ntfy.sh & Bark)</h2>
         </div>
 
-        <div className="ios-card p-5 space-y-3">
-          <div>
-            <p className="text-xs font-semibold text-white">Your Private Notification Topic</p>
-            <p className="text-xs text-[#8e8e93] mt-0.5">
-              Each user receives a unique, long random topic. Subscribe to this topic in the free <strong>ntfy</strong> app (iOS / Android / Web) to get alerts for new aired episodes.
-            </p>
+        <div className="ios-card p-5 space-y-5">
+          {/* Channel 1: ntfy.sh */}
+          <div className="space-y-2.5">
+            <div>
+              <p className="text-xs font-semibold text-white">ntfy.sh (Free Public Server)</p>
+              <p className="text-xs text-[#8e8e93] mt-0.5">
+                Each user receives a unique, long random topic. Subscribe to this topic in the free <strong>ntfy</strong> app (iOS / Android / Web) to get alerts for new aired episodes.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] flex items-center justify-between gap-3">
+              <span className="font-mono text-xs text-[#ffd60a] truncate select-all">
+                {user.ntfyTopic}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyTopic}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-semibold transition-all ios-press shrink-0"
+              >
+                {copiedTopic ? <Check className="w-3.5 h-3.5 text-[#32d74b]" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedTopic ? "Copied" : "Copy"}</span>
+              </button>
+            </div>
+
+            <div>
+              <a
+                href={`https://ntfy.sh/${user.ntfyTopic}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0a84ff] hover:underline"
+              >
+                <span>Open topic on ntfy.sh</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] flex items-center justify-between gap-3">
-            <span className="font-mono text-xs text-[#ffd60a] truncate select-all">
-              {user.ntfyTopic}
+          {/* Channel 2: Bark */}
+          <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2.5">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-semibold text-white">Bark (iOS Push)</p>
+                {user.barkKey && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#32d74b]/15 text-[#32d74b] border border-[#32d74b]/30">
+                    Connected
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#8e8e93] mt-0.5">
+                Paste your device key from the Bark iOS app (or your custom server URL) to receive native iOS notifications.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <input
+                type="text"
+                value={barkKeyInput}
+                onChange={(e) => setBarkKeyInput(e.target.value)}
+                placeholder="e.g. your_bark_key or https://api.day.app/..."
+                className="flex-1 px-3 py-2 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white text-xs font-mono placeholder:text-[#555] focus:outline-none focus:border-[#ffd60a]"
+              />
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleSaveBarkKey}
+                  disabled={isSavingBarkKey || !barkKeyInput.trim() || barkKeyInput.trim() === user.barkKey}
+                  className="px-3 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-semibold transition-all ios-press disabled:opacity-40"
+                >
+                  {isSavingBarkKey ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save Bark Key"}
+                </button>
+                {user.barkKey && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteBarkKey}
+                    disabled={isSavingBarkKey}
+                    className="px-2.5 py-2 rounded-xl bg-[#ff453a]/15 hover:bg-[#ff453a]/25 text-[#ff453a] text-xs font-semibold transition-all ios-press"
+                    title="Remove Bark key"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+            {barkFeedback && (
+              <p className="text-[11px] text-[#32d74b] font-semibold">{barkFeedback}</p>
+            )}
+          </div>
+
+          {/* Combined Test Notification Dispatcher */}
+          <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs text-[#8e8e93]">
+              Send a test push to all configured services:
             </span>
-            <button
-              type="button"
-              onClick={handleCopyTopic}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-semibold transition-all ios-press shrink-0"
-            >
-              {copiedTopic ? <Check className="w-3.5 h-3.5 text-[#32d74b]" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedTopic ? "Copied" : "Copy"}</span>
-            </button>
-          </div>
-
-          <div className="pt-2 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap items-center justify-between gap-3">
-            <a
-              href={`https://ntfy.sh/${user.ntfyTopic}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0a84ff] hover:underline"
-            >
-              <span>Open topic on ntfy.sh</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
 
             <button
               type="button"
