@@ -68,3 +68,4 @@ describe("Cryptographic Utilities & Scrypt Hashing", () => {
     expect(normalizeRecoveryCode("  ab cd - ef gh - jk 23  ")).toBe("ABCDEFGHJK23");
   });
 });
+

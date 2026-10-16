@@ -125,3 +125,4 @@ export function generateRecoveryCodes(count = 10): GeneratedRecoveryCodes {
 export function normalizeRecoveryCode(input: string): string {
   return input.replace(/[\s-]/g, "").toUpperCase();
 }
+

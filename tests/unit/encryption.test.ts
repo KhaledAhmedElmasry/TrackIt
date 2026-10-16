@@ -58,3 +58,4 @@ describe("AES-256-GCM API Key Encryption & Decryption", () => {
     expect(() => encryptApiKey("   ", testMasterKey)).toThrowError(AppError);
   });
 });
+

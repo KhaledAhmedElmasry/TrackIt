@@ -25,3 +25,4 @@ export async function DELETE(req: NextRequest) {
     return handleApiError(error);
   }
 }
+

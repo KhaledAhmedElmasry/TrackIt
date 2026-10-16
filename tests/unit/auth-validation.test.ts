@@ -73,3 +73,4 @@ describe("Authentication Input Validation Schemas", () => {
     });
   });
 });
+

@@ -82,19 +82,16 @@ export default function ProfilePage() {
     if (!user) return;
     let mounted = true;
 
-    fetch("/api/keys")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (mounted && json?.success && json.data) {
-          setKeys(json.data);
-        }
-      })
-      .catch(console.warn);
+    queueMicrotask(() => {
+      if (mounted) {
+        void fetchKeys();
+      }
+    });
 
     return () => {
       mounted = false;
     };
-  }, [user]);
+  }, [user, fetchKeys]);
 
   const handleSaveKey = async (e: React.FormEvent) => {
     e.preventDefault();

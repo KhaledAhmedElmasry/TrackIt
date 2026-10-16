@@ -162,3 +162,4 @@ export class EmailService {
     return this.sendViaBrevo({ to, subject, html, text });
   }
 }
+

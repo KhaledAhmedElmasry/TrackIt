@@ -58,29 +58,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    fetch("/api/auth/me", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (mounted) {
-          if (json?.success && json.data?.user) {
-            setUser(json.data.user);
-          } else {
-            setUser(null);
-          }
-          setIsLoading(false);
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setUser(null);
-          setIsLoading(false);
-        }
-      });
-
+    queueMicrotask(() => {
+      if (mounted) {
+        void refreshUser();
+      }
+    });
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [refreshUser]);
 
   const logout = useCallback(async () => {
     try {

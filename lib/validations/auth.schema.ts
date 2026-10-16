@@ -69,3 +69,4 @@ export const saveKeySchema = z.object({
 export const deleteKeySchema = z.object({
   keyType: z.enum(["tmdb", "gemini"]),
 });
+
