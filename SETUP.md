@@ -115,6 +115,13 @@ Values:
 4. In the ntfy app, tap **Subscribe to topic**, paste your topic, and tap **Subscribe**.
 5. Tap the **Send Test Notification** button in WatchTrack Settings &mdash; your phone will buzz immediately with a test alert!
 
+### Optional: Bark (Native iOS Push)
+1. Install the free **Bark** app on your iPhone from the [App Store](https://apps.apple.com/us/app/bark-customed-notifications/id1403753865).
+2. Open Bark and copy your device key (or URL `https://api.day.app/YOUR_KEY/`).
+3. In WatchTrack **Settings (Profile)** &rarr; **Push Notifications**, paste your Bark key into the Bark field and tap **Save Bark Key**.
+4. Tap **Send Test Notification** &mdash; WatchTrack dispatches to both ntfy and Bark!
+
+
 ---
 
 ## Step 7: Deploy Free to Vercel
