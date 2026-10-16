@@ -1,0 +1,51 @@
+import type { MetadataRoute } from "next";
+
+/**
+ * Web App Manifest definition for WatchTrack
+ * Configures native-like standalone PWA display, Apple dark background, and high-res icons.
+ */
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "WatchTrack - Private Movie & Series Tracker",
+    short_name: "WatchTrack",
+    description: "Private, fast, and secure movie and TV series tracker with Apple iOS design.",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#000000",
+    theme_color: "#000000",
+    orientation: "portrait-primary",
+    icons: [
+      {
+        src: "/icons/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
+      },
+      {
+        src: "/icons/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+      {
+        src: "/icons/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+      },
+    ],
+    categories: ["entertainment", "utilities"],
+    shortcuts: [
+      {
+        name: "Want to Watch",
+        url: "/lists?tab=want_to_watch",
+        description: "View saved movies and series to watch",
+      },
+      {
+        name: "Search Titles",
+        url: "/search",
+        description: "Search TMDB movies and TV series",
+      },
+    ],
+  };
+}
+

@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --surface: #121215;
+  --surface-hover: #1c1c1f;
+  --surface-active: #242429;
+  --surface-glass: rgba(18, 18, 22, 0.75);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-highlight: rgba(255, 255, 255, 0.16);
+  --accent: #0a84ff;
+  --accent-hover: #0071e3;
+  --accent-muted: rgba(10, 132, 255, 0.15);
+  --text-primary: #ffffff;
+  --text-secondary: #8e8e93;
+  --text-tertiary: #636366;
+  --danger: #ff453a;
+  --danger-muted: rgba(255, 69, 58, 0.15);
+  --success: #32d74b;
+  --success-muted: rgba(50, 215, 75, 0.15);
+  --warning: #ffd60a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-text-secondary: var(--text-secondary);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Force dark theme everywhere - No light mode allowed */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #000000 !important;
+  color: #f5f5f7 !important;
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  overflow-x: hidden;
+  min-height: 100dvh;
+}
+
+/* Allow text selection inside inputs and readouts */
+input, textarea, [contenteditable="true"], .selectable-text {
+  user-select: text;
+}
+
+/* iOS Glassmorphism translucent blurred bars */
+.glass-bar {
+  background: var(--surface-glass);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border-color: var(--border-subtle);
+}
+
+.glass-card {
+  background: rgba(22, 22, 26, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+}
+
+/* iOS Card styling */
+.ios-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.25rem;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.ios-card:hover {
+  border-color: var(--border-highlight);
+  background-color: var(--surface-hover);
+}
+
+/* Native feel active press animation */
+.ios-press {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.ios-press:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* Safe area insets for notches, home indicator, status bars */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Clean minimal scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }

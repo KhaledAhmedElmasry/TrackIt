@@ -1,0 +1,51 @@
+name: WatchTrack CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint, Type Check & Test
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      MONGODB_URI: "mongodb+srv://mock:mock@cluster0.mongodb.net/test?retryWrites=true&w=majority"
+      MONGODB_DB_NAME: "watchtrack_test"
+      MASTER_ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      SESSION_SECRET: "ci-validation-session-secret-key-32-chars-min"
+      CRON_SECRET: "ci-validation-cron-secret-16-chars"
+      APP_URL: "http://localhost:3000"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Code Quality (Lint)
+        run: npm run lint
+
+      - name: Strict Type Check
+        run: npm run type-check
+
+      - name: Run Test Suite (Vitest)
+        run: npm run test
+
+      - name: Build Next.js Application
+        run: npm run build
+
