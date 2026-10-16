@@ -512,12 +512,14 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 )}
 
                 <span className="text-xs text-[#8e8e93] font-medium">
-                  {details.yearRange}
+                  {isMovie
+                    ? (details.releaseDate ? `Released: ${details.releaseDate}` : details.yearRange)
+                    : details.yearRange}
                 </span>
 
                 {details.status && (
                   <span className="text-xs text-[#0a84ff] font-semibold">
-                    &bull; {details.status}
+                    • {details.status}
                   </span>
                 )}
               </div>
@@ -557,7 +559,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 <div className="flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5" />
                   <span>
-                    {details.totalSeasons} {details.totalSeasons === 1 ? "Season" : "Seasons"} &bull; {details.totalEpisodes} Episodes
+                    {details.totalSeasons} {details.totalSeasons === 1 ? "Season" : "Seasons"} • {details.totalEpisodes} Episodes
                   </span>
                 </div>
               )}
@@ -756,7 +758,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                           {season.name || `Season ${seasonNum}`}
                         </h3>
                         <p className="text-[11px] text-[#8e8e93]">
-                          {season.episodeCount} Episodes {season.airDate ? `&bull; ${season.airDate.slice(0, 4)}` : ""}
+                          {season.episodeCount} Episodes {season.airDate ? `• ${season.airDate.slice(0, 4)}` : ""}
                         </p>
                       </div>
                     </div>
@@ -836,9 +838,15 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                                       {ep.episodeNumber}. {ep.name}
                                     </span>
 
+                                    {ep.airDate && (
+                                      <span className="text-[11px] text-[#8e8e93]">
+                                        ({ep.airDate})
+                                      </span>
+                                    )}
+
                                     {!isAired && (
                                       <span className="px-1.5 py-0.2 rounded bg-[#ff9f0a]/15 text-[#ff9f0a] text-[10px] font-semibold border border-[#ff9f0a]/30">
-                                        Airs {ep.airDate || "TBA"}
+                                        Unaired
                                       </span>
                                     )}
 
@@ -900,7 +908,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                         Season 0 (Specials)
                       </h3>
                       <p className="text-[10px] text-[#8e8e93]/70">
-                        {specialsSeason.episodeCount} Specials &bull; Does not affect series progress
+                        {specialsSeason.episodeCount} Specials • Does not affect series progress
                       </p>
                     </div>
                   </div>
@@ -933,7 +941,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                               {isWatched && <Check className="w-3 h-3 stroke-[3]" />}
                             </button>
                             <span className="text-white font-medium">
-                              S00E{ep.episodeNumber} &bull; {ep.name}
+                              S00E{ep.episodeNumber} • {ep.name}
                             </span>
                           </div>
                           {ep.airDate && (

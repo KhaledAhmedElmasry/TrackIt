@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 export interface UserProfile {
   id: string;
   email: string;
+  username?: string;
   isVerified: boolean;
   ntfyTopic: string;
   barkKey?: string;

@@ -67,6 +67,7 @@ export interface TmdbTitleDetail {
   startYear: number | null;
   endYear: number | null;
   yearRange: string;
+  releaseDate?: string | null;
   status: string; // "Returning Series", "Ended", "Released", etc.
   isFinished: boolean;
   ageRating: string | null;
@@ -299,6 +300,7 @@ export class TmdbService {
         startYear: releaseYear,
         endYear: releaseYear,
         yearRange: releaseYear ? `${releaseYear}` : "TBA",
+        releaseDate: data.release_date || null,
         status: data.status || "Released",
         isFinished,
         ageRating,
@@ -370,6 +372,7 @@ export class TmdbService {
         startYear,
         endYear,
         yearRange,
+        releaseDate: data.first_air_date || null,
         status: data.status || "Returning Series",
         isFinished,
         ageRating,

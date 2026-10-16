@@ -161,7 +161,7 @@ export default function SearchPage() {
     searchTimeoutRef.current = setTimeout(() => {
       setIsLoading(true);
       performSearch(query, filterType);
-    }, 300);
+    }, 50);
 
     return () => {
       if (searchTimeoutRef.current) {

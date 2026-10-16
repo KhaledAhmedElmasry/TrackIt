@@ -36,6 +36,7 @@ export interface UserRecoveryCode {
 export interface UserDocument {
   _id?: ObjectId;
   email: string;
+  username?: string;
   passwordHash: string;
   isVerified: boolean;
   verificationTokenHash?: string | null;

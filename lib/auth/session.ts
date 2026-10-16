@@ -21,6 +21,7 @@ const SESSION_TTL_MS = SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
 export interface AuthenticatedUser {
   id: string;
   email: string;
+  username?: string;
   isVerified: boolean;
   ntfyTopic: string;
   barkKey?: string;
@@ -106,6 +107,7 @@ export async function getSessionContext(tokenOverride?: string): Promise<Session
       user: {
         id: user._id.toHexString(),
         email: user.email,
+        username: user.username || "",
         isVerified: user.isVerified,
         ntfyTopic: user.ntfyTopic,
         barkKey: user.barkKey || "",

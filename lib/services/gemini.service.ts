@@ -33,7 +33,6 @@ const CANDIDATE_GEMINI_MODELS = [
   "gemini-3.5-flash-lite",
   "gemini-3.8-flash",
   "gemini-flash-latest",
-  "gemini-2.5-flash-lite",
 ];
 const RECOMMENDATION_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes cooldown
 
@@ -157,6 +156,9 @@ Do NOT include markdown formatting or backticks around the JSON.`;
           const errMsg = errorJson?.error?.message || `Gemini request failed (${geminiRes.status})`;
           if (geminiRes.status === 404 || geminiRes.status === 503) {
             lastError = new ExternalServiceError(`Gemini AI (${modelName}): ${errMsg}`);
+            if (geminiRes.status === 503) {
+              await new Promise((r) => setTimeout(r, 600));
+            }
             continue;
           }
           throw new ExternalServiceError(`Gemini AI Error: ${errMsg}`);

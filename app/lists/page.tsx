@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import {
   Bookmark,
   PlayCircle,
@@ -40,9 +41,19 @@ interface TrackedItem {
 
 type TabType = "want_to_watch" | "currently_watching" | "watched";
 
-export default function ListsPage() {
+function ListsContent() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>("want_to_watch");
+  const searchParams = useSearchParams();
+  const tabQuery = searchParams.get("tab");
+  const [userSelectedTab, setUserSelectedTab] = useState<TabType | null>(null);
+  const activeTab: TabType = userSelectedTab ?? (
+    tabQuery === "currently_watching" || tabQuery === "watching"
+      ? "currently_watching"
+      : tabQuery === "watched"
+      ? "watched"
+      : "want_to_watch"
+  );
+  const setActiveTab = (tab: TabType) => setUserSelectedTab(tab);
   const [filterType, setFilterType] = useState<"all" | "movie" | "tv">("all");
   const [items, setItems] = useState<TrackedItem[]>([]);
   const [counts, setCounts] = useState({
@@ -308,5 +319,19 @@ export default function ListsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ListsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-20 text-center text-[#8e8e93] text-sm animate-pulse">
+          Loading library...
+        </div>
+      }
+    >
+      <ListsContent />
+    </Suspense>
   );
 }

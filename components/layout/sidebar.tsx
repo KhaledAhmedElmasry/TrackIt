@@ -10,12 +10,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Film, ShieldCheck } from "lucide-react";
+import { Film } from "lucide-react";
 import { NAV_ITEMS } from "./bottom-nav";
 import { cn } from "@/lib/utils/cn";
+import { useAuth } from "@/components/auth/auth-context";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   return (
     <aside
@@ -28,13 +30,12 @@ export function Sidebar() {
           <Film className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+          <h1 className="text-base font-bold tracking-tight text-white">
             WatchTrack
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[rgba(255,255,255,0.08)] text-[#8e8e93]">
-              Private
-            </span>
           </h1>
-          <p className="text-[11px] text-[#8e8e93]">Your personal tracker</p>
+          <p className="text-[11px] text-[#8e8e93]">
+            {user?.username ? `Hi, ${user.username}` : "Your personal tracker"}
+          </p>
         </div>
       </div>
 
@@ -71,30 +72,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-
-      {/* Security & Free-tier Status Badge */}
-      <div className="my-4 px-3 py-3 rounded-2xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
-        <div className="flex items-center gap-2 mb-1">
-          <ShieldCheck className="w-4 h-4 text-[#32d74b]" />
-          <span className="text-xs font-semibold text-white">Private & Encrypted</span>
-        </div>
-        <p className="text-[11px] text-[#8e8e93] leading-relaxed">
-          User keys encrypted with AES-256-GCM. Scoped strictly to your session.
-        </p>
-      </div>
-
-      {/* Mandatory TMDB Attribution & Logo Text */}
-      <div className="pt-3 border-t border-[rgba(255,255,255,0.06)] px-2">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] font-black tracking-widest px-1.5 py-0.5 rounded bg-[#01b4e4] text-[#0d253f]">
-            TMDB
-          </span>
-          <span className="text-[11px] font-semibold text-[#8e8e93]">Attribution</span>
-        </div>
-        <p className="text-[10px] text-[#636366] leading-tight">
-          This product uses the TMDB API but is not endorsed or certified by TMDB.
-        </p>
-      </div>
     </aside>
   );
 }

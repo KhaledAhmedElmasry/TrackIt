@@ -111,7 +111,7 @@ export function ContinueWatchingRow() {
           <h2 className="text-lg font-bold text-white tracking-tight">Continue Watching</h2>
         </div>
         <Link
-          href="/lists"
+          href="/lists?tab=currently_watching"
           className="text-xs text-[#0a84ff] font-semibold hover:underline flex items-center gap-1"
         >
           <span>View all</span>

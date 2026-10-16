@@ -81,24 +81,50 @@ export function TopHeader({ unreadCount: initialCount = 0 }: TopHeaderProps) {
           </span>
         </div>
 
-        {/* Right Actions: Notifications Bell */}
-        <div className="flex items-center gap-2">
-          <Link
-            href="/notifications"
-            aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
-            className="relative flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-full text-[#8e8e93] hover:text-white hover:bg-[rgba(255,255,255,0.08)] active:bg-[rgba(255,255,255,0.12)] transition-colors ios-press"
-          >
-            <Bell className="w-5 h-5" />
-            {unreadCount > 0 && (
-              <span
-                role="status"
-                aria-label={`${unreadCount} unread notifications`}
-                className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[#ff453a] text-white text-[10px] font-bold flex items-center justify-center shadow-sm shadow-[#ff453a]/50 animate-pulse"
-              >
-                {unreadCount > 99 ? "99+" : unreadCount}
+        {/* Right Actions: User Profile badge & Notifications Bell with Hover Tooltip */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {user && (
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.12)] border border-[rgba(255,255,255,0.08)] transition-all ios-press text-xs font-semibold text-white max-w-[140px] sm:max-w-[180px] truncate"
+              title={user.username ? `@${user.username}` : user.email}
+            >
+              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#0a84ff] to-[#5856d6] flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                {(user.username || user.email || "U").charAt(0).toUpperCase()}
+              </div>
+              <span className="truncate">{user.username || user.email.split("@")[0]}</span>
+            </Link>
+          )}
+
+          <div className="relative group">
+            <Link
+              href="/notifications"
+              title={unreadCount > 0 ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}` : "Notifications"}
+              aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
+              className="relative flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-full text-[#8e8e93] hover:text-white hover:bg-[rgba(255,255,255,0.08)] active:bg-[rgba(255,255,255,0.12)] transition-colors ios-press"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span
+                  role="status"
+                  aria-label={`${unreadCount} unread notifications`}
+                  className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[#ff453a] text-white text-[10px] font-bold flex items-center justify-center shadow-sm shadow-[#ff453a]/50 animate-pulse"
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Apple styled hover popover/tooltip */}
+            <div className="absolute right-0 top-full mt-1 hidden group-hover:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1c1c1e] border border-[rgba(255,255,255,0.12)] shadow-xl text-xs whitespace-nowrap z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+              <span className={`w-2 h-2 rounded-full ${unreadCount > 0 ? "bg-[#ff453a]" : "bg-[#32d74b]"}`} />
+              <span className="font-semibold text-white">
+                {unreadCount > 0
+                  ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
+                  : "Notifications (all caught up)"}
               </span>
-            )}
-          </Link>
+            </div>
+          </div>
         </div>
       </div>
     </header>

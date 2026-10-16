@@ -33,6 +33,7 @@ import {
   Upload,
   Send,
   FileJson,
+  User as UserIcon,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 
@@ -68,6 +69,46 @@ export default function ProfilePage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  // Display Username State
+  const [usernameInput, setUsernameInput] = useState(user?.username || "");
+  const [isSavingUsername, setIsSavingUsername] = useState(false);
+  const [usernameFeedback, setUsernameFeedback] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.username !== undefined) {
+      queueMicrotask(() => {
+        setUsernameInput(user.username || "");
+      });
+    }
+  }, [user?.username]);
+
+  const handleSaveUsername = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!usernameInput.trim()) return;
+    setIsSavingUsername(true);
+    setUsernameFeedback(null);
+    setUsernameError(null);
+    try {
+      const res = await fetch("/api/user/username", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: usernameInput.trim() }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        await refreshUser();
+        setUsernameFeedback(json.message || "Username saved successfully!");
+      } else {
+        setUsernameError(json.error || "Failed to update username");
+      }
+    } catch {
+      setUsernameError("Failed to update username");
+    } finally {
+      setIsSavingUsername(false);
+    }
+  };
+
   // Bark Push Key State
   const [barkKeyInput, setBarkKeyInput] = useState(user?.barkKey || "");
   const [isSavingBarkKey, setIsSavingBarkKey] = useState(false);
@@ -75,7 +116,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user?.barkKey !== undefined) {
-      setBarkKeyInput(user.barkKey);
+      queueMicrotask(() => {
+        setBarkKeyInput(user.barkKey || "");
+      });
     }
   }, [user?.barkKey]);
 
@@ -386,6 +429,61 @@ export default function ProfilePage() {
               </span>
             )}
           </div>
+        </div>
+
+        {/* Display Username Configuration */}
+        <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-3">
+          <div>
+            <label htmlFor="username-input" className="text-xs font-bold text-white flex items-center gap-1.5">
+              <UserIcon className="w-3.5 h-3.5 text-[#0a84ff]" />
+              <span>Display Username</span>
+            </label>
+            <p className="text-[11px] text-[#8e8e93] mt-0.5">
+              Set your personal username displayed across the app and greeting banners.
+            </p>
+          </div>
+
+          <form onSubmit={handleSaveUsername} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                id="username-input"
+                type="text"
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
+                placeholder="Enter display username (e.g. MovieLover)"
+                minLength={2}
+                maxLength={30}
+                className="w-full px-3.5 py-2 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.1)] text-xs text-white placeholder-[#636366] focus:outline-none focus:border-[#0a84ff] transition-colors"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSavingUsername || !usernameInput.trim() || usernameInput.trim() === (user.username || "")}
+              className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-bold transition-all ios-press shrink-0 flex items-center justify-center gap-1.5"
+            >
+              {isSavingUsername ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <span>Save Username</span>
+              )}
+            </button>
+          </form>
+
+          {usernameFeedback && (
+            <p className="text-[11px] text-[#32d74b] font-medium flex items-center gap-1">
+              <Check className="w-3.5 h-3.5" />
+              <span>{usernameFeedback}</span>
+            </p>
+          )}
+          {usernameError && (
+            <p className="text-[11px] text-[#ff453a] font-medium flex items-center gap-1">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>{usernameError}</span>
+            </p>
+          )}
         </div>
       </div>
 
