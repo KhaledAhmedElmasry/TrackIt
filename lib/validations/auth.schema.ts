@@ -17,6 +17,12 @@ export const signupSchema = z.object({
     .max(128, "Password must not exceed 128 characters")
     .regex(/[A-Za-z]/, "Password must contain at least one letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
+  username: z
+    .string()
+    .trim()
+    .min(2, "Username must be at least 2 characters")
+    .max(30, "Username must not exceed 30 characters")
+    .optional(),
 });
 
 export const loginSchema = z.object({

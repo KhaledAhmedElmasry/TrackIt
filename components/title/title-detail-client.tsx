@@ -22,10 +22,32 @@ import {
   Loader2,
   Trash2,
   Plus,
+  CheckSquare,
+  Square,
+  X,
 } from "lucide-react";
 import { TmdbTitleDetail, TmdbSeasonDetail } from "@/lib/services/tmdb.service";
 import { TrackedItemDocument } from "@/lib/models/types";
 import { isEpisodeInRange } from "@/lib/utils/ranges";
+
+interface CollectionPart {
+  id: number;
+  title: string;
+  posterPath: string | null;
+  releaseYear: number | null;
+  yearRange: string;
+  voteAverage: number;
+  isWatched: boolean;
+  status: string | null;
+}
+
+interface CollectionDetail {
+  id: number;
+  name: string;
+  overview: string;
+  posterPath: string | null;
+  parts: CollectionPart[];
+}
 
 interface TitleDetailClientProps {
   params: Promise<{
@@ -51,6 +73,18 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
   const [expandedSeason, setExpandedSeason] = useState<number | null>(null);
   const [loadingSeason, setLoadingSeason] = useState<number | null>(null);
   const [isSpecialsExpanded, setIsSpecialsExpanded] = useState(false);
+
+  // 0-10 Rating Modal State
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const [ratingInput, setRatingInput] = useState<string>("");
+  const [isSavingRating, setIsSavingRating] = useState(false);
+
+  // Franchise Collection Dropdown State
+  const [isCollectionExpanded, setIsCollectionExpanded] = useState(false);
+  const [collectionDetail, setCollectionDetail] = useState<CollectionDetail | null>(null);
+  const [isLoadingCollection, setIsLoadingCollection] = useState(false);
+  const [selectedPartIds, setSelectedPartIds] = useState<Set<number>>(new Set());
+  const [isUpdatingCollectionParts, setIsUpdatingCollectionParts] = useState(false);
 
   // Action states
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -298,12 +332,17 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
     }
   };
 
-  // Star Rating
-  const handleRating = async (newRating: number) => {
+  // 0-10 Rating Handler (accepts up to 2 decimal places or null)
+  const handleSaveRating = async (newRating: number | null) => {
     if (!tracked) {
       await handleAddToLibrary();
     }
-    const targetRating = tracked?.rating === newRating ? null : newRating;
+    const cleanRating =
+      newRating !== null
+        ? Math.min(10, Math.max(0, Math.round(newRating * 100) / 100))
+        : null;
+
+    setIsSavingRating(true);
     try {
       const res = await fetch("/api/tracking/rating", {
         method: "POST",
@@ -311,15 +350,21 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
         body: JSON.stringify({
           tmdbId,
           mediaType,
-          rating: targetRating,
+          rating: cleanRating,
         }),
       });
 
       if (res.ok) {
-        setTracked((prev) => (prev ? { ...prev, rating: targetRating } : null));
+        setTracked((prev) => (prev ? { ...prev, rating: cleanRating } : null));
+        setIsRatingModalOpen(false);
+      } else {
+        const json = await res.json();
+        alert(json.error || "Failed to update rating");
       }
     } catch {
       alert("Failed to update rating");
+    } finally {
+      setIsSavingRating(false);
     }
   };
 
@@ -366,9 +411,103 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
     }
   };
 
-  // Mark entire collection as watched
-  const handleMarkCollectionWatched = async (collectionId: number) => {
-    if (!confirm(`Mark all movies in this collection as watched?`)) return;
+  // Fetch Franchise Collection Parts
+  const fetchCollection = useCallback(async (collectionId: number) => {
+    setIsLoadingCollection(true);
+    try {
+      const res = await fetch(`/api/tmdb/collection?id=${collectionId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setCollectionDetail(json.data);
+          const parts: CollectionPart[] = json.data.parts || [];
+          const unwatched = parts.filter((p) => !p.isWatched).map((p) => p.id);
+          setSelectedPartIds(new Set(unwatched.length > 0 ? unwatched : parts.map((p) => p.id)));
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to load franchise collection:", err);
+    } finally {
+      setIsLoadingCollection(false);
+    }
+  }, []);
+
+  // Toggle selection of a single part in the franchise collection
+  const handleToggleSelectPart = (partId: number) => {
+    setSelectedPartIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(partId)) {
+        next.delete(partId);
+      } else {
+        next.add(partId);
+      }
+      return next;
+    });
+  };
+
+  // Toggle select all parts in franchise
+  const handleToggleSelectAllParts = () => {
+    if (!collectionDetail) return;
+    if (selectedPartIds.size === collectionDetail.parts.length) {
+      setSelectedPartIds(new Set());
+    } else {
+      setSelectedPartIds(new Set(collectionDetail.parts.map((p) => p.id)));
+    }
+  };
+
+  // Mark only selected parts in franchise collection as watched
+  const handleMarkSelectedCollectionWatched = async () => {
+    if (!collectionDetail || selectedPartIds.size === 0) return;
+    setIsUpdatingCollectionParts(true);
+
+    try {
+      const selectedParts = collectionDetail.parts.filter((p) => selectedPartIds.has(p.id));
+      const res = await fetch("/api/tracking/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "add_items",
+          items: selectedParts.map((p) => ({
+            tmdbId: p.id,
+            mediaType: "movie",
+            title: p.title,
+            posterPath: p.posterPath,
+            yearRange: p.yearRange,
+            status: "watched",
+          })),
+        }),
+      });
+
+      if (res.ok) {
+        setCollectionDetail((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            parts: prev.parts.map((p) =>
+              selectedPartIds.has(p.id) ? { ...p, isWatched: true, status: "watched" } : p
+            ),
+          };
+        });
+
+        if (selectedPartIds.has(tmdbId)) {
+          setTracked((prev) => (prev ? { ...prev, status: "watched" } : null));
+        }
+
+        alert(`Marked ${selectedParts.length} franchise movie${selectedParts.length === 1 ? "" : "s"} as watched!`);
+      } else {
+        const json = await res.json();
+        alert(json.error || "Failed to mark selected movies");
+      }
+    } catch {
+      alert("Failed to mark selected movies");
+    } finally {
+      setIsUpdatingCollectionParts(false);
+    }
+  };
+
+  // Mark whole collection as watched
+  const handleMarkEntireCollectionWatched = async (collectionId: number) => {
+    if (!confirm(`Mark all movies across this franchise collection as watched?`)) return;
     setIsMarkingCollection(true);
     try {
       const res = await fetch("/api/tracking/bulk", {
@@ -382,7 +521,16 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
       const json = await res.json();
       if (res.ok) {
         alert(json.message || "Franchise collection marked as watched!");
-        loadTitle();
+        if (collectionDetail) {
+          setCollectionDetail((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              parts: prev.parts.map((p) => ({ ...p, isWatched: true, status: "watched" })),
+            };
+          });
+        }
+        await loadTitle();
       } else {
         alert(json.error || "Failed to mark collection");
       }
@@ -633,26 +781,37 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
           </div>
 
           {/* Interactive Controls (Rating & Notifications) */}
-          <div className="flex items-center gap-3">
-            {/* 1-5 Star Rating */}
-            <div className="flex items-center gap-1 bg-[#2c2c2e]/60 px-2.5 py-1 rounded-xl border border-white/10">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  onClick={() => handleRating(star)}
-                  className="p-0.5 text-[#8e8e93] hover:text-[#ffd60a] transition-colors"
-                  title={`Rate ${star} star${star > 1 ? "s" : ""}`}
-                >
-                  <Star
-                    className={`w-4 h-4 ${
-                      tracked?.rating && tracked.rating >= star
-                        ? "text-[#ffd60a] fill-[#ffd60a]"
-                        : ""
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            {/* 0-10 Rating Button */}
+            <button
+              onClick={() => {
+                setRatingInput(
+                  tracked?.rating !== undefined && tracked?.rating !== null
+                    ? String(tracked.rating)
+                    : ""
+                );
+                setIsRatingModalOpen(true);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ios-press ${
+                tracked?.rating !== undefined && tracked?.rating !== null
+                  ? "bg-[#ffd60a]/15 text-[#ffd60a] border-[#ffd60a]/30 shadow-sm"
+                  : "bg-[#2c2c2e]/60 text-[#8e8e93] hover:text-[#ffd60a] border-white/10"
+              }`}
+              title="Rate this title (0.00 to 10.00)"
+            >
+              <Star
+                className={`w-3.5 h-3.5 ${
+                  tracked?.rating !== undefined && tracked?.rating !== null
+                    ? "fill-[#ffd60a] text-[#ffd60a]"
+                    : "text-[#ffd60a]"
+                }`}
+              />
+              <span>
+                {tracked?.rating !== undefined && tracked?.rating !== null
+                  ? `${tracked.rating}/10`
+                  : "Rate / 10"}
+              </span>
+            </button>
 
             {/* Notification Bell (for Series) */}
             {!isMovie && (
@@ -691,33 +850,191 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
         </div>
       </div>
 
-      {/* Movie Franchise Collection Callout */}
+      {/* Movie Franchise Collection Collapsible Dropdown */}
       {isMovie && details.belongsToCollection && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#1c1c1e] to-[#2c2c2e] border border-[rgba(255,255,255,0.08)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold text-[#0a84ff] uppercase tracking-wider">
-              Franchise Collection
-            </span>
-            <h3 className="text-sm font-bold text-white">
-              {details.belongsToCollection.name}
-            </h3>
-            <p className="text-xs text-[#8e8e93]">
-              Track and mark all movies across this entire franchise at once.
-            </p>
+        <div className="rounded-2xl overflow-hidden bg-[#1c1c1e] border border-[rgba(255,255,255,0.08)] shadow-lg transition-all">
+          {/* Accordion Trigger Header */}
+          <div
+            onClick={() => {
+              const nextState = !isCollectionExpanded;
+              setIsCollectionExpanded(nextState);
+              if (nextState && !collectionDetail && details.belongsToCollection) {
+                void fetchCollection(details.belongsToCollection.id);
+              }
+            }}
+            className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-colors"
+          >
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-[#0a84ff] uppercase tracking-wider">
+                  Franchise Collection
+                </span>
+                {collectionDetail && (
+                  <span className="px-2 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-bold border border-[#0a84ff]/30">
+                    {collectionDetail.parts.filter((p) => p.isWatched).length} / {collectionDetail.parts.length} Watched
+                  </span>
+                )}
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                <span>{details.belongsToCollection.name}</span>
+              </h3>
+              <p className="text-xs text-[#8e8e93]">
+                Tap to view all franchise movies and mark all or select titles as watched.
+              </p>
+            </div>
+
+            <div className="p-2 rounded-xl bg-white/5 text-[#8e8e93] hover:text-white transition-colors shrink-0">
+              {isCollectionExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </div>
           </div>
 
-          <button
-            onClick={() => handleMarkCollectionWatched(details.belongsToCollection!.id)}
-            disabled={isMarkingCollection}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all disabled:opacity-50"
-          >
-            {isMarkingCollection ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#32d74b]" />
-            )}
-            <span>Mark whole collection as watched</span>
-          </button>
+          {/* Expanded Dropdown Content */}
+          {isCollectionExpanded && (
+            <div className="border-t border-[rgba(255,255,255,0.06)] p-4 sm:p-5 space-y-4 bg-black/25">
+              {isLoadingCollection ? (
+                <div className="py-8 text-center space-y-2">
+                  <Loader2 className="w-5 h-5 text-[#0a84ff] animate-spin mx-auto" />
+                  <p className="text-xs text-[#8e8e93]">Loading franchise movies...</p>
+                </div>
+              ) : collectionDetail ? (
+                <div className="space-y-3">
+                  {/* Actions Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b border-white/[0.06]">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleToggleSelectAllParts}
+                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-white flex items-center gap-1.5 transition-colors"
+                      >
+                        {selectedPartIds.size === collectionDetail.parts.length ? (
+                          <>
+                            <CheckSquare className="w-3.5 h-3.5 text-[#0a84ff]" />
+                            <span>Deselect All</span>
+                          </>
+                        ) : (
+                          <>
+                            <Square className="w-3.5 h-3.5 text-[#8e8e93]" />
+                            <span>Select All</span>
+                          </>
+                        )}
+                      </button>
+                      <span className="text-xs text-[#8e8e93]">
+                        {selectedPartIds.size} of {collectionDetail.parts.length} selected
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleMarkSelectedCollectionWatched}
+                        disabled={isUpdatingCollectionParts || selectedPartIds.size === 0}
+                        className="px-3 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] disabled:opacity-40 text-white text-xs font-bold flex items-center gap-1.5 transition-all ios-press"
+                      >
+                        {isUpdatingCollectionParts ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Check className="w-3.5 h-3.5" />
+                        )}
+                        <span>Mark Selected Watched</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleMarkEntireCollectionWatched(details.belongsToCollection!.id)}
+                        disabled={isMarkingCollection}
+                        className="px-3 py-1.5 rounded-xl bg-[#32d74b]/15 hover:bg-[#32d74b]/25 border border-[#32d74b]/30 text-[#32d74b] text-xs font-bold flex items-center gap-1.5 transition-all ios-press disabled:opacity-40"
+                      >
+                        {isMarkingCollection ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        )}
+                        <span>Mark All Watched</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Movies List in Franchise */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    {collectionDetail.parts.map((part) => {
+                      const isSelected = selectedPartIds.has(part.id);
+                      const isCurrent = part.id === tmdbId;
+
+                      return (
+                        <div
+                          key={part.id}
+                          onClick={() => handleToggleSelectPart(part.id)}
+                          className={`p-2.5 rounded-xl border flex items-center gap-3 cursor-pointer transition-all ${
+                            isSelected
+                              ? "bg-[#0a84ff]/[0.08] border-[#0a84ff]/40"
+                              : "bg-[#161618] border-white/[0.04] hover:border-white/10"
+                          } ${isCurrent ? "ring-1 ring-[#ffd60a]/40" : ""}`}
+                        >
+                          {/* Checkbox */}
+                          <div className="p-1 text-white shrink-0">
+                            {isSelected ? (
+                              <CheckSquare className="w-4 h-4 text-[#0a84ff]" />
+                            ) : (
+                              <Square className="w-4 h-4 text-[#636366]" />
+                            )}
+                          </div>
+
+                          {/* Thumbnail */}
+                          <div className="relative w-9 h-13 rounded-lg overflow-hidden bg-[#222] shrink-0 border border-white/10">
+                            {part.posterPath ? (
+                              <Image
+                                src={`https://image.tmdb.org/t/p/w92${part.posterPath}`}
+                                alt={part.title}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-[#8e8e93]">
+                                <Film className="w-3.5 h-3.5 opacity-40" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <h4
+                                className="text-xs font-bold text-white truncate"
+                                title={part.title}
+                              >
+                                {part.title}
+                              </h4>
+                              {isCurrent && (
+                                <span className="px-1 py-0.2 rounded bg-[#ffd60a]/20 text-[#ffd60a] text-[9px] font-bold">
+                                  Current
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-[#8e8e93] mt-0.5">
+                              {part.yearRange || "TBA"}
+                            </p>
+                          </div>
+
+                          {/* Status Badge */}
+                          <div className="shrink-0">
+                            {part.isWatched ? (
+                              <span className="px-2 py-0.5 rounded-md bg-[#32d74b]/15 border border-[#32d74b]/30 text-[#32d74b] text-[10px] font-bold flex items-center gap-1">
+                                <Check className="w-3 h-3" />
+                                <span>Watched</span>
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[#8e8e93] text-[10px] font-medium">
+                                Unwatched
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-[#ff453a]">Unable to load franchise collection.</p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -954,6 +1271,114 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 0-10 Rating Modal */}
+      {isRatingModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+        >
+          <div className="w-full max-w-sm rounded-3xl bg-[#1c1c1e] border border-[rgba(255,255,255,0.12)] p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-[#ffd60a] fill-[#ffd60a]" />
+                <h3 className="text-base font-extrabold text-white">Rate Title</h3>
+              </div>
+              <button
+                onClick={() => setIsRatingModalOpen(false)}
+                className="p-1 rounded-full text-[#8e8e93] hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#8e8e93]">
+              Enter a score from <strong className="text-white">0.00 to 10.00</strong> (decimals supported up to 2 places).
+            </p>
+
+            {/* Custom Input */}
+            <div className="space-y-1.5">
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="10"
+                  value={ratingInput}
+                  onChange={(e) => setRatingInput(e.target.value)}
+                  placeholder="e.g. 8.5 or 9.25"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#2c2c2e] border border-white/10 text-white font-bold text-sm focus:outline-none focus:border-[#ffd60a] transition-colors"
+                />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#8e8e93]">
+                  / 10
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Preset Buttons */}
+            <div>
+              <p className="text-[11px] font-semibold text-[#8e8e93] mb-1.5">Quick Presets</p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {[5.0, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setRatingInput(String(preset))}
+                    className="py-1 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-white border border-white/5 transition-colors"
+                  >
+                    {preset.toFixed(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-2 flex items-center justify-between gap-2 border-t border-white/[0.06]">
+              {tracked?.rating !== undefined && tracked?.rating !== null ? (
+                <button
+                  type="button"
+                  onClick={() => handleSaveRating(null)}
+                  disabled={isSavingRating}
+                  className="px-3 py-2 rounded-xl bg-[#ff453a]/15 hover:bg-[#ff453a]/25 text-[#ff453a] text-xs font-semibold transition-colors"
+                >
+                  Clear
+                </button>
+              ) : <div />}
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRatingModalOpen(false)}
+                  className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-[#8e8e93] hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const num = parseFloat(ratingInput);
+                    if (isNaN(num)) {
+                      alert("Please enter a valid number between 0 and 10");
+                      return;
+                    }
+                    if (num < 0 || num > 10) {
+                      alert("Rating must be between 0 and 10");
+                      return;
+                    }
+                    void handleSaveRating(num);
+                  }}
+                  disabled={isSavingRating || !ratingInput.trim()}
+                  className="px-4 py-2 rounded-xl bg-[#ffd60a] hover:bg-[#eac408] text-black text-xs font-bold transition-all shadow-md disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isSavingRating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                  <span>Save Rating</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -58,7 +58,10 @@ export async function POST(req: NextRequest) {
         });
 
         if (item.status === "watched" && item.mediaType === "movie") {
-          await TrackingService.toggleMovieWatched(session.user.id, item.tmdbId);
+          const current = await TrackingService.getTrackedItem(session.user.id, item.tmdbId, "movie");
+          if (current && current.status !== "watched") {
+            await TrackingService.toggleMovieWatched(session.user.id, item.tmdbId);
+          }
         }
 
         added.push(doc);

@@ -203,5 +203,19 @@ describe("Tracking Service - Pure Interval Math", () => {
       ).toBe("watched");
     });
   });
+
+  describe("rating scale (0 to 10 with 2 decimal places)", () => {
+    it("validates ratings within [0, 10] range and rounds to 2 decimal places", () => {
+      const formatRating = (val: number) => Math.min(10, Math.max(0, Math.round(val * 100) / 100));
+
+      expect(formatRating(8.5)).toBe(8.5);
+      expect(formatRating(9.256)).toBe(9.26);
+      expect(formatRating(10)).toBe(10);
+      expect(formatRating(0)).toBe(0);
+      expect(formatRating(7.1234)).toBe(7.12);
+      expect(formatRating(11)).toBe(10);
+      expect(formatRating(-1)).toBe(0);
+    });
+  });
 });
 

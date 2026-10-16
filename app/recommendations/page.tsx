@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Clock,
   ArrowRight,
+  Star,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 
@@ -24,6 +25,7 @@ interface RecommendationItem {
   mediaType: "movie" | "tv";
   title: string;
   reason: string;
+  predictedRating?: number;
   posterPath: string | null;
   yearRange: string;
 }
@@ -250,13 +252,19 @@ export default function RecommendationsPage() {
 
                     {/* Metadata & Reason */}
                     <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                         <span className="px-1.5 py-0.2 rounded bg-black/60 text-[9px] font-bold text-white uppercase border border-white/10">
                           {item.mediaType === "movie" ? "Movie" : "Series"}
                         </span>
                         <span className="text-[10px] text-[#8e8e93]">
                           {item.yearRange || "TBA"}
                         </span>
+                        {item.predictedRating !== undefined && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#ffd60a]/15 border border-[#ffd60a]/30 text-[9px] font-bold text-[#ffd60a]">
+                            <Star className="w-2.5 h-2.5 fill-[#ffd60a]" />
+                            <span>{item.predictedRating}/10 Match</span>
+                          </span>
+                        )}
                       </div>
 
                       <Link

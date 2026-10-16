@@ -69,11 +69,11 @@ export function TopHeader({ unreadCount: initialCount = 0 }: TopHeaderProps) {
     <header className="sticky top-0 z-30 w-full glass-bar border-b border-[rgba(255,255,255,0.08)] pt-safe">
       <div className="flex items-center justify-between h-14 px-4 max-w-7xl mx-auto">
         {/* Mobile Brand / Page Title */}
-        <div className="flex items-center gap-2.5">
-          <div className="md:hidden w-8 h-8 rounded-xl bg-gradient-to-br from-[#0a84ff] to-[#005bb5] flex items-center justify-center shadow-md shadow-[#0a84ff]/20">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="md:hidden w-8 h-8 rounded-xl bg-gradient-to-br from-[#0a84ff] to-[#005bb5] flex items-center justify-center shadow-md shadow-[#0a84ff]/20 shrink-0">
             <Film className="w-4 h-4 text-white" />
           </div>
-          <h2 className="text-lg font-bold tracking-tight text-white md:hidden">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-white md:hidden truncate">
             {getPageTitle()}
           </h2>
           <span className="hidden md:inline-block text-xs font-medium text-[#8e8e93]">
@@ -82,17 +82,17 @@ export function TopHeader({ unreadCount: initialCount = 0 }: TopHeaderProps) {
         </div>
 
         {/* Right Actions: User Profile badge & Notifications Bell with Hover Tooltip */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {user && (
             <Link
               href="/profile"
-              className="flex items-center gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.12)] border border-[rgba(255,255,255,0.08)] transition-all ios-press text-xs font-semibold text-white max-w-[140px] sm:max-w-[180px] truncate"
+              className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.12)] border border-[rgba(255,255,255,0.08)] transition-all ios-press text-xs font-semibold text-white max-w-[160px]"
               title={user.username ? `@${user.username}` : user.email}
             >
-              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#0a84ff] to-[#5856d6] flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+              <div className="w-6 h-6 sm:w-5 sm:h-5 rounded-full bg-gradient-to-tr from-[#0a84ff] to-[#5856d6] flex items-center justify-center text-[11px] sm:text-[10px] font-bold text-white shrink-0">
                 {(user.username || user.email || "U").charAt(0).toUpperCase()}
               </div>
-              <span className="truncate">{user.username || user.email.split("@")[0]}</span>
+              <span className="hidden sm:inline truncate">{user.username || user.email.split("@")[0]}</span>
             </Link>
           )}
 

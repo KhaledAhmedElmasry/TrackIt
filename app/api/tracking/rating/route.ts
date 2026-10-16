@@ -7,12 +7,17 @@ import { UnauthorizedError } from "@/lib/errors/app-error";
 const RatingSchema = z.object({
   tmdbId: z.number().int().positive(),
   mediaType: z.enum(["movie", "tv"]),
-  rating: z.number().int().min(1).max(5).nullable(),
+  rating: z
+    .number()
+    .min(0, "Rating cannot be less than 0")
+    .max(10, "Rating cannot exceed 10")
+    .transform((val) => Math.round(val * 100) / 100)
+    .nullable(),
 });
 
 /**
  * POST /api/tracking/rating
- * Sets or clears a 1-5 star rating.
+ * Sets or clears a 0-10 rating (up to 2 decimal places).
  */
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: parsed.rating ? `Rating set to ${parsed.rating} stars` : "Rating cleared",
+      message: parsed.rating !== null ? `Rating set to ${parsed.rating}/10` : "Rating cleared",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

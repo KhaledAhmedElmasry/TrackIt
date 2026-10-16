@@ -59,10 +59,11 @@ export class AuthService {
   static async signup(params: {
     email: string;
     password: string;
+    username?: string;
     ip?: string;
     userAgent?: string;
   }): Promise<SignupResult> {
-    const { email, password, ip = "127.0.0.1", userAgent } = params;
+    const { email, password, username, ip = "127.0.0.1", userAgent } = params;
     const normalizedEmail = email.trim().toLowerCase();
 
     // 1. Rate limit signup attempts (max 5 per IP per hour)
@@ -90,6 +91,7 @@ export class AuthService {
     // 4. Save user document
     const userDoc: UserDocument = {
       email: normalizedEmail,
+      username: username?.trim() || undefined,
       passwordHash,
       isVerified: false,
       verificationTokenHash,

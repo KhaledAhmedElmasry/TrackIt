@@ -20,6 +20,7 @@ export interface AiRecommendationItem {
   mediaType: MediaType;
   title: string;
   reason: string;
+  predictedRating?: number; // Predicted likeness rating from 0.00 to 10.00
   posterPath: string | null;
   yearRange: string;
 }
@@ -93,39 +94,55 @@ export class GeminiService {
       );
     }
 
-    // Prepare compact summary of user tastes (strictly no personal information)
+    // Prepare compact summary of user tastes and habits (strictly no personal information)
     const trackedIdsSet = new Set(library.map((item) => `${item.mediaType}:${item.tmdbId}`));
+
+    const totalMovies = library.filter((i) => i.mediaType === "movie" && i.status === "watched").length;
+    const totalTv = library.filter((i) => i.mediaType === "tv").length;
+    const ratedItems = library.filter((i) => typeof i.rating === "number" && i.rating > 0);
+    const avgRating = ratedItems.length > 0
+      ? (ratedItems.reduce((acc, curr) => acc + (curr.rating || 0), 0) / ratedItems.length).toFixed(2)
+      : "N/A";
+
+    const userHabits = {
+      watchedMoviesCount: totalMovies,
+      trackedSeriesCount: totalTv,
+      userAverageRatingScale0to10: avgRating,
+      primaryFormatPreference: totalMovies > totalTv ? "movies" : "tv series",
+    };
 
     const compactProfile = watchedOrRated.slice(0, 30).map((item) => ({
       tmdbId: item.tmdbId,
       mediaType: item.mediaType,
       title: item.minimalSnapshot?.title || `Title ${item.tmdbId}`,
       status: item.status,
-      rating: item.rating || "unrated",
+      rating: item.rating !== undefined && item.rating !== null ? `${item.rating}/10` : "unrated",
     }));
 
-    const systemPrompt = `You are a film and television recommendation engine.
-Analyze the user's viewing history and ratings below.
-Recommend 6 to 10 outstanding movies and TV series tailored to their taste.
+    const systemPrompt = `You are an expert film and television recommendation engine.
+Analyze the user's viewing history, 0-10 decimal ratings, and watch habits below.
+Recommend 6 to 10 outstanding movies and TV series tailored precisely to their likeness and taste.
 
 CRITICAL RULES:
 1. NEVER recommend any title that is already in the user's list (do NOT recommend any tmdbId listed below).
 2. ONLY recommend real movies and TV series with accurate TMDB (The Movie Database) integer IDs.
-3. Provide a concise, 1-sentence reason for each recommendation explaining why the user will enjoy it based on their tastes.
-4. Output MUST be valid JSON adhering strictly to this schema:
+3. Compute an expected predicted rating from 0.00 to 10.00 (e.g. 8.75 or 9.40) reflecting how much this user will like the title based on their watch habits and previous ratings.
+4. Provide a concise, 1-sentence reason for each recommendation explicitly connecting it to their likeness and habits (e.g. "Given your 9.5/10 rating on X and preference for thrillers, this delivers...").
+5. Output MUST be valid JSON adhering strictly to this schema:
 {
   "recommendations": [
     {
       "tmdbId": 12345,
-      "mediaType": "movie" | "tv",
+      "mediaType": "movie",
       "title": "Exact Title",
-      "reason": "Because you enjoyed X and Y, this offers similar..."
+      "predictedRating": 9.25,
+      "reason": "Because you rated X 9.5/10 and frequently watch sci-fi thrillers, this matches your taste..."
     }
   ]
 }
 Do NOT include markdown formatting or backticks around the JSON.`;
 
-    const userPrompt = `User viewing history and ratings:\n${JSON.stringify(compactProfile, null, 2)}`;
+    const userPrompt = `User Watch Habits:\n${JSON.stringify(userHabits, null, 2)}\n\nUser Viewing History and 0-10 Ratings:\n${JSON.stringify(compactProfile, null, 2)}`;
 
     // Call Gemini Free Tier REST endpoint with automatic candidate fallback
     let rawResponseText = "";
@@ -188,6 +205,7 @@ Do NOT include markdown formatting or backticks around the JSON.`;
         tmdbId: number;
         mediaType: "movie" | "tv";
         title: string;
+        predictedRating?: number;
         reason: string;
       }>;
     } = {};
@@ -225,7 +243,11 @@ Do NOT include markdown formatting or backticks around the JSON.`;
             tmdbId: tmdbData.id,
             mediaType: tmdbData.mediaType,
             title: tmdbData.title,
-            reason: rec.reason || "Recommended based on your recent viewing history.",
+            reason: rec.reason || "Recommended based on your recent viewing history and habits.",
+            predictedRating:
+              typeof rec.predictedRating === "number" && !isNaN(rec.predictedRating)
+                ? Math.min(10, Math.max(0, Math.round(rec.predictedRating * 100) / 100))
+                : undefined,
             posterPath: tmdbData.posterPath,
             yearRange: tmdbData.yearRange,
           });

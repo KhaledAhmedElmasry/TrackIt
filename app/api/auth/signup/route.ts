@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     const result = await AuthService.signup({
       email: validated.email,
       password: validated.password,
+      username: validated.username,
       ip,
       userAgent,
     });

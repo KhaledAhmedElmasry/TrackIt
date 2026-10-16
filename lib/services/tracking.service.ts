@@ -332,7 +332,7 @@ export class TrackingService {
   }
 
   /**
-   * Sets or clears a 1-5 star rating.
+   * Sets or clears a 0-10 rating (up to 2 decimal places).
    */
   static async setRating(
     userId: string | ObjectId,
@@ -340,17 +340,18 @@ export class TrackingService {
     mediaType: MediaType,
     rating: number | null
   ): Promise<void> {
-    if (rating !== null && (rating < 1 || rating > 5)) {
-      throw new ValidationError("Rating must be an integer between 1 and 5 stars");
+    if (rating !== null && (rating < 0 || rating > 10)) {
+      throw new ValidationError("Rating must be a number between 0 and 10");
     }
 
+    const cleanRating = rating !== null ? Math.round(rating * 100) / 100 : null;
     const userObjectId = typeof userId === "string" ? new ObjectId(userId) : userId;
     const db = await getDb();
 
     await db.collection("tracked_items").updateOne(
       { userId: userObjectId, tmdbId, mediaType },
       {
-        $set: { rating, updatedAt: new Date() },
+        $set: { rating: cleanRating, updatedAt: new Date() },
       }
     );
   }

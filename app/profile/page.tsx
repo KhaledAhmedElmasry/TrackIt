@@ -388,7 +388,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in max-w-4xl mx-auto pb-12">
+    <div className="space-y-8 animate-in fade-in max-w-4xl mx-auto pb-32">
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
