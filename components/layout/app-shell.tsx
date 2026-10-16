@@ -33,19 +33,27 @@ export function AppShell({ children, unreadNotificationsCount = 0 }: AppShellPro
         <FirstRunSetupModal />
         <div className="min-h-screen bg-black text-[#f5f5f7] flex flex-col md:flex-row antialiased selection:bg-[#0a84ff]/30">
           {/* PC / Desktop Sidebar */}
-          <Sidebar />
+          <React.Suspense fallback={<div className="hidden md:block w-64 bg-[#141416]" />}>
+            <Sidebar />
+          </React.Suspense>
 
           {/* Content Area with Top Header and Safe Area padding */}
           <div className="flex-1 flex flex-col md:pl-64 min-w-0 transition-all">
-            <TopHeader unreadCount={unreadNotificationsCount} />
+            <React.Suspense fallback={<div className="h-14 glass-bar" />}>
+              <TopHeader unreadCount={unreadNotificationsCount} />
+            </React.Suspense>
 
             <main className="flex-1 px-4 py-6 md:px-8 md:py-8 max-w-7xl w-full mx-auto pb-24 md:pb-8">
               <UnverifiedBanner />
-              {children}
+              <React.Suspense fallback={<div className="p-8 text-center text-xs text-[#8e8e93]">Loading...</div>}>
+                {children}
+              </React.Suspense>
             </main>
 
             {/* Phone Bottom Tab Bar */}
-            <BottomNav />
+            <React.Suspense fallback={<div className="h-16 md:hidden glass-bar" />}>
+              <BottomNav />
+            </React.Suspense>
           </div>
         </div>
       </OfflineProvider>

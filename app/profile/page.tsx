@@ -29,6 +29,10 @@ import {
   RefreshCw,
   Sparkles,
   ShieldCheck,
+  Download,
+  Upload,
+  Send,
+  FileJson,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 
@@ -63,6 +67,71 @@ export default function ProfilePage() {
   const [deletePassword, setDeletePassword] = useState("");
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Test Push & Data Management State
+  const [isSendingTestPush, setIsSendingTestPush] = useState(false);
+  const [testPushFeedback, setTestPushFeedback] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  const handleSendTestPush = async () => {
+    setIsSendingTestPush(true);
+    setTestPushFeedback(null);
+    try {
+      const res = await fetch("/api/notifications/test-push", { method: "POST" });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setTestPushFeedback("Test notification dispatched to your device!");
+      } else {
+        alert(json.error || "Failed to send test push");
+      }
+    } catch {
+      alert("Failed to send test push");
+    } finally {
+      setIsSendingTestPush(false);
+    }
+  };
+
+  const handleExportData = () => {
+    const anchor = document.createElement("a");
+    anchor.href = "/api/user/export";
+    anchor.download = "watchtrack-export.json";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    setImportStatus(null);
+    setImportError(null);
+
+    try {
+      const text = await file.text();
+      const payload = JSON.parse(text);
+      const res = await fetch("/api/user/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setImportStatus(json.message);
+      } else {
+        setImportError(json.error || "Failed to import file");
+      }
+    } catch (err) {
+      setImportError((err as Error).message || "Invalid JSON backup file");
+    } finally {
+      setIsImporting(false);
+      e.target.value = "";
+    }
+  };
 
   const fetchKeys = useCallback(async () => {
     try {
@@ -464,15 +533,37 @@ export default function ProfilePage() {
             </button>
           </div>
 
-          <a
-            href={`https://ntfy.sh/${user.ntfyTopic}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0a84ff] hover:underline pt-1"
-          >
-            <span>Open topic on ntfy.sh</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          <div className="pt-2 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap items-center justify-between gap-3">
+            <a
+              href={`https://ntfy.sh/${user.ntfyTopic}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0a84ff] hover:underline"
+            >
+              <span>Open topic on ntfy.sh</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+
+            <button
+              type="button"
+              onClick={handleSendTestPush}
+              disabled={isSendingTestPush}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#ffd60a]/15 hover:bg-[#ffd60a]/25 border border-[#ffd60a]/30 text-[#ffd60a] text-xs font-bold transition-all ios-press disabled:opacity-50"
+            >
+              {isSendingTestPush ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              <span>Send Test Notification</span>
+            </button>
+          </div>
+
+          {testPushFeedback && (
+            <p className="text-[11px] text-[#32d74b] font-semibold pt-1">
+              {testPushFeedback}
+            </p>
+          )}
         </div>
       </section>
 
@@ -488,6 +579,64 @@ export default function ProfilePage() {
           <p className="text-xs text-[#8e8e93] leading-relaxed">
             Your 10 one-time recovery codes generated at signup remain active until used. They allow you to reset your password instantly at any time, even if you cannot access your email.
           </p>
+        </div>
+      </section>
+
+      {/* Data Management Section (Phase 6) */}
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <FileJson className="w-5 h-5 text-[#0a84ff]" />
+          <h2 className="text-base font-bold text-white">Data Management</h2>
+        </div>
+
+        <div className="ios-card p-5 space-y-4">
+          <div>
+            <h3 className="text-xs font-semibold text-white">Export & Import Your Watchlist</h3>
+            <p className="text-xs text-[#8e8e93] mt-0.5 leading-relaxed">
+              Your library belongs to you. Export your entire tracked watchlist, ratings, and episode progress as an offline JSON backup, or import to restore or migrate data.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            {/* Export Button */}
+            <button
+              type="button"
+              onClick={handleExportData}
+              className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press flex items-center gap-2 shadow-md shadow-[#0a84ff]/20"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Library (JSON)</span>
+            </button>
+
+            {/* Import Button */}
+            <label className="px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-bold transition-all ios-press flex items-center gap-2 cursor-pointer border border-white/10">
+              {isImporting ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0a84ff]" />
+              ) : (
+                <Upload className="w-3.5 h-3.5" />
+              )}
+              <span>{isImporting ? "Importing..." : "Import Library (JSON)"}</span>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImportFile}
+                disabled={isImporting}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {importStatus && (
+            <div className="p-3 rounded-xl bg-[#32d74b]/15 border border-[#32d74b]/30 text-xs text-[#32d74b] font-semibold">
+              {importStatus}
+            </div>
+          )}
+
+          {importError && (
+            <div className="p-3 rounded-xl bg-[#ff453a]/15 border border-[#ff453a]/30 text-xs text-[#ff453a] font-semibold">
+              {importError}
+            </div>
+          )}
         </div>
       </section>
 

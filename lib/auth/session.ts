@@ -80,38 +80,43 @@ export async function getSessionContext(tokenOverride?: string): Promise<Session
     return null;
   }
 
-  const tokenHash = hashToken(token);
-  const db = await getDb();
+  try {
+    const tokenHash = hashToken(token);
+    const db = await getDb();
 
-  const session = await db.collection("sessions").findOne({
-    sessionTokenHash: tokenHash,
-    expiresAt: { $gt: new Date() },
-  });
+    const session = await db.collection("sessions").findOne({
+      sessionTokenHash: tokenHash,
+      expiresAt: { $gt: new Date() },
+    });
 
-  if (!session) {
+    if (!session) {
+      return null;
+    }
+
+    const user = await db.collection("users").findOne<UserDocument>({
+      _id: session.userId,
+    });
+
+    if (!user || !user._id) {
+      return null;
+    }
+
+    return {
+      user: {
+        id: user._id.toHexString(),
+        email: user.email,
+        isVerified: user.isVerified,
+        ntfyTopic: user.ntfyTopic,
+        hasTmdbKey: Boolean(user.keys?.tmdb?.encrypted),
+        hasGeminiKey: Boolean(user.keys?.gemini?.encrypted),
+        createdAt: user.createdAt,
+      },
+      sessionId: session._id ? session._id.toHexString() : "",
+    };
+  } catch (err) {
+    console.warn("Session check bypassed (database unconfigured or unreachable):", err instanceof Error ? err.message : err);
     return null;
   }
-
-  const user = await db.collection("users").findOne<UserDocument>({
-    _id: session.userId,
-  });
-
-  if (!user || !user._id) {
-    return null;
-  }
-
-  return {
-    user: {
-      id: user._id.toHexString(),
-      email: user.email,
-      isVerified: user.isVerified,
-      ntfyTopic: user.ntfyTopic,
-      hasTmdbKey: Boolean(user.keys?.tmdb?.encrypted),
-      hasGeminiKey: Boolean(user.keys?.gemini?.encrypted),
-      createdAt: user.createdAt,
-    },
-    sessionId: session._id ? session._id.toHexString() : "",
-  };
 }
 
 /**

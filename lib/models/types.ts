@@ -49,6 +49,7 @@ export interface UserDocument {
     barkKey?: string;
   };
   ntfyTopic: string; // Long random unguessable topic generated per user
+  barkKey?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,10 +65,13 @@ export interface SeasonWatchRange {
 }
 
 export interface MinimalSnapshot {
+  tmdbId?: number;
+  mediaType?: MediaType;
   title: string;
   posterPath: string | null;
-  startYear: number | null;
-  endYear: number | null;
+  startYear?: number | null;
+  endYear?: number | null;
+  yearRange?: string;
   totalSeasons?: number;
 }
 
@@ -75,6 +79,8 @@ export interface LastSeenAiredEpisode {
   seasonNumber: number;
   episodeNumber: number;
   airDate?: string;
+  season?: number;
+  episode?: number;
 }
 
 export interface TrackedItemDocument {
@@ -124,16 +130,20 @@ export interface MetadataCacheDocument {
 export interface NotificationDocument {
   _id?: ObjectId;
   userId: ObjectId;
-  tmdbId: number;
-  mediaType: MediaType;
+  tmdbId?: number;
+  mediaType?: MediaType;
   title: string;
-  seasonNumber: number;
-  episodeNumber: number;
+  message?: string;
+  link?: string | null;
+  type?: "new_episode" | "system";
+  seasonNumber?: number;
+  episodeNumber?: number;
   episodeName?: string;
-  airDate: string;
-  isRead: boolean;
+  airDate?: string;
+  isRead?: boolean;
+  read?: boolean;
   readAt?: Date | null;
-  expiresAt: Date; // MongoDB TTL index (cleans up after 30 days)
+  expiresAt?: Date;
   createdAt: Date;
 }
 

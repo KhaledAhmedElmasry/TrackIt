@@ -1,0 +1,57 @@
+name: Weekly Encrypted Database Backup
+
+on:
+  schedule:
+    # Runs at 03:00 UTC every Sunday
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: backup-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backup:
+    name: MongoDB Atlas Encrypted Backup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install MongoDB Database Tools (mongodump)
+        run: |
+          wget -q https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.9.4.deb
+          sudo dpkg -i mongodb-database-tools-ubuntu2204-x86_64-100.9.4.deb
+          rm mongodb-database-tools-ubuntu2204-x86_64-100.9.4.deb
+
+      - name: Create Compressed Database Dump
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: |
+          if [ -z "$MONGODB_URI" ]; then
+            echo "MONGODB_URI secret not configured. Skipping dump."
+            exit 1
+          fi
+          mongodump --uri="$MONGODB_URI" --archive=backup_raw.archive --gzip
+
+      - name: Encrypt Database Dump with AES-256-CBC
+        env:
+          MASTER_KEY: ${{ secrets.MASTER_ENCRYPTION_KEY }}
+        run: |
+          if [ -z "$MASTER_KEY" ]; then
+            echo "MASTER_ENCRYPTION_KEY secret not configured. Skipping encryption."
+            exit 1
+          fi
+          openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 \
+            -in backup_raw.archive \
+            -out watchtrack_backup_$(date +%Y%m%d).enc \
+            -k "$MASTER_KEY"
+          rm backup_raw.archive
+
+      - name: Upload Encrypted Artifact (90 Days Retention)
+        uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-database-backup
+          path: watchtrack_backup_*.enc
+          retention-days: 90

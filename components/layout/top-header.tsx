@@ -9,16 +9,50 @@
  * - Accessible touch targets and focus indicators.
  */
 
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Bell, Film } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/auth/auth-context";
 
 interface TopHeaderProps {
   unreadCount?: number;
 }
 
-export function TopHeader({ unreadCount = 0 }: TopHeaderProps) {
+export function TopHeader({ unreadCount: initialCount = 0 }: TopHeaderProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const [fetchedCount, setFetchedCount] = useState(0);
+
+  const fetchUnread = useCallback(async () => {
+    if (!user) {
+      setFetchedCount(0);
+      return;
+    }
+    try {
+      const res = await fetch("/api/notifications");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setFetchedCount(json.data.unreadCount || 0);
+        }
+      }
+    } catch {
+      // Ignore background notification fetch errors
+    }
+  }, [user]);
+
+  useEffect(() => {
+    let mounted = true;
+    queueMicrotask(() => {
+      if (mounted) void fetchUnread();
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [fetchUnread, pathname]);
+
+  const unreadCount = initialCount > 0 ? initialCount : fetchedCount;
 
   // Determine dynamic title for mobile view based on current path
   const getPageTitle = () => {
@@ -70,4 +104,3 @@ export function TopHeader({ unreadCount = 0 }: TopHeaderProps) {
     </header>
   );
 }
-

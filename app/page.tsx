@@ -1,16 +1,7 @@
-/**
- * WatchTrack Home Dashboard
- *
- * Implements Apple iOS style:
- * - Large title styling with crisp contrast.
- * - Translucent rounded cards and quick navigation buttons.
- * - "Continue Watching" row preview.
- * - Free-tier stack status indicators and PWA install guide.
- */
+"use client";
 
 import Link from "next/link";
 import {
-  Film,
   Search,
   Sparkles,
   Layers,
@@ -19,61 +10,37 @@ import {
   Smartphone,
   Server,
   ArrowRight,
-  PlayCircle,
+  ExternalLink,
 } from "lucide-react";
+import { useAuth } from "@/components/auth/auth-context";
+import { ContinueWatchingRow } from "@/components/home/continue-watching-row";
 
 export default function HomePage() {
+  const { user } = useAuth();
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-8 pb-16 animate-in fade-in duration-300">
       {/* iOS Large Title Header */}
       <div className="space-y-1">
         <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#0a84ff]/15 border border-[#0a84ff]/30 text-[#0a84ff] text-xs font-semibold">
-          <span>Phase 1 Verified</span>
+          <span>Private & Encrypted</span>
           <span className="w-1.5 h-1.5 rounded-full bg-[#32d74b]" />
-          <span>App Shell Active</span>
+          <span>Active</span>
         </div>
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
           WatchTrack
         </h1>
         <p className="text-sm md:text-base text-[#8e8e93]">
-          Your private, encrypted movie and TV series tracker.
+          Your private, self-hosted movie and TV series tracker.
         </p>
       </div>
 
-      {/* Continue Watching Section (Phase 1 preview) */}
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <PlayCircle className="w-5 h-5 text-[#0a84ff]" />
-            <h2 className="text-lg font-bold text-white tracking-tight">Continue Watching</h2>
-          </div>
-          <span className="text-xs text-[#8e8e93]">Next unwatched episodes</span>
-        </div>
-
-        {/* Empty state placeholder styled like iOS card */}
-        <div className="ios-card p-6 flex flex-col items-center justify-center text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center text-[#8e8e93]">
-            <Film className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-white">No active series yet</p>
-            <p className="text-xs text-[#8e8e93] max-w-sm mt-0.5">
-              Once you add series to your watchlist, your next unwatched episode will appear here for instant one-tap tracking.
-            </p>
-          </div>
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-semibold ios-press hover:bg-[#0071e3] transition-colors"
-          >
-            <Search className="w-3.5 h-3.5" />
-            <span>Search titles to track</span>
-          </Link>
-        </div>
-      </section>
+      {/* Dynamic Continue Watching Row */}
+      <ContinueWatchingRow />
 
       {/* Quick Navigation Cards */}
       <section className="space-y-3">
-        <h2 className="text-lg font-bold text-white tracking-tight">Quick Access</h2>
+        <h2 className="text-lg font-bold text-white tracking-tight">Explore</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
           <Link
             href="/search"
@@ -142,7 +109,7 @@ export default function HomePage() {
                 <span>MongoDB Atlas M0</span>
               </div>
               <p className="text-[11px] text-[#8e8e93]">
-                512 MB free tier, singleton pool, compact season ranges.
+                512 MB free tier, singleton connection pool, compact season ranges.
               </p>
             </div>
 
@@ -171,18 +138,40 @@ export default function HomePage() {
             <div className="flex items-center gap-2">
               <Key className="w-4 h-4 text-[#8e8e93]" />
               <span className="text-xs text-[#8e8e93]">
-                To track titles, add your free TMDB API key in settings.
+                {user?.hasTmdbKey
+                  ? "TMDB API key connected. Your search and tracking are active."
+                  : "To search titles, add your free TMDB API key in settings."}
               </span>
             </div>
             <Link
               href="/profile"
               className="text-xs font-semibold text-[#0a84ff] hover:underline inline-flex items-center gap-1"
             >
-              Configure Keys <ArrowRight className="w-3.5 h-3.5" />
+              {user?.hasTmdbKey ? "Settings" : "Configure Keys"} <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
       </section>
+
+      {/* TMDB Required Attribution */}
+      <footer className="pt-6 border-t border-white/[0.04] text-center space-y-2">
+        <div className="flex items-center justify-center gap-2 text-xs text-[#8e8e93]">
+          <span className="px-1.5 py-0.5 rounded bg-[#01b4e4] text-black font-extrabold text-[10px] tracking-wider">
+            TMDB
+          </span>
+          <p className="text-[11px]">
+            This product uses the TMDB API but is not endorsed or certified by TMDB.
+          </p>
+          <a
+            href="https://www.themoviedb.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#8e8e93] hover:text-white inline-flex items-center"
+          >
+            <ExternalLink className="w-3 h-3 ml-0.5" />
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
