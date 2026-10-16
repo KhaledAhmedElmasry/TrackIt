@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, connection } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
 import { KeyService } from "@/lib/services/key.service";
@@ -21,6 +21,7 @@ export const maxDuration = 60; // Up to 60 seconds where supported
  * Protected by CRON_SECRET bearer token.
  */
 export async function GET(req: NextRequest) {
+  await connection();
   try {
     // Verify Cron Secret
     const authHeader = req.headers.get("authorization");

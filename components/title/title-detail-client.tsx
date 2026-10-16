@@ -952,3 +952,4 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
     </div>
   );
 }
+
