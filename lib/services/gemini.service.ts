@@ -29,7 +29,12 @@ export interface RecommendationResult {
   generatedAt: Date;
 }
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const CANDIDATE_GEMINI_MODELS = [
+  "gemini-3.5-flash-lite",
+  "gemini-3.8-flash",
+  "gemini-flash-latest",
+  "gemini-2.5-flash-lite",
+];
 const RECOMMENDATION_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes cooldown
 
 export class GeminiService {
@@ -123,42 +128,56 @@ Do NOT include markdown formatting or backticks around the JSON.`;
 
     const userPrompt = `User viewing history and ratings:\n${JSON.stringify(compactProfile, null, 2)}`;
 
-    // Call Gemini Free Tier REST endpoint
+    // Call Gemini Free Tier REST endpoint with automatic candidate fallback
     let rawResponseText = "";
-    try {
-      const geminiRes = await fetch(`${GEMINI_API_URL}?key=${geminiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
+    let lastError: Error | null = null;
+
+    for (const modelName of CANDIDATE_GEMINI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`;
+        const geminiRes = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.4,
+              responseMimeType: "application/json",
             },
-          ],
-          generationConfig: {
-            temperature: 0.4,
-            responseMimeType: "application/json",
-          },
-        }),
-      });
+          }),
+        });
 
-      if (!geminiRes.ok) {
-        const errorJson = await geminiRes.json().catch(() => null);
-        const errMsg = errorJson?.error?.message || `Gemini request failed (${geminiRes.status})`;
-        throw new ExternalServiceError(`Gemini AI Error: ${errMsg}`);
+        if (!geminiRes.ok) {
+          const errorJson = await geminiRes.json().catch(() => null);
+          const errMsg = errorJson?.error?.message || `Gemini request failed (${geminiRes.status})`;
+          if (geminiRes.status === 404 || geminiRes.status === 503) {
+            lastError = new ExternalServiceError(`Gemini AI (${modelName}): ${errMsg}`);
+            continue;
+          }
+          throw new ExternalServiceError(`Gemini AI Error: ${errMsg}`);
+        }
+
+        const geminiJson = await geminiRes.json();
+        rawResponseText =
+          geminiJson.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+        lastError = null;
+        break;
+      } catch (err) {
+        if (err instanceof ExternalServiceError && (err.message.includes("404") || err.message.includes("503"))) {
+          lastError = err;
+          continue;
+        }
+        throw err;
       }
+    }
 
-      const geminiJson = await geminiRes.json();
-      rawResponseText =
-        geminiJson.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-    } catch (err) {
-      if (err instanceof ExternalServiceError) throw err;
-      throw new ExternalServiceError(
-        `Failed to communicate with Google Gemini API: ${
-          err instanceof Error ? err.message : String(err)
-        }`
-      );
+    if (!rawResponseText && lastError) {
+      throw lastError;
     }
 
     // Parse structured JSON
