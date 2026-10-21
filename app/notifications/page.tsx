@@ -256,7 +256,7 @@ export default function NotificationsPage() {
           <button
             onClick={handleMarkAllRead}
             disabled={isMarkingAll}
-            className="px-3.5 py-1.5 rounded-full bg-[#1f1424] hover:bg-[#2c1b33] border border-plum-line text-xs font-semibold text-[#4fd27f] flex items-center gap-1.5 transition-all disabled:opacity-50"
+            className="btn-quiet px-3.5 py-1.5 rounded-full bg-[#1f1424] hover:bg-[#2c1b33] border border-plum-line text-xs font-semibold text-[#4fd27f] flex items-center gap-1.5 transition-all disabled:opacity-50"
           >
             {isMarkingAll ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -281,7 +281,7 @@ export default function NotificationsPage() {
             <button
               onClick={handleSendTestPush}
               disabled={isSendingTest}
-              className="px-3 py-1.5 rounded-xl bg-transparent hover:bg-green hover:text-ink border border-green text-green text-xs font-bold transition-all ios-press flex items-center gap-1.5 disabled:opacity-40"
+              className="btn-outline px-3 py-1.5 rounded-xl bg-transparent hover:bg-green hover:text-ink border border-green text-green text-xs font-bold transition-all ios-press flex items-center gap-1.5 disabled:opacity-40"
             >
               {isSendingTest ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
               <span>Test Push</span>
@@ -318,7 +318,7 @@ export default function NotificationsPage() {
                 <button
                   onClick={handleSaveBark}
                   disabled={isSavingBark || !barkKeyInput.trim() || barkKeyInput.trim() === user.barkKey}
-                  className="px-3 py-1.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold shrink-0 transition-all disabled:opacity-40"
+                  className="btn-primary px-3 py-1.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold shrink-0 transition-all disabled:opacity-40"
                 >
                   {isSavingBark ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save"}
                 </button>
@@ -326,7 +326,7 @@ export default function NotificationsPage() {
                   <button
                     onClick={handleDeleteBark}
                     disabled={isSavingBark}
-                    className="p-1.5 rounded-xl bg-[#ff8a80]/15 text-[#ff8a80] hover:bg-[#ff8a80]/25 transition-colors shrink-0"
+                    className="btn-danger p-1.5 rounded-xl bg-[#ff8a80]/15 text-[#ff8a80] hover:bg-[#ff8a80]/25 transition-colors shrink-0"
                     title="Remove Bark key"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -386,7 +386,7 @@ export default function NotificationsPage() {
               <button
                 type="button"
                 onClick={() => setSelectedIds(allSelected ? new Set() : new Set(notifications.map((n) => n._id)))}
-                className="h-10 px-4 rounded-full border border-plum-line text-[13px] font-semibold hover:border-lilac hover:bg-plum transition-colors"
+                className="btn-quiet h-10 px-4 rounded-full border border-plum-line text-[13px] font-semibold hover:border-lilac hover:bg-plum transition-colors"
               >
                 {allSelected ? "Deselect all" : "Select all"}
               </button>
@@ -414,7 +414,7 @@ export default function NotificationsPage() {
             <button
               type="button"
               onClick={() => setIsSelecting(true)}
-              className="h-10 px-4 rounded-full border border-plum-line text-[13px] font-semibold flex items-center gap-1.5 hover:border-lilac hover:bg-plum transition-colors"
+              className="btn-quiet h-10 px-4 rounded-full border border-plum-line text-[13px] font-semibold flex items-center gap-1.5 hover:border-lilac hover:bg-plum transition-colors"
             >
               <CheckSquare className="w-4 h-4" />
               Select

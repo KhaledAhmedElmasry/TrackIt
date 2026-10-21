@@ -14,6 +14,7 @@
   --lilac: #b48cc0;
   --green: #4fd27f;
   --green-hover: #3fbf6d;
+  --green-light: #6fe196;
   --cream: #f2ece4;
   --smoke: #b7a9bc;
   --dim: #8a7c90;
@@ -77,16 +78,74 @@ select:disabled {
   cursor: not-allowed;
 }
 
-/* Hover feedback: every enabled button brightens; explicit hover colours still apply on top */
-button:not(:disabled),
-a.ios-press {
-  transition: filter 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease,
-    transform 0.12s ease;
+/*
+ * Button states. Each variant gets a clearly different hover (colour shift plus
+ * ring or fill, not just brightness), a pressed state and a smooth transition.
+ * These sit outside Tailwind's layers, so they win over per-element hover: classes
+ * and every button of a kind behaves the same everywhere.
+ */
+button,
+a.btn-primary,
+a.btn-outline,
+a.btn-quiet {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.12s ease, filter 0.15s ease;
 }
 
-button:not(:disabled):hover,
-a.ios-press:hover {
-  filter: brightness(1.12);
+/* Solid green: lighter fill and a soft green ring */
+.btn-primary:not(:disabled):hover {
+  background-color: var(--green-light);
+  box-shadow: 0 0 0 4px rgb(79 210 127 / 0.22), 0 8px 20px rgb(0 0 0 / 0.35);
+  transform: translateY(-1px);
+}
+
+/* Ink button on a green surface (Up next): lifts to plum with a green ring */
+.btn-ink:not(:disabled):hover {
+  background-color: var(--plum);
+  box-shadow: 0 0 0 3px rgb(11 9 12 / 0.35), 0 8px 20px rgb(0 0 0 / 0.3);
+  transform: translateY(-1px);
+}
+
+/* Green outline: fills in */
+.btn-outline:not(:disabled):hover {
+  background-color: var(--green);
+  border-color: var(--green);
+  color: var(--ink);
+}
+
+/* Tinted green chip-buttons: stronger tint and border */
+.btn-tint:not(:disabled):hover {
+  background-color: rgb(79 210 127 / 0.3);
+  border-color: var(--green);
+  color: var(--green-light);
+}
+
+/* Quiet bordered buttons: raised plum background and lilac border */
+.btn-quiet:not(:disabled):hover {
+  background-color: var(--plum-raised);
+  border-color: var(--lilac);
+  color: var(--cream);
+}
+
+/* Destructive: coral tint */
+.btn-danger:not(:disabled):hover {
+  background-color: rgb(255 138 128 / 0.16);
+  color: var(--danger);
+}
+
+.btn-primary:not(:disabled):active,
+.btn-ink:not(:disabled):active,
+.btn-outline:not(:disabled):active,
+.btn-tint:not(:disabled):active,
+.btn-quiet:not(:disabled):active,
+.btn-danger:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+/* Any other button (icon buttons, tabs, toggles) still gets a visible lift in brightness */
+button:not(:disabled):not(.btn-primary):not(.btn-ink):not(.btn-outline):not(.btn-tint):not(.btn-quiet):not(.btn-danger):hover {
+  filter: brightness(1.25);
 }
 
 /* Interactive cards lift and light up on hover */

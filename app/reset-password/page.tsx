@@ -94,7 +94,7 @@ function ResetPasswordContent() {
                 setMode("token");
                 setErrorMessage(null);
               }}
-              className={`py-2 rounded-lg transition-all ${
+              className={`btn-primary py-2 rounded-lg transition-all ${
                 mode === "token"
                   ? "bg-[#4fd27f] text-ink shadow"
                   : "text-[#b7a9bc] hover:text-cream"
@@ -108,7 +108,7 @@ function ResetPasswordContent() {
                 setMode("recovery");
                 setErrorMessage(null);
               }}
-              className={`py-2 rounded-lg transition-all ${
+              className={`btn-primary py-2 rounded-lg transition-all ${
                 mode === "recovery"
                   ? "bg-[#4fd27f] text-ink shadow"
                   : "text-[#b7a9bc] hover:text-cream"
@@ -221,7 +221,7 @@ function ResetPasswordContent() {
               <button
                 type="submit"
                 disabled={isLoading || newPassword.length < 8}
-                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+                className="btn-primary w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

@@ -39,7 +39,7 @@ export function BottomNav() {
                 href={href}
                 aria-label="Search"
                 aria-current={isActive ? "page" : undefined}
-                className="justify-self-center -mt-7 w-[60px] h-[60px] rounded-full bg-green border-[5px] border-ink flex items-center justify-center ios-press"
+                className="btn-primary justify-self-center -mt-7 w-[60px] h-[60px] rounded-full bg-green border-[5px] border-ink flex items-center justify-center ios-press"
               >
                 <Icon className="w-6 h-6 text-ink" strokeWidth={2.6} />
               </Link>

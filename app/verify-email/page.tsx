@@ -78,7 +78,7 @@ function VerifyEmailContent() {
             </div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press mt-2"
+              className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press mt-2"
             >
               <span>Go to TrackIt</span>
               <ArrowRight className="w-4 h-4" />

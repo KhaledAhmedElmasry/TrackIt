@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <TopHeader />
             </React.Suspense>
 
-            <main className="flex-1 px-4 py-6 md:px-14 md:py-10 max-w-[1240px] w-full pb-28 md:pb-16">
+            <main className="flex-1 min-w-0 w-full px-4 py-6 md:px-14 md:py-10 pb-28 md:pb-16">
               <UnverifiedBanner />
               <React.Suspense fallback={<div className="p-8 text-center text-xs text-smoke">Loading…</div>}>
                 {children}

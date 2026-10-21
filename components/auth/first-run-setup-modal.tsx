@@ -138,7 +138,7 @@ export function FirstRunSetupModal() {
             <button
               type="submit"
               disabled={isLoading || !apiKey.trim() || isSuccess}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50"
+              className="btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

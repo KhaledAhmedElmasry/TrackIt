@@ -73,10 +73,10 @@ export default function HomePage() {
           Keep your watchlist, tick off episodes as you go and get a ping when a new one airs.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/signup" className="h-12 px-6 rounded-[10px] bg-green text-ink font-bold flex items-center ios-press">
+          <Link href="/signup" className="btn-primary h-12 px-6 rounded-[10px] bg-green text-ink font-bold flex items-center ios-press">
             Create free account
           </Link>
-          <Link href="/login" className="h-12 px-6 rounded-[10px] border border-plum-line font-semibold flex items-center ios-press">
+          <Link href="/login" className="btn-quiet h-12 px-6 rounded-[10px] border border-plum-line font-semibold flex items-center ios-press">
             Sign in
           </Link>
         </div>
@@ -100,7 +100,7 @@ export default function HomePage() {
         </div>
         <Link
           href="/search"
-          className="hidden md:flex h-11 px-5 rounded-[10px] border border-plum-line items-center gap-2 text-sm font-semibold hover:border-green transition-colors"
+          className="btn-quiet hidden md:flex h-11 px-5 rounded-[10px] border border-plum-line items-center gap-2 text-sm font-semibold hover:border-green transition-colors"
         >
           <Plus className="w-4 h-4" strokeWidth={2.4} />
           Add a title
@@ -128,7 +128,7 @@ export default function HomePage() {
         ) : nowShowing.length === 0 ? (
           <div className="rounded-[14px] bg-plum p-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-smoke">Nothing in progress. Find a series and tick off the first episode.</p>
-            <Link href="/search" className="h-11 px-5 rounded-[10px] bg-green text-ink font-bold flex items-center ios-press">
+            <Link href="/search" className="btn-primary h-11 px-5 rounded-[10px] bg-green text-ink font-bold flex items-center ios-press">
               Find something to watch
             </Link>
           </div>
@@ -177,7 +177,7 @@ export default function HomePage() {
                         type="button"
                         onClick={() => markWatched(item)}
                         disabled={markingId === item.id}
-                        className={`${pct === null ? "mt-auto" : ""} h-10 rounded-[9px] bg-green text-ink text-sm font-bold flex items-center justify-center gap-2 ios-press disabled:opacity-70`}
+                        className={`btn-primary ${pct === null ? "mt-auto" : ""} h-10 rounded-[9px] bg-green text-ink text-sm font-bold flex items-center justify-center gap-2 ios-press disabled:opacity-70`}
                       >
                         {markingId === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" strokeWidth={2.6} />}
                         Mark watched

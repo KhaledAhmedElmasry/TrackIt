@@ -290,7 +290,7 @@ export default function SearchPage() {
               setIsMultiSelect(!isMultiSelect);
               if (isMultiSelect) setSelectedKeys(new Set());
             }}
-            className={`h-10 px-4 rounded-full text-[13px] font-semibold flex items-center gap-2 transition-colors ${
+            className={`btn-quiet h-10 px-4 rounded-full text-[13px] font-semibold flex items-center gap-2 transition-colors ${
               isMultiSelect ? "bg-cream text-ink" : "border border-plum-line text-smoke hover:text-cream"
             }`}
           >
@@ -461,7 +461,7 @@ export default function SearchPage() {
                     type="button"
                     onClick={(e) => handleQuickAdd(item, e)}
                     disabled={isAdding}
-                    className="h-10 rounded-[9px] border border-green text-green text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-green hover:text-ink transition-colors disabled:opacity-60"
+                    className="btn-outline h-10 rounded-[9px] border border-green text-green text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-green hover:text-ink transition-colors disabled:opacity-60"
                   >
                     {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" strokeWidth={2.6} />}
                     Want to watch
@@ -495,7 +495,7 @@ export default function SearchPage() {
           <button
             onClick={handleBulkAdd}
             disabled={isBulkAdding}
-            className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50"
+            className="btn-primary px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50"
           >
             {isBulkAdding ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

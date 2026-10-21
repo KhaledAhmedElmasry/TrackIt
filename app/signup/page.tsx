@@ -191,7 +191,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading || !email || password.length < 8}
-              className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+              className="btn-primary w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -296,7 +296,7 @@ export default function SignupPage() {
                 type="button"
                 onClick={handleFinishSignup}
                 disabled={!hasConfirmedSaved}
-                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-primary w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Continue to TrackIt
               </button>

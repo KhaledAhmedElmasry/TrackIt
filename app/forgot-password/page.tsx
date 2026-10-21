@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading || !email}
-                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50"
+                className="btn-primary w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
           <div className="pt-4 border-t border-plum-line">
             <Link
               href="/reset-password?mode=recovery"
-              className="p-3 rounded-xl bg-plum-raised border border-plum-line flex items-center gap-3 group hover:border-[#b48cc0]/30 transition-colors"
+              className="btn-quiet p-3 rounded-xl bg-plum-raised border border-plum-line flex items-center gap-3 group hover:border-[#b48cc0]/30 transition-colors"
             >
               <div className="p-2 rounded-lg bg-[#b48cc0]/20 text-[#b48cc0]">
                 <KeyRound className="w-4 h-4" />

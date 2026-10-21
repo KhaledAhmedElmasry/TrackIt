@@ -114,7 +114,7 @@ export default function RecommendationsPage() {
             type="button"
             onClick={() => handleGenerateRecommendations(true)}
             disabled={isLoading}
-            className="h-11 px-5 rounded-[10px] border border-plum-line text-sm font-semibold flex items-center gap-2 hover:border-green hover:bg-plum transition-colors disabled:opacity-50"
+            className="btn-quiet h-11 px-5 rounded-[10px] border border-plum-line text-sm font-semibold flex items-center gap-2 hover:border-green hover:bg-plum transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-green" : ""}`} />
             New picks
@@ -211,7 +211,7 @@ export default function RecommendationsPage() {
                       <button
                         type="button"
                         onClick={() => handleQuickAdd(item)}
-                        className="h-9 px-3.5 rounded-[9px] border border-green text-green text-[13px] font-bold inline-flex items-center gap-1.5 hover:bg-green hover:text-ink transition-colors"
+                        className="btn-outline h-9 px-3.5 rounded-[9px] border border-green text-green text-[13px] font-bold inline-flex items-center gap-1.5 hover:bg-green hover:text-ink transition-colors"
                       >
                         <Plus className="w-4 h-4" strokeWidth={2.6} />
                         Want to watch
@@ -233,7 +233,7 @@ export default function RecommendationsPage() {
             type="button"
             onClick={() => handleGenerateRecommendations(false)}
             disabled={isLoading || !hasGeminiKey || !hasTmdbKey}
-            className="mt-2 h-11 px-5 rounded-[10px] bg-green text-ink text-sm font-bold inline-flex items-center gap-2 hover:bg-green-hover transition-colors disabled:opacity-40"
+            className="btn-primary mt-2 h-11 px-5 rounded-[10px] bg-green text-ink text-sm font-bold inline-flex items-center gap-2 hover:bg-green-hover transition-colors disabled:opacity-40"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? "Picking…" : "Get my picks"}

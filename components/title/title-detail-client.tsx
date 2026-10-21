@@ -78,7 +78,7 @@ function SeasonProgress({
         <button
           type="button"
           onClick={onMarkSeason}
-          className="h-11 px-[18px] rounded-[10px] border border-green text-green text-sm font-semibold ios-press"
+          className="btn-outline h-11 px-[18px] rounded-[10px] border border-green text-green text-sm font-semibold ios-press"
         >
           Mark season watched
         </button>
@@ -645,7 +645,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
             </button>
             <Link
               href="/profile"
-              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-xs font-semibold text-ink"
+              className="btn-primary px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-xs font-semibold text-ink"
             >
               Verify API Key in Settings
             </Link>
@@ -747,7 +747,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 <button
                   type="button"
                   onClick={handleToggleMovieWatched}
-                  className="h-12 px-5 rounded-[10px] border border-green text-green font-bold flex items-center gap-2 ios-press"
+                  className="btn-outline h-12 px-5 rounded-[10px] border border-green text-green font-bold flex items-center gap-2 ios-press"
                 >
                   <Check className="w-4 h-4" strokeWidth={2.6} />
                   I&rsquo;ve seen it
@@ -757,7 +757,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 type="button"
                 onClick={handleAddToLibrary}
                 disabled={isSubmitting}
-                className="h-12 px-6 rounded-[10px] bg-green text-ink font-bold flex items-center gap-2 ios-press disabled:opacity-60"
+                className="btn-primary h-12 px-6 rounded-[10px] bg-green text-ink font-bold flex items-center gap-2 ios-press disabled:opacity-60"
               >
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" strokeWidth={2.6} />}
                 Want to watch
@@ -783,7 +783,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 <button
                   type="button"
                   onClick={handleToggleMovieWatched}
-                  className={`h-[52px] px-6 rounded-[10px] font-bold flex items-center gap-2.5 ios-press ${
+                  className={`btn-ink h-[52px] px-6 rounded-[10px] font-bold flex items-center gap-2.5 ios-press ${
                     tracked.status === "watched" ? "border border-plum-line text-smoke" : "bg-ink text-green"
                   }`}
                 >
@@ -830,7 +830,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                       <button
                         type="button"
                         onClick={() => handleToggleEpisode(upNext.seasonNumber, upNext.episodeNumber)}
-                        className="h-[52px] px-6 rounded-[10px] bg-ink text-green font-bold flex items-center gap-2.5 ios-press"
+                        className="btn-ink h-[52px] px-6 rounded-[10px] bg-ink text-green font-bold flex items-center gap-2.5 ios-press"
                       >
                         <Check className="w-[18px] h-[18px]" strokeWidth={2.6} />
                         Mark watched
@@ -857,7 +857,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   setRatingInput(hasRating ? String(tracked.rating) : "");
                   setIsRatingModalOpen(true);
                 }}
-                className="h-11 px-4 rounded-[10px] border border-plum-line text-sm font-semibold hover:border-green ios-press"
+                className="btn-quiet h-11 px-4 rounded-[10px] border border-plum-line text-sm font-semibold hover:border-green ios-press"
               >
                 {hasRating ? "Change" : "Rate it"}
               </button>
@@ -989,7 +989,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                       <button
                         onClick={handleMarkSelectedCollectionWatched}
                         disabled={isUpdatingCollectionParts || selectedPartIds.size === 0}
-                        className="px-3 py-1.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] disabled:opacity-40 text-ink text-xs font-bold flex items-center gap-1.5 transition-all ios-press"
+                        className="btn-primary px-3 py-1.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] disabled:opacity-40 text-ink text-xs font-bold flex items-center gap-1.5 transition-all ios-press"
                       >
                         {isUpdatingCollectionParts ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1002,7 +1002,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                       <button
                         onClick={() => handleMarkEntireCollectionWatched(details.belongsToCollection!.id)}
                         disabled={isMarkingCollection}
-                        className="px-3 py-1.5 rounded-xl bg-[#4fd27f]/15 hover:bg-[#4fd27f]/25 border border-[#4fd27f]/30 text-[#4fd27f] text-xs font-bold flex items-center gap-1.5 transition-all ios-press disabled:opacity-40"
+                        className="btn-tint px-3 py-1.5 rounded-xl bg-[#4fd27f]/15 hover:bg-[#4fd27f]/25 border border-[#4fd27f]/30 text-[#4fd27f] text-xs font-bold flex items-center gap-1.5 transition-all ios-press disabled:opacity-40"
                       >
                         {isMarkingCollection ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1120,7 +1120,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                     role="tab"
                     aria-selected={active}
                     onClick={() => setExpandedSeason(season.seasonNumber)}
-                    className={`min-w-[88px] h-14 px-3.5 rounded-[10px] border flex flex-col items-center justify-center gap-0.5 shrink-0 transition-colors ${
+                    className={`btn-quiet min-w-[88px] h-14 px-3.5 rounded-[10px] border flex flex-col items-center justify-center gap-0.5 shrink-0 transition-colors ${
                       active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac hover:bg-plum"
                     }`}
                   >
@@ -1137,7 +1137,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   role="tab"
                   aria-selected={expandedSeason === 0}
                   onClick={() => setExpandedSeason(0)}
-                  className={`min-w-[88px] h-14 px-3.5 rounded-[10px] border flex flex-col items-center justify-center gap-0.5 shrink-0 transition-colors ${
+                  className={`btn-quiet min-w-[88px] h-14 px-3.5 rounded-[10px] border flex flex-col items-center justify-center gap-0.5 shrink-0 transition-colors ${
                     expandedSeason === 0 ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac"
                   }`}
                 >
@@ -1220,7 +1220,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                         <button
                           type="button"
                           onClick={() => handleMarkAllUpToHere(selectedSeasonDetail.seasonNumber, ep.episodeNumber)}
-                          className="hidden sm:block h-9 px-3.5 rounded-lg border border-plum-line text-smoke hover:text-cream text-[13px] font-semibold shrink-0"
+                          className="btn-quiet hidden sm:block h-9 px-3.5 rounded-lg border border-plum-line text-smoke hover:text-cream text-[13px] font-semibold shrink-0"
                         >
                           Watched up to here
                         </button>
@@ -1241,7 +1241,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
           type="button"
           onClick={handleRemoveFromLibrary}
           disabled={isSubmitting}
-          className="self-start h-10 text-danger text-sm font-semibold hover:underline"
+          className="btn-danger self-start h-10 text-danger text-sm font-semibold hover:underline"
         >
           Remove from my lists
         </button>
@@ -1300,7 +1300,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                     key={preset}
                     type="button"
                     onClick={() => setRatingInput(String(preset))}
-                    className="py-1 rounded-lg bg-plum-raised hover:bg-plum-line text-xs font-semibold text-cream border border-plum-line transition-colors"
+                    className="btn-quiet py-1 rounded-lg bg-plum-raised hover:bg-plum-line text-xs font-semibold text-cream border border-plum-line transition-colors"
                   >
                     {preset.toFixed(1)}
                   </button>
@@ -1315,7 +1315,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   type="button"
                   onClick={() => handleSaveRating(null)}
                   disabled={isSavingRating}
-                  className="px-3 py-2 rounded-xl bg-[#ff8a80]/15 hover:bg-[#ff8a80]/25 text-[#ff8a80] text-xs font-semibold transition-colors"
+                  className="btn-danger px-3 py-2 rounded-xl bg-[#ff8a80]/15 hover:bg-[#ff8a80]/25 text-[#ff8a80] text-xs font-semibold transition-colors"
                 >
                   Clear
                 </button>

@@ -84,7 +84,7 @@ function ListsContent() {
         </div>
         <Link
           href="/search"
-          className="hidden md:flex h-11 px-5 rounded-[10px] border border-plum-line items-center gap-2 text-sm font-semibold hover:border-green transition-colors"
+          className="btn-quiet hidden md:flex h-11 px-5 rounded-[10px] border border-plum-line items-center gap-2 text-sm font-semibold hover:border-green transition-colors"
         >
           <Search className="w-4 h-4" />
           Add a title
@@ -101,7 +101,7 @@ function ListsContent() {
               role="tab"
               aria-selected={active}
               onClick={() => setActiveTab(tab.id)}
-              className={`h-16 rounded-xl border flex flex-col items-center justify-center gap-0.5 transition-colors ${
+              className={`btn-quiet h-16 rounded-xl border flex flex-col items-center justify-center gap-0.5 transition-colors ${
                 active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac hover:bg-plum"
               }`}
             >
@@ -207,7 +207,7 @@ function ListsContent() {
           </p>
           <Link
             href="/search"
-            className="mt-2 h-11 px-5 rounded-[10px] bg-green text-ink text-sm font-bold flex items-center gap-2 ios-press"
+            className="btn-primary mt-2 h-11 px-5 rounded-[10px] bg-green text-ink text-sm font-bold flex items-center gap-2 ios-press"
           >
             <Search className="w-4 h-4" />
             Find something to watch

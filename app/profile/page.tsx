@@ -374,7 +374,7 @@ export default function ProfilePage() {
         <div className="flex items-center justify-center gap-3 pt-2">
           <Link
             href="/login"
-            className="px-5 py-2.5 rounded-xl bg-[#4fd27f] text-ink text-xs font-bold ios-press"
+            className="btn-primary px-5 py-2.5 rounded-xl bg-[#4fd27f] text-ink text-xs font-bold ios-press"
           >
             Sign In
           </Link>
@@ -461,7 +461,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={isSavingUsername || !usernameInput.trim() || usernameInput.trim() === (user.username || "")}
-              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] disabled:opacity-50 disabled:pointer-events-none text-ink text-xs font-bold transition-all ios-press shrink-0 flex items-center justify-center gap-1.5"
+              className="btn-primary px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] disabled:opacity-50 disabled:pointer-events-none text-ink text-xs font-bold transition-all ios-press shrink-0 flex items-center justify-center gap-1.5"
             >
               {isSavingUsername ? (
                 <>
@@ -541,7 +541,7 @@ export default function ProfilePage() {
                     setInputKey("");
                     setKeyError(null);
                   }}
-                  className="flex-1 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
+                  className="btn-primary flex-1 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
                 >
                   {keys?.tmdb.configured ? (
                     <>
@@ -745,7 +745,7 @@ export default function ProfilePage() {
                     type="button"
                     onClick={handleDeleteBarkKey}
                     disabled={isSavingBarkKey}
-                    className="px-2.5 py-2 rounded-xl bg-[#ff8a80]/15 hover:bg-[#ff8a80]/25 text-[#ff8a80] text-xs font-semibold transition-all ios-press"
+                    className="btn-danger px-2.5 py-2 rounded-xl bg-[#ff8a80]/15 hover:bg-[#ff8a80]/25 text-[#ff8a80] text-xs font-semibold transition-all ios-press"
                     title="Remove Bark key"
                   >
                     Remove
@@ -768,7 +768,7 @@ export default function ProfilePage() {
               type="button"
               onClick={handleSendTestPush}
               disabled={isSendingTestPush}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-transparent hover:bg-green hover:text-ink border border-green text-green text-xs font-bold transition-all ios-press disabled:opacity-50"
+              className="btn-outline inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-transparent hover:bg-green hover:text-ink border border-green text-green text-xs font-bold transition-all ios-press disabled:opacity-50"
             >
               {isSendingTestPush ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -822,7 +822,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={handleExportData}
-              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center gap-2"
+              className="btn-primary px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center gap-2"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Library (JSON)</span>
@@ -877,7 +877,7 @@ export default function ProfilePage() {
               setDeletePassword("");
               setDeleteError(null);
             }}
-            className="px-4 py-2 rounded-xl bg-[#ff8a80]/20 hover:bg-[#ff8a80] text-[#ff8a80] hover:text-cream text-xs font-bold transition-all ios-press"
+            className="btn-danger px-4 py-2 rounded-xl bg-[#ff8a80]/20 hover:bg-[#ff8a80] text-[#ff8a80] hover:text-cream text-xs font-bold transition-all ios-press"
           >
             Delete Account Permanently
           </button>
@@ -936,7 +936,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={isSavingKey || !inputKey.trim()}
-                  className="px-5 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
+                  className="btn-primary px-5 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {isSavingKey && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Save & Encrypt</span>
