@@ -10,49 +10,65 @@ concurrency:
   group: backup-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
+env:
+  MONGO_TOOLS_VERSION: "100.13.0"
+
 jobs:
   backup:
     name: MongoDB Atlas Encrypted Backup
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moves to Ubuntu 26, which the MongoDB tools .deb below does not target
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Check required secrets
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MASTER_KEY: ${{ secrets.MASTER_ENCRYPTION_KEY }}
+        run: |
+          missing=0
+          if [ -z "$MONGODB_URI" ]; then
+            echo "::error title=Missing secret::Add MONGODB_URI under GitHub repo Settings > Secrets and variables > Actions."
+            missing=1
+          fi
+          if [ -z "$MASTER_KEY" ]; then
+            echo "::error title=Missing secret::Add MASTER_ENCRYPTION_KEY under GitHub repo Settings > Secrets and variables > Actions."
+            missing=1
+          fi
+          exit $missing
 
       - name: Install MongoDB Database Tools (mongodump)
         run: |
-          wget -q https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.9.4.deb
-          sudo dpkg -i mongodb-database-tools-ubuntu2204-x86_64-100.9.4.deb
-          rm mongodb-database-tools-ubuntu2204-x86_64-100.9.4.deb
+          deb="mongodb-database-tools-ubuntu2404-x86_64-${MONGO_TOOLS_VERSION}.deb"
+          wget -q "https://fastdl.mongodb.org/tools/db/${deb}"
+          sudo dpkg -i "${deb}"
+          rm "${deb}"
 
       - name: Create Compressed Database Dump
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: |
-          if [ -z "$MONGODB_URI" ]; then
-            echo "MONGODB_URI secret not configured. Skipping dump."
+          if ! mongodump --uri="$MONGODB_URI" --archive=backup_raw.archive --gzip; then
+            echo "::error title=mongodump failed::Could not dump the database. Most common cause: MongoDB Atlas > Network Access does not allow GitHub runners (add 0.0.0.0/0). Also check the MONGODB_URI secret's username/password."
             exit 1
           fi
-          mongodump --uri="$MONGODB_URI" --archive=backup_raw.archive --gzip
 
       - name: Encrypt Database Dump with AES-256-CBC
         env:
           MASTER_KEY: ${{ secrets.MASTER_ENCRYPTION_KEY }}
         run: |
-          if [ -z "$MASTER_KEY" ]; then
-            echo "MASTER_ENCRYPTION_KEY secret not configured. Skipping encryption."
-            exit 1
-          fi
+          # Key is read from the environment, not argv, so it never shows up in the process list
           openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 \
             -in backup_raw.archive \
             -out trackit_backup_$(date +%Y%m%d).enc \
-            -k "$MASTER_KEY"
+            -pass env:MASTER_KEY
           rm backup_raw.archive
 
       - name: Upload Encrypted Artifact (90 Days Retention)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: encrypted-database-backup
           path: trackit_backup_*.enc
           retention-days: 90
-
