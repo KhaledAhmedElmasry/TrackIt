@@ -413,19 +413,19 @@ export default function ProfilePage() {
 
       {/* Account Info Card */}
       <div className="ios-card p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-0.5">
             <p className="text-xs text-[#b7a9bc]">Signed in as</p>
-            <p className="text-sm font-bold text-cream">{user.email}</p>
+            <p className="text-sm font-bold text-cream break-all">{user.email}</p>
           </div>
-          <div>
+          <div className="shrink-0">
             {user.isVerified ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[11px] font-bold whitespace-nowrap">
                 <Check className="w-3.5 h-3.5" />
                 <span>Verified</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e9b44c]/15 text-[#e9b44c] text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e9b44c]/15 text-[#e9b44c] text-[11px] font-bold whitespace-nowrap">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>Unverified</span>
               </span>
