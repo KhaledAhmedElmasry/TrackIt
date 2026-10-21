@@ -31,8 +31,7 @@ export async function GET() {
     return NextResponse.json({
       status: "healthy",
       timestamp: new Date().toISOString(),
-      service: "WatchTrack API",
-      phase: "Phase 1 - Project Setup & App Shell",
+      service: "TrackIt API",
       database: {
         status: dbStatus,
         latencyMs: dbLatencyMs,

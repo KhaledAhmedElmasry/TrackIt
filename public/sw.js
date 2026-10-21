@@ -1,5 +1,5 @@
 /**
- * WatchTrack Service Worker
+ * TrackIt Service Worker
  *
  * Implements App Shell caching for instant loading on phone and desktop.
  * Provides read-only offline support:
@@ -8,7 +8,10 @@
  * - Read-only offline experience displays an offline banner with write actions disabled.
  */
 
-const CACHE_NAME = "watchtrack-shell-v1";
+const CACHE_NAME = "trackit-shell-v2";
+
+// Account, key and export responses must never be persisted in Cache Storage.
+const UNCACHEABLE_API_PREFIXES = ["/api/auth/", "/api/keys", "/api/user/", "/api/cron/"];
 
 // Core App Shell assets required for offline launch
 const APP_SHELL_ASSETS = [
@@ -79,6 +82,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Sensitive API reads: always network, never cached
+  if (UNCACHEABLE_API_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) {
+    return;
+  }
+
   // API read requests (/api/*): Network-first with cache fallback
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(
@@ -133,7 +141,18 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets (CSS, JS, images, icons): Cache-first with stale-while-revalidate
+  // Only hashed build output and app icons are safe to serve cache-first.
+  // Everything else (notably Next.js RSC payload requests, which are GETs that
+  // are not navigations) goes straight to the network so pages are never stale.
+  const isStaticAsset =
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname.startsWith("/icons/") ||
+    url.pathname === "/favicon.png";
+  if (!isStaticAsset || request.headers.get("RSC")) {
+    return;
+  }
+
+  // Static assets: Cache-first with stale-while-revalidate
   event.respondWith(
     caches.match(request).then((cached) => {
       const fetchPromise = fetch(request)

@@ -21,11 +21,14 @@ const options: MongoClientOptions = {
 };
 
 declare global {
-  // Allow global caching in development and warm serverless containers
+  // Cache the client promise on the global scope so warm serverless invocations
+  // (and Next.js dev hot reloads) reuse one connection pool.
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-let clientPromise: Promise<MongoClient>;
+// Database name used before the WatchTrack -> TrackIt rename. Existing deployments
+// store all user data here, so it stays the fallback when MONGODB_DB_NAME is unset.
+const LEGACY_DEFAULT_DB_NAME = "watchtrack";
 
 /**
  * Returns a cached Promise resolving to the active MongoClient instance.
@@ -41,47 +44,27 @@ export function getMongoClientPromise(): Promise<MongoClient> {
     );
   }
 
-  // In development and warm serverless execution, reuse the global promise
-  if (process.env.NODE_ENV === "development") {
-    if (!global._mongoClientPromise) {
-      const client = new MongoClient(uri, options);
-      global._mongoClientPromise = client.connect();
-    }
-    return global._mongoClientPromise;
-  } else {
-    // In production serverless, reuse clientPromise if cached on global scope across container lifetime
-    if (!global._mongoClientPromise) {
-      const client = new MongoClient(uri, options);
-      global._mongoClientPromise = client.connect();
-    }
-    clientPromise = global._mongoClientPromise;
-    return clientPromise;
+  if (!global._mongoClientPromise) {
+    const client = new MongoClient(uri, options);
+    global._mongoClientPromise = client.connect().catch((err) => {
+      // Do not cache a failed connection attempt; the next request retries.
+      global._mongoClientPromise = undefined;
+      throw err;
+    });
   }
+  return global._mongoClientPromise;
 }
-
-let indexesEnsured = false;
 
 /**
  * Convenience helper to obtain the target database instance.
  * Reuses the cached MongoClient and defaults to the configured database name.
  *
+ * Indexes are not created here: doing so on every cold start delayed the first
+ * request. They are ensured by the daily cron job (see lib/db/init-indexes.ts).
+ *
  * @param dbName Optional database name override, defaults to process.env.MONGODB_DB_NAME || "watchtrack"
  */
 export async function getDb(dbName?: string): Promise<Db> {
   const client = await getMongoClientPromise();
-  const name = dbName || process.env.MONGODB_DB_NAME || "watchtrack";
-  const db = client.db(name);
-
-  if (!indexesEnsured) {
-    indexesEnsured = true;
-    import("./init-indexes")
-      .then((m) => m.ensureIndexes(db))
-      .catch((err) => {
-        console.warn("Failed to ensure indexes automatically:", err);
-        indexesEnsured = false;
-      });
-  }
-
-  return db;
+  return client.db(dbName || process.env.MONGODB_DB_NAME || LEGACY_DEFAULT_DB_NAME);
 }
-

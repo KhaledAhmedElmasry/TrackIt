@@ -73,6 +73,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
+      // Drop offline-cached API responses so the next user on this device can't read them
+      if ("caches" in window) {
+        const names = await caches.keys();
+        await Promise.all(names.map((name) => caches.delete(name)));
+      }
     } finally {
       setUser(null);
       router.push("/login");

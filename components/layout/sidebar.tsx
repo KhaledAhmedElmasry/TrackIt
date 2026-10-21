@@ -31,7 +31,7 @@ export function Sidebar() {
         </div>
         <div>
           <h1 className="text-base font-bold tracking-tight text-white">
-            WatchTrack
+            TrackIt
           </h1>
           <p className="text-[11px] text-[#8e8e93]">
             {user?.username ? `Hi, ${user.username}` : "Your personal tracker"}

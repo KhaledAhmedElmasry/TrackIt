@@ -45,7 +45,7 @@ jobs:
           fi
           openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 \
             -in backup_raw.archive \
-            -out watchtrack_backup_$(date +%Y%m%d).enc \
+            -out trackit_backup_$(date +%Y%m%d).enc \
             -k "$MASTER_KEY"
           rm backup_raw.archive
 
@@ -53,6 +53,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: encrypted-database-backup
-          path: watchtrack_backup_*.enc
+          path: trackit_backup_*.enc
           retention-days: 90
 

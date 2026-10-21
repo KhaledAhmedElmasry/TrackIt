@@ -91,7 +91,7 @@ export interface TrackedItemDocument {
   mediaType: MediaType;
   status: WatchStatus; // Derived & indexed for high-performance list queries
   override?: StatusOverride; // Manual "dropped" or "on_hold"
-  rating?: number | null; // 1-5 star rating
+  rating?: number | null; // 0-10 rating, up to 2 decimals
   notify: boolean; // Opt-in push notification toggle
   minimalSnapshot: MinimalSnapshot;
   lastSeenAiredEpisode?: LastSeenAiredEpisode | null;

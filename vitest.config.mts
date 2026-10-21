@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 /**
- * Vitest configuration for WatchTrack unit and integration testing.
+ * Vitest configuration for TrackIt unit and integration testing.
  * Configures React testing environment, JSDOM, and path alias mapping to match tsconfig.
  */
 export default defineConfig({

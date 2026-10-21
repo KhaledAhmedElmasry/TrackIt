@@ -10,6 +10,7 @@
  * - Permanent cascaded account deletion removing all user data.
  */
 
+import { after } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "../db/mongodb";
 import {
@@ -27,6 +28,7 @@ import { UserDocument } from "../models/types";
 import {
   AuthenticationError,
   ConflictError,
+  ExternalServiceError,
   NotFoundError,
   ValidationError,
 } from "../errors/app-error";
@@ -82,7 +84,7 @@ export class AuthService {
     // 3. Cryptographic preparations
     const passwordHash = await hashPassword(password);
     const { plainCodes, hashedCodes } = generateRecoveryCodes(10);
-    const ntfyTopic = `watchtrack-usr-${generateRandomToken(16)}`;
+    const ntfyTopic = `trackit-usr-${generateRandomToken(16)}`;
 
     const verificationToken = generateRandomToken(32);
     const verificationTokenHash = hashToken(verificationToken);
@@ -108,9 +110,12 @@ export class AuthService {
     // 5. Create initial session
     const sessionToken = await createSession(userId, userAgent, ip);
 
-    // 6. Send verification email (non-blocking failure safe)
-    EmailService.sendVerificationEmail(normalizedEmail, verificationToken).catch((err) =>
-      console.error("Async verification email dispatch error:", err)
+    // 6. Send verification email after the response. A bare un-awaited promise is
+    // dropped when the serverless function freezes; after() keeps it alive.
+    after(() =>
+      EmailService.sendVerificationEmail(normalizedEmail, verificationToken).catch((err) =>
+        console.error("Async verification email dispatch error:", err)
+      )
     );
 
     return {
@@ -243,7 +248,10 @@ export class AuthService {
     await RateLimitService.increment(`auth:resend:${userObjectId}`, 900);
     await RateLimitService.increment(`auth:resend:ip:${ip}`, 900);
 
-    await EmailService.sendVerificationEmail(user.email, verificationToken);
+    const sent = await EmailService.sendVerificationEmail(user.email, verificationToken);
+    if (!sent) {
+      throw new ExternalServiceError("Email", "The verification email could not be sent. Please try again later.");
+    }
   }
 
   /**
@@ -279,8 +287,11 @@ export class AuthService {
         }
       );
 
-      EmailService.sendPasswordResetEmail(normalizedEmail, resetToken).catch((err) =>
-        console.error("Async reset email dispatch error:", err)
+      // Sent after the response so timing does not reveal whether the account exists.
+      after(() =>
+        EmailService.sendPasswordResetEmail(normalizedEmail, resetToken).catch((err) =>
+          console.error("Async reset email dispatch error:", err)
+        )
       );
     }
 
@@ -387,6 +398,9 @@ export class AuthService {
     const db = await getDb();
     const users = db.collection("users");
 
+    const rateKey = `auth:delete:${userObjectId}`;
+    await RateLimitService.assert(rateKey, 5);
+
     const user = await users.findOne<UserDocument>({ _id: userObjectId });
     if (!user) {
       throw new NotFoundError("User account not found");
@@ -394,6 +408,7 @@ export class AuthService {
 
     const isValid = await verifyPassword(passwordConfirm, user.passwordHash);
     if (!isValid) {
+      await RateLimitService.increment(rateKey, 900);
       throw new AuthenticationError("Incorrect password. Account deletion aborted.");
     }
 
@@ -403,6 +418,7 @@ export class AuthService {
       db.collection("sessions").deleteMany({ userId: userObjectId }),
       db.collection("tracked_items").deleteMany({ userId: userObjectId }),
       db.collection("notifications").deleteMany({ userId: userObjectId }),
+      db.collection("rate_limits").deleteOne({ key: rateKey }),
     ]);
   }
 }

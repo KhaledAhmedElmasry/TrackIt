@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
 
 /**
- * Web App Manifest definition for WatchTrack
+ * Web App Manifest definition for TrackIt
  * Configures native-like standalone PWA display, Apple dark background, and high-res icons.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "WatchTrack - Private Movie & Series Tracker",
-    short_name: "WatchTrack",
+    name: "TrackIt - Private Movie & Series Tracker",
+    short_name: "TrackIt",
     description: "Private, fast, and secure movie and TV series tracker with Apple iOS design.",
     start_url: "/",
     display: "standalone",

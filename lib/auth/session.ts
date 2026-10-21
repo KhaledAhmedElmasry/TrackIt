@@ -86,19 +86,35 @@ export async function getSessionContext(tokenOverride?: string): Promise<Session
     const tokenHash = hashToken(token);
     const db = await getDb();
 
-    const session = await db.collection("sessions").findOne({
-      sessionTokenHash: tokenHash,
-      expiresAt: { $gt: new Date() },
-    });
+    // Single round trip: session joined with its user (secrets projected out).
+    const [session] = await db
+      .collection<SessionDocument>("sessions")
+      .aggregate<SessionDocument & { user: UserDocument }>([
+        { $match: { sessionTokenHash: tokenHash, expiresAt: { $gt: new Date() } } },
+        { $limit: 1 },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+            pipeline: [
+              {
+                $project: {
+                  passwordHash: 0,
+                  recoveryCodes: 0,
+                  verificationTokenHash: 0,
+                  resetTokenHash: 0,
+                },
+              },
+            ],
+          },
+        },
+        { $unwind: "$user" },
+      ])
+      .toArray();
 
-    if (!session) {
-      return null;
-    }
-
-    const user = await db.collection("users").findOne<UserDocument>({
-      _id: session.userId,
-    });
-
+    const user = session?.user;
     if (!user || !user._id) {
       return null;
     }

@@ -77,7 +77,7 @@ export default function SignupPage() {
   const handleCopyCodes = () => {
     if (!recoveryCodes) return;
     const textToCopy = [
-      "WATCHTRACK RECOVERY BACKUP CODES",
+      "TRACKIT RECOVERY BACKUP CODES",
       "Keep these codes in a secure password manager or offline safe.",
       "Each code is valid once to reset your password if email is unavailable.",
       "",
@@ -300,7 +300,7 @@ export default function SignupPage() {
                 disabled={!hasConfirmedSaved}
                 className="w-full py-3 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#0a84ff]/20"
               >
-                Continue to WatchTrack
+                Continue to TrackIt
               </button>
             </div>
           </div>

@@ -1,8 +1,8 @@
-# WatchTrack — Complete Setup & Verification Guide
+# TrackIt — Complete Setup & Verification Guide
 
 This guide contains **exact, numbered, step-by-step instructions** and direct links to create all required free accounts, configure your environment, deploy the application, and verify every single feature.
 
-> **Zero Paid Services Guarantee**: Every single component in WatchTrack operates on a **100% free tier** with **no credit card required**.
+> **Zero Paid Services Guarantee**: Every single component in TrackIt operates on a **100% free tier** with **no credit card required**.
 
 ---
 
@@ -49,7 +49,7 @@ Values:
 3. In the setup wizard, select **M0 Free** (512 MB Storage).
 4. Choose your preferred cloud provider (AWS, GCP, or Azure) and closest region.
 5. Under **Security Quickstart**:
-   - **Database User**: Create a username (e.g. `watchtrack_user`) and a secure password.
+   - **Database User**: Create a username (e.g. `trackit_user`) and a secure password.
    - **Network Access**: Add IP Address `0.0.0.0/0` (Allow access from anywhere) so Vercel and local dev can connect.
 6. Click **Database** in the sidebar, click **Connect**, select **Drivers** (Node.js).
 7. Copy the connection string:
@@ -58,7 +58,7 @@ Values:
    ```
 8. Replace `<username>` and `<password>` with your database user credentials and append `/watchtrack` before `?`:
    ```
-   mongodb+srv://watchtrack_user:YOUR_PASSWORD@cluster0.xxxxx.mongodb.net/watchtrack?retryWrites=true&w=majority
+   mongodb+srv://trackit_user:YOUR_PASSWORD@cluster0.xxxxx.mongodb.net/watchtrack?retryWrites=true&w=majority
    ```
 9. Paste this string into `MONGODB_URI` inside `.env.local`.
 
@@ -72,11 +72,11 @@ Values:
 4. Click **Create** and choose **Developer**.
 5. Accept the terms of use.
 6. Fill in the short application:
-   - Application Name: `WatchTrack`
+   - Application Name: `TrackIt`
    - Application URL: Your deployment URL or `http://localhost:3000`
    - Summary: "Personal private movie and TV show tracking application"
 7. Copy your **API Key (v3 auth)** (32 characters).
-8. Once logged into WatchTrack, paste it into **Settings &rarr; TMDB Key** (or the First-Run Setup modal).
+8. Once logged into TrackIt, paste it into **Settings &rarr; TMDB Key** (or the First-Run Setup modal).
 
 ---
 
@@ -87,7 +87,7 @@ Values:
 3. Click **Get API key** in the top navigation.
 4. Click **Create API key** (select "Create API key in new project").
 5. Copy the generated key.
-6. Paste it into **Settings &rarr; Google Gemini Key** in WatchTrack.
+6. Paste it into **Settings &rarr; Google Gemini Key** in TrackIt.
 
 ---
 
@@ -96,11 +96,16 @@ Values:
 1. Sign up at [Brevo Free Registration](https://onboarding.brevo.com/account/register).
 2. Confirm your email address.
 3. Go to [Brevo SMTP & API Keys](https://app.brevo.com/settings/keys/api).
-4. Click **Generate a new API key**, name it `WatchTrack`, and copy the key (`xkeysib-...`).
+4. Click **Generate a new API key**, name it `TrackIt`, and copy the key (`xkeysib-...`).
 5. Go to [Senders & IP](https://app.brevo.com/senders) and ensure your registered email address is verified as a valid Sender.
-6. Add `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, and `BREVO_SENDER_NAME` to `.env.local`.
+6. Add `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, and `BREVO_SENDER_NAME` to `.env.local`. `BREVO_SENDER_EMAIL` is required whenever `BREVO_API_KEY` is set and must exactly match a verified sender.
 
-> **Note on Backup Codes**: If Brevo is unconfigured or in local development, WatchTrack issues **10 one-time recovery backup codes** (`XXXX-XXXX-XXXX`) directly on screen upon signup, which guarantee you can reset your password anytime even without email delivery!
+> **Emails reach you but not other users?** Check, in order:
+> 1. **Brevo &rarr; Transactional &rarr; Logs**: look for `blocked`, `soft bounce` or `hard bounce` entries for the recipient.
+> 2. **Free-mail sender**: if `BREVO_SENDER_EMAIL` is a `@gmail.com` / `@outlook.com` address, other inboxes reject or spam it because Brevo cannot pass Gmail's DMARC check for that domain. Use an address on a domain you own and authenticate it under **Senders, Domains & Dedicated IPs &rarr; Domains** (add the DKIM and DMARC DNS records Brevo shows).
+> 3. **Account activation**: new Brevo accounts may need their profile completed / activation approved before mail to arbitrary recipients is delivered.
+
+> **Note on Backup Codes**: If Brevo is unconfigured or in local development, TrackIt issues **10 one-time recovery backup codes** (`XXXX-XXXX-XXXX`) directly on screen upon signup, which guarantee you can reset your password anytime even without email delivery!
 
 ---
 
@@ -110,16 +115,16 @@ Values:
    - [ntfy for iOS (App Store)](https://apps.apple.com/us/app/ntfy/id1625396347)
    - [ntfy for Android (Google Play / F-Droid)](https://play.google.com/store/apps/details?id=io.heckel.ntfy)
    - Or open the web app: [ntfy.sh](https://ntfy.sh)
-2. In WatchTrack, go to **Settings (Profile)**.
-3. Copy your unique, private **Notification Topic** (e.g. `watchtrack_usr_abcdef1234567890`).
+2. In TrackIt, go to **Settings (Profile)**.
+3. Copy your unique, private **Notification Topic** (e.g. `trackit-usr-abcdef1234567890`).
 4. In the ntfy app, tap **Subscribe to topic**, paste your topic, and tap **Subscribe**.
-5. Tap the **Send Test Notification** button in WatchTrack Settings &mdash; your phone will buzz immediately with a test alert!
+5. Tap the **Send Test Notification** button in TrackIt Settings &mdash; your phone will buzz immediately with a test alert!
 
 ### Optional: Bark (Native iOS Push)
 1. Install the free **Bark** app on your iPhone from the [App Store](https://apps.apple.com/us/app/bark-customed-notifications/id1403753865).
 2. Open Bark and copy your device key (or URL `https://api.day.app/YOUR_KEY/`).
-3. In WatchTrack **Settings (Profile)** &rarr; **Push Notifications**, paste your Bark key into the Bark field and tap **Save Bark Key**.
-4. Tap **Send Test Notification** &mdash; WatchTrack dispatches to both ntfy and Bark!
+3. In TrackIt **Settings (Profile)** &rarr; **Push Notifications**, paste your Bark key into the Bark field and tap **Save Bark Key**.
+4. Tap **Send Test Notification** &mdash; TrackIt dispatches to both ntfy and Bark!
 
 
 ---
@@ -129,21 +134,21 @@ Values:
 1. Push your repository to your GitHub account:
    ```bash
    git add .
-   git commit -m "Complete WatchTrack build"
+   git commit -m "Complete TrackIt build"
    git push origin main
    ```
 2. Go to [Vercel](https://vercel.com/) and click **Add New Project**.
 3. Import your GitHub repository.
 4. In the **Environment Variables** section, add:
    - `MONGODB_URI`
-   - `MONGODB_DB_NAME` = `watchtrack`
+   - `MONGODB_DB_NAME` = `watchtrack` (the database name kept from before the TrackIt rename, so existing data stays in place)
    - `MASTER_ENCRYPTION_KEY`
    - `SESSION_SECRET`
    - `CRON_SECRET`
    - `BREVO_API_KEY` (optional)
-   - `BREVO_SENDER_EMAIL` (optional)
-   - `BREVO_SENDER_NAME` = `WatchTrack`
-   - `APP_URL` = your Vercel URL (e.g. `https://your-watchtrack.vercel.app`)
+   - `BREVO_SENDER_EMAIL` (required if `BREVO_API_KEY` is set; must be a verified Brevo sender)
+   - `BREVO_SENDER_NAME` = `TrackIt`
+   - `APP_URL` = your Vercel URL (e.g. `https://track-it-chi-rose.vercel.app`), used for links in emails and push notifications
 5. Click **Deploy**. Vercel will build and launch your production app in under 2 minutes.
 
 ---

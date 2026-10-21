@@ -150,10 +150,11 @@ Do NOT include markdown formatting or backticks around the JSON.`;
 
     for (const modelName of CANDIDATE_GEMINI_MODELS) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`;
+        // Key goes in a header, not the query string, so it never lands in request logs
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
         const geminiRes = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKey },
           body: JSON.stringify({
             contents: [
               {

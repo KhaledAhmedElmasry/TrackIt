@@ -75,7 +75,7 @@ export function FirstRunSetupModal() {
               Connect Your Free TMDB Key
             </h2>
             <p className="text-xs text-[#8e8e93] mt-1">
-              WatchTrack uses your personal TMDB developer key to fetch movie and series details.
+              TrackIt uses your personal TMDB developer key to fetch movie and series details.
             </p>
           </div>
         </div>

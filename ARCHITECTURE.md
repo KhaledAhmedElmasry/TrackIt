@@ -1,12 +1,12 @@
-# WatchTrack — System Architecture & Engineering Guide
+# TrackIt — System Architecture & Engineering Guide
 
-This document defines the architectural patterns, security model, and structural guidelines of **WatchTrack**. Any future developer or AI assistant must adhere strictly to these conventions.
+This document defines the architectural patterns, security model, and structural guidelines of **TrackIt**. Any future developer or AI assistant must adhere strictly to these conventions.
 
 ---
 
 ## 1. Architectural Philosophy: The Monolithic MVC in Next.js
 
-WatchTrack is built as **ONE cohesive, monolithic Next.js App Router application**. There is no separate NestJS or Express backend, and no third-party database-as-a-service abstraction layer (e.g. Supabase). All backend routes and business logic execute inside Next.js Route Handlers.
+TrackIt is built as **ONE cohesive, monolithic Next.js App Router application**. There is no separate NestJS or Express backend, and no third-party database-as-a-service abstraction layer (e.g. Supabase). All backend routes and business logic execute inside Next.js Route Handlers.
 
 ```
 ┌────────────────────────────────────────────────────────┐

@@ -195,7 +195,7 @@ export default function ProfilePage() {
   const handleExportData = () => {
     const anchor = document.createElement("a");
     anchor.href = "/api/user/export";
-    anchor.download = "watchtrack-export.json";
+    anchor.download = "trackit-export.json";
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);

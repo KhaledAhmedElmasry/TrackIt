@@ -62,7 +62,7 @@ export default function LoginPage() {
             <Film className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            Sign In to WatchTrack
+            Sign In to TrackIt
           </h1>
           <p className="text-xs text-[#8e8e93]">
             Your private, encrypted entertainment tracker

@@ -25,17 +25,17 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "WatchTrack - Private Movie & Series Tracker",
-    template: "%s | WatchTrack",
+    default: "TrackIt - Private Movie & Series Tracker",
+    template: "%s | TrackIt",
   },
   description:
     "A private, responsive movie and TV series tracker installable as a native-feeling PWA with dark Apple iOS styling.",
   manifest: "/manifest.webmanifest",
-  applicationName: "WatchTrack",
+  applicationName: "TrackIt",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "WatchTrack",
+    title: "TrackIt",
   },
   icons: {
     icon: [

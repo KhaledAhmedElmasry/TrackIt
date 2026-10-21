@@ -5,7 +5,9 @@
  * - Unique constraints on users, sessions, and tracked items
  * - High-speed compound indexes for user list tab screens
  * - Notification and daily cron job lookup indexes
- * - Automatic TTL indexes for sessions, rate limiting counters, cache records, and old notifications
+ * - Automatic TTL indexes for sessions, rate limiting counters, and cache records
+ *
+ * Run by the daily cron job; every createIndex call is idempotent.
  */
 
 import { Db } from "mongodb";
@@ -65,15 +67,11 @@ export async function ensureIndexes(dbOverride?: Db): Promise<void> {
     { expireAfterSeconds: 0, name: "idx_cache_ttl" }
   );
 
-  // 6. In-app notifications with user unread lookups and 30-day TTL cleanup
+  // 6. In-app notifications: per-user listing and unread counts
   const notifications = db.collection("notifications");
   await notifications.createIndex(
-    { userId: 1, isRead: 1, createdAt: -1 },
-    { name: "idx_user_notifications" }
-  );
-  await notifications.createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 0, name: "idx_notification_ttl" }
+    { userId: 1, read: 1, createdAt: -1 },
+    { name: "idx_user_notifications_read" }
   );
 }
 

@@ -1,8 +1,8 @@
-# WatchTrack
+# TrackIt
 
 > A private, fast, and secure movie and TV series tracker built as ONE monolithic Next.js App Router application with Apple iOS dark-mode design, installable as a native-feeling Progressive Web App (PWA).
 
-[![CI](https://github.com/your-username/watchtrack/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/watchtrack/actions/workflows/ci.yml)
+[![CI](https://github.com/your-username/trackit/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/trackit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zero-Cost Stack](https://img.shields.io/badge/Cost-$0%2Fmonth-brightgreen.svg)](#zero-cost-free-tier-stack)
 
@@ -10,7 +10,7 @@
 
 ## Zero-Cost Free-Tier Stack
 
-WatchTrack is engineered from the ground up to run **100% on free tiers with zero credit cards required**:
+TrackIt is engineered from the ground up to run **100% on free tiers with zero credit cards required**:
 
 | Component | Technology | Free Tier Specification |
 | :--- | :--- | :--- |
@@ -95,8 +95,8 @@ WatchTrack is engineered from the ground up to run **100% on free tiers with zer
 
 ### 2. Clone and Install
 ```bash
-git clone https://github.com/your-username/watchtrack.git
-cd watchtrack
+git clone https://github.com/your-username/trackit.git
+cd trackit
 npm install
 ```
 
@@ -147,12 +147,12 @@ npm run build
 ## Installing as a PWA on Your Device
 
 - **iOS (iPhone/iPad Safari)**:
-  1. Open WatchTrack in Safari.
+  1. Open TrackIt in Safari.
   2. Tap the **Share** button (box with upward arrow).
   3. Scroll down and tap **Add to Home Screen**.
-  4. Launch WatchTrack from your home screen for full standalone experience.
+  4. Launch TrackIt from your home screen for full standalone experience.
 - **Android (Chrome)**:
-  1. Open WatchTrack in Chrome.
+  1. Open TrackIt in Chrome.
   2. Tap the menu (three dots) -> **Install App** or **Add to Home screen**.
 - **Desktop (Chrome/Edge/Brave)**:
   1. Click the **Install** icon in the URL address bar.
@@ -161,7 +161,7 @@ npm run build
 
 ## Database Backup and Restore Procedure
 
-WatchTrack keeps all user lists and history in your free MongoDB Atlas M0 cluster.
+TrackIt keeps all user lists and history in your free MongoDB Atlas M0 cluster.
 
 ### 1. Manual Backup (Using MongoDB Database Tools)
 To export an encrypted full dump locally:

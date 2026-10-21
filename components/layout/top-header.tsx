@@ -30,7 +30,7 @@ export function TopHeader({ unreadCount: initialCount = 0 }: TopHeaderProps) {
       return;
     }
     try {
-      const res = await fetch("/api/notifications");
+      const res = await fetch("/api/notifications?countOnly=1");
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
@@ -56,13 +56,13 @@ export function TopHeader({ unreadCount: initialCount = 0 }: TopHeaderProps) {
 
   // Determine dynamic title for mobile view based on current path
   const getPageTitle = () => {
-    if (pathname === "/") return "WatchTrack";
+    if (pathname === "/") return "TrackIt";
     if (pathname.startsWith("/search")) return "Search";
     if (pathname.startsWith("/lists")) return "My Lists";
     if (pathname.startsWith("/recommendations")) return "Picks for You";
     if (pathname.startsWith("/profile")) return "Settings";
     if (pathname.startsWith("/notifications")) return "Notifications";
-    return "WatchTrack";
+    return "TrackIt";
   };
 
   return (

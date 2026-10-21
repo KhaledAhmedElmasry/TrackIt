@@ -16,7 +16,7 @@ const ImportItemSchema = z.object({
   mediaType: z.enum(["movie", "tv"]),
   status: z.enum(["want_to_watch", "currently_watching", "watched"]),
   override: z.enum(["dropped", "on_hold"]).nullable().optional(),
-  rating: z.number().int().min(1).max(5).nullable().optional(),
+  rating: z.number().min(0).max(10).nullable().optional(),
   notify: z.boolean().optional(),
   minimalSnapshot: z.object({
     tmdbId: z.number().int().positive(),
@@ -29,15 +29,16 @@ const ImportItemSchema = z.object({
     .array(
       z.object({
         season: z.number().int().min(0),
-        ranges: z.array(z.tuple([z.number(), z.number()])),
+        ranges: z.array(z.tuple([z.number().int().min(0), z.number().int().min(0)])).max(500),
       })
     )
+    .max(200)
     .optional(),
 });
 
 const ImportPayloadSchema = z.object({
   version: z.number().int().optional(),
-  library: z.array(ImportItemSchema),
+  library: z.array(ImportItemSchema).max(5000, "Import is limited to 5000 titles"),
 });
 
 /**
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
           mediaType: item.mediaType,
           status: item.status,
           override: item.override || null,
-          rating: item.rating || null,
+          rating: item.rating ?? null,
           notify: item.notify ?? (item.mediaType === "tv"),
           minimalSnapshot: {
             tmdbId: item.minimalSnapshot.tmdbId,

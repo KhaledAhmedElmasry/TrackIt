@@ -1,12 +1,22 @@
+import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse, connection } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
+import { ensureIndexes } from "@/lib/db/init-indexes";
+import { getAppUrl } from "@/lib/utils/app-url";
 import { KeyService } from "@/lib/services/key.service";
 import { TmdbService } from "@/lib/services/tmdb.service";
 import { NotificationService } from "@/lib/services/notification.service";
 import { TrackedItemDocument, UserDocument } from "@/lib/models/types";
 
 export const maxDuration = 60; // Up to 60 seconds where supported
+
+function secretMatches(provided: string | null, expected: string): boolean {
+  if (!provided) return false;
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
 
 /**
  * GET /api/cron/daily
@@ -36,7 +46,8 @@ export async function GET(req: NextRequest) {
     }
 
     const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-    const isAuthorized = bearerToken === expectedSecret || cronSecretHeader === expectedSecret;
+    const isAuthorized =
+      secretMatches(bearerToken, expectedSecret) || secretMatches(cronSecretHeader, expectedSecret);
 
     if (!isAuthorized) {
       return NextResponse.json(
@@ -181,7 +192,7 @@ export async function GET(req: NextRequest) {
 
     // --- Step 3: Dispatch ONE combined push notification per user ---
     let pushesSent = 0;
-    const appBaseUrl = process.env.NEXTAUTH_URL || "https://watchtrack.app";
+    const appBaseUrl = getAppUrl();
 
     for (const [userIdStr, episodes] of userUpdatesQueue.entries()) {
       if (episodes.length === 0) continue;
@@ -226,12 +237,19 @@ export async function GET(req: NextRequest) {
     // --- Step 4: Maintenance Cleanups ---
     const now = new Date();
 
-    // 1. Delete unverified accounts older than 7 days
+    // 1. Delete unverified accounts older than 7 days, along with their data
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const unverifiedUsersResult = await db.collection("users").deleteMany({
-      isVerified: false,
-      createdAt: { $lt: sevenDaysAgo },
-    });
+    const staleUserIds = await db
+      .collection<UserDocument>("users")
+      .find({ isVerified: false, createdAt: { $lt: sevenDaysAgo } }, { projection: { _id: 1 } })
+      .map((u) => u._id!)
+      .toArray();
+    const unverifiedUsersResult = await db.collection("users").deleteMany({ _id: { $in: staleUserIds } });
+    await Promise.all([
+      db.collection("sessions").deleteMany({ userId: { $in: staleUserIds } }),
+      db.collection("tracked_items").deleteMany({ userId: { $in: staleUserIds } }),
+      db.collection("notifications").deleteMany({ userId: { $in: staleUserIds } }),
+    ]);
 
     // 2. Delete read notifications older than 30 days
     const oldNotificationsDeleted = await NotificationService.cleanupOldNotifications(30);
@@ -245,6 +263,9 @@ export async function GET(req: NextRequest) {
     const expiredTokensResult = await db.collection("tokens").deleteMany({
       expiresAt: { $lt: now },
     });
+
+    // 5. Ensure indexes exist (idempotent; kept out of the request path)
+    await ensureIndexes(db);
 
     const executionTimeMs = Date.now() - startTime;
 

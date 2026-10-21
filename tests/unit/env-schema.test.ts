@@ -4,8 +4,8 @@ import { envSchema } from "@/lib/validations/env.schema";
 describe("Environment Variables Schema Validation", () => {
   const validEnv = {
     NODE_ENV: "development",
-    MONGODB_URI: "mongodb+srv://user:pass@cluster0.mongodb.net/watchtrack?retryWrites=true&w=majority",
-    MONGODB_DB_NAME: "watchtrack",
+    MONGODB_URI: "mongodb+srv://user:pass@cluster0.mongodb.net/trackit?retryWrites=true&w=majority",
+    MONGODB_DB_NAME: "trackit",
     MASTER_ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
     SESSION_SECRET: "this-is-a-very-long-and-secure-session-secret-key-32chars",
     CRON_SECRET: "cron_secret_bearer_token_12345",

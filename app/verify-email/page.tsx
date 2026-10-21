@@ -80,7 +80,7 @@ function VerifyEmailContent() {
               href="/"
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press mt-2 shadow-lg shadow-[#0a84ff]/20"
             >
-              <span>Go to WatchTrack</span>
+              <span>Go to TrackIt</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

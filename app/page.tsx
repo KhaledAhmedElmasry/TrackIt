@@ -18,7 +18,7 @@ export default function HomePage() {
       {/* iOS Large Title Header */}
       <div className="space-y-1">
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-          {user?.username ? `Welcome, ${user.username}` : "WatchTrack"}
+          {user?.username ? `Welcome, ${user.username}` : "TrackIt"}
         </h1>
         <p className="text-sm md:text-base text-[#8e8e93]">
           Track your movies and TV shows effortlessly.

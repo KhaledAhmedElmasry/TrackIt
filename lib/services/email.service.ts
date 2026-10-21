@@ -8,6 +8,8 @@
  * - Apple dark-styled responsive email templates.
  */
 
+import { getAppUrl } from "../utils/app-url";
+
 interface SendEmailParams {
   to: string;
   subject: string;
@@ -21,8 +23,8 @@ export class EmailService {
    */
   private static async sendViaBrevo(params: SendEmailParams): Promise<boolean> {
     const apiKey = process.env.BREVO_API_KEY;
-    const senderEmail = process.env.BREVO_SENDER_EMAIL || "no-reply@watchtrack.app";
-    const senderName = process.env.BREVO_SENDER_NAME || "WatchTrack";
+    const senderEmail = process.env.BREVO_SENDER_EMAIL;
+    const senderName = process.env.BREVO_SENDER_NAME || "TrackIt";
 
     // If Brevo is not configured (e.g. initial setup / development), log for convenience
     if (!apiKey) {
@@ -32,6 +34,13 @@ export class EmailService {
       console.log(`[EmailService:DEV_MODE] Subject: ${params.subject}`);
       console.log(`[EmailService:DEV_MODE] Text: ${params.text}`);
       return true;
+    }
+
+    // Brevo only delivers from a sender address verified in the Brevo dashboard
+    // (Senders, Domains & Dedicated IPs). There is no safe default to fall back to.
+    if (!senderEmail) {
+      console.error("[EmailService] BREVO_SENDER_EMAIL is not configured; cannot send email.");
+      return false;
     }
 
     try {
@@ -53,7 +62,7 @@ export class EmailService {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        console.error(`Brevo API Error (${response.status}):`, errorBody);
+        console.error(`Brevo API Error (${response.status}) sending "${params.subject}":`, errorBody);
         return false;
       }
 
@@ -68,11 +77,11 @@ export class EmailService {
    * Sends the email verification message containing a 30-minute single-use link.
    */
   static async sendVerificationEmail(to: string, token: string): Promise<boolean> {
-    const appUrl = process.env.APP_URL || "http://localhost:3000";
+    const appUrl = getAppUrl();
     const verificationUrl = `${appUrl}/verify-email?token=${token}`;
 
-    const subject = "Verify your WatchTrack account";
-    const text = `Welcome to WatchTrack!\n\nPlease verify your email address by visiting this link (expires in 30 minutes):\n${verificationUrl}\n\nIf you did not sign up for WatchTrack, please ignore this email.`;
+    const subject = "Verify your TrackIt account";
+    const text = `Welcome to TrackIt!\n\nPlease verify your email address by visiting this link (expires in 30 minutes):\n${verificationUrl}\n\nIf you did not sign up for TrackIt, please ignore this email.`;
 
     const html = `
       <!DOCTYPE html>
@@ -81,7 +90,7 @@ export class EmailService {
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #121215; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 32px;">
           <tr>
             <td align="center" style="padding-bottom: 24px;">
-              <h1 style="color: #ffffff; font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">WatchTrack</h1>
+              <h1 style="color: #ffffff; font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">TrackIt</h1>
               <p style="color: #8e8e93; font-size: 13px; margin-top: 4px;">Private movie & TV series tracker</p>
             </td>
           </tr>
@@ -97,7 +106,7 @@ export class EmailService {
                   </td>
                 </tr>
               </table>
-              <p style="color: #8e8e93; font-size: 12px; margin: 0;">If you did not create a WatchTrack account, you can safely ignore this email.</p>
+              <p style="color: #8e8e93; font-size: 12px; margin: 0;">If you did not create a TrackIt account, you can safely ignore this email.</p>
             </td>
           </tr>
           <tr>
@@ -117,11 +126,11 @@ export class EmailService {
    * Sends the password reset message containing a 30-minute single-use link.
    */
   static async sendPasswordResetEmail(to: string, token: string): Promise<boolean> {
-    const appUrl = process.env.APP_URL || "http://localhost:3000";
+    const appUrl = getAppUrl();
     const resetUrl = `${appUrl}/reset-password?token=${token}`;
 
-    const subject = "Reset your WatchTrack password";
-    const text = `A password reset was requested for your WatchTrack account.\n\nClick this link to set a new password (expires in 30 minutes):\n${resetUrl}\n\nIf you did not request this, you can ignore this email. You can also always reset your password using your one-time recovery backup codes.`;
+    const subject = "Reset your TrackIt password";
+    const text = `A password reset was requested for your TrackIt account.\n\nClick this link to set a new password (expires in 30 minutes):\n${resetUrl}\n\nIf you did not request this, you can ignore this email. You can also always reset your password using your one-time recovery backup codes.`;
 
     const html = `
       <!DOCTYPE html>
@@ -130,7 +139,7 @@ export class EmailService {
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #121215; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 32px;">
           <tr>
             <td align="center" style="padding-bottom: 24px;">
-              <h1 style="color: #ffffff; font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">WatchTrack</h1>
+              <h1 style="color: #ffffff; font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">TrackIt</h1>
               <p style="color: #8e8e93; font-size: 13px; margin-top: 4px;">Password Reset Request</p>
             </td>
           </tr>

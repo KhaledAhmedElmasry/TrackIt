@@ -43,7 +43,7 @@ export async function GET() {
         mediaType: item.mediaType,
         status: item.status,
         override: item.override || null,
-        rating: item.rating || null,
+        rating: item.rating ?? null,
         notify: item.notify ?? false,
         minimalSnapshot: item.minimalSnapshot,
         watchedEpisodes: item.watchedEpisodes || [],
@@ -53,7 +53,7 @@ export async function GET() {
     };
 
     const dateStr = new Date().toISOString().slice(0, 10);
-    const filename = `watchtrack-export-${dateStr}.json`;
+    const filename = `trackit-export-${dateStr}.json`;
 
     return new NextResponse(JSON.stringify(sanitizedExport, null, 2), {
       status: 200,

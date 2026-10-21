@@ -29,7 +29,7 @@ export const envSchema = z.object({
   // Brevo transactional email API key (free tier 300/day)
   BREVO_API_KEY: z.string().optional(),
   BREVO_SENDER_EMAIL: z.string().email().optional(),
-  BREVO_SENDER_NAME: z.string().default("WatchTrack"),
+  BREVO_SENDER_NAME: z.string().default("TrackIt"),
   // Base URL for links in verification/reset emails
   APP_URL: z.string().url().default("http://localhost:3000"),
 });

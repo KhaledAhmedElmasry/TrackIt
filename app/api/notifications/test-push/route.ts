@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db/mongodb";
 import { NotificationService } from "@/lib/services/notification.service";
 import { UnauthorizedError } from "@/lib/errors/app-error";
 import { UserDocument } from "@/lib/models/types";
+import { getAppUrl } from "@/lib/utils/app-url";
 
 /**
  * POST /api/notifications/test-push
@@ -39,9 +40,9 @@ export async function POST() {
     const res = await NotificationService.sendPush({
       topic,
       barkKey,
-      title: "WatchTrack Test Push",
+      title: "TrackIt Test Push",
       message: "Push notifications are working perfectly! You'll receive alerts for newly aired episodes.",
-      clickUrl: process.env.NEXTAUTH_URL || "https://watchtrack.app",
+      clickUrl: getAppUrl(),
     });
 
     if (!res.ntfySent && !res.barkSent) {

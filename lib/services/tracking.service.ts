@@ -1,7 +1,7 @@
 /**
  * Tracking & Status Derivation Service
  *
- * Implements the core business logic of WatchTrack:
+ * Implements the core business logic of TrackIt:
  * - Pure compact numerical range algorithms for episode tracking ([start, end] contiguous intervals).
  * - Automatic status derivation:
  *   - No episodes watched -> "want_to_watch"

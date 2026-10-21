@@ -27,7 +27,8 @@ export const signupSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Please provide a valid email address"),
-  password: z.string().min(1, "Password is required"),
+  // Capped so oversized inputs cannot be fed to scrypt
+  password: z.string().min(1, "Password is required").max(128, "Invalid email or password"),
 });
 
 export const verifyEmailSchema = z.object({
@@ -64,12 +65,16 @@ export const resetPasswordWithRecoveryCodeSchema = z.object({
 });
 
 export const deleteAccountSchema = z.object({
-  password: z.string().min(1, "Current password is required to delete account"),
+  password: z.string().min(1, "Current password is required to delete account").max(128),
 });
 
 export const saveKeySchema = z.object({
   keyType: z.enum(["tmdb", "gemini"]),
-  key: z.string().trim().min(8, "API key must be at least 8 characters long"),
+  key: z
+    .string()
+    .trim()
+    .min(8, "API key must be at least 8 characters long")
+    .max(1024, "API key is too long"),
 });
 
 export const deleteKeySchema = z.object({

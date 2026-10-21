@@ -17,10 +17,10 @@ export function ServiceWorkerRegister() {
       navigator.serviceWorker
         .register("/sw.js")
         .then((registration) => {
-          console.log("WatchTrack PWA Service Worker registered with scope:", registration.scope);
+          console.log("TrackIt PWA Service Worker registered with scope:", registration.scope);
         })
         .catch((error) => {
-          console.warn("WatchTrack Service Worker registration failed:", error);
+          console.warn("TrackIt Service Worker registration failed:", error);
         });
     }
   }, []);

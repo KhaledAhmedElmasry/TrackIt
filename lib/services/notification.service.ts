@@ -2,7 +2,7 @@
  * Push Notification & In-App Notification Service
  *
  * Implements:
- * - Free push via ntfy.sh (per-user long random topic, e.g. "watchtrack_usr_abcdef123456").
+ * - Free push via ntfy.sh (per-user long random topic, e.g. "trackit-usr-abcdef123456").
  * - Optional Bark push notification key.
  * - In-app notification creation and read/unread state management.
  * - Zero cost: uses public free servers (ntfy.sh / day.app).
@@ -126,6 +126,15 @@ export class NotificationService {
     ]);
 
     return { notifications, unreadCount };
+  }
+
+  /**
+   * Counts the user's unread in-app notifications.
+   */
+  static async getUnreadCount(userId: string | ObjectId): Promise<number> {
+    const userObjectId = typeof userId === "string" ? new ObjectId(userId) : userId;
+    const db = await getDb();
+    return db.collection("notifications").countDocuments({ userId: userObjectId, read: false });
   }
 
   /**
