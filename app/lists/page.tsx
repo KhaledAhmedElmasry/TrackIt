@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
+import { useCachedFetch } from "@/lib/client/cache";
 
 interface TrackedItem {
   _id: string;
@@ -50,54 +51,16 @@ function ListsContent() {
   );
   const setActiveTab = (tab: TabType) => setUserSelectedTab(tab);
   const [filterType, setFilterType] = useState<"all" | "movie" | "tv">("all");
-  const [items, setItems] = useState<TrackedItem[]>([]);
-  const [counts, setCounts] = useState({
-    wantToWatch: 0,
-    currentlyWatching: 0,
-    watched: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchLibrary = useCallback(async () => {
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const res = await fetch("/api/tracking");
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          setItems(json.data.items || []);
-          if (json.data.counts) {
-            setCounts({
-              wantToWatch: json.data.counts.wantToWatch || 0,
-              currentlyWatching: json.data.counts.currentlyWatching || 0,
-              watched: json.data.counts.watched || 0,
-            });
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("Failed to fetch lists:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    let mounted = true;
-    queueMicrotask(() => {
-      if (mounted) {
-        void fetchLibrary();
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [fetchLibrary]);
+  const { data: library, isLoading } = useCachedFetch<{
+    items: TrackedItem[];
+    counts?: { wantToWatch?: number; currentlyWatching?: number; watched?: number };
+  }>(user ? "/api/tracking" : null, user?.id);
+  const items = library?.items ?? [];
+  const counts = {
+    wantToWatch: library?.counts?.wantToWatch ?? 0,
+    currentlyWatching: library?.counts?.currentlyWatching ?? 0,
+    watched: library?.counts?.watched ?? 0,
+  };
 
   // Filter items by active tab and mediaType filter
   const currentTabItems = items.filter((item) => {
@@ -139,7 +102,7 @@ function ListsContent() {
               aria-selected={active}
               onClick={() => setActiveTab(tab.id)}
               className={`h-16 rounded-xl border flex flex-col items-center justify-center gap-0.5 transition-colors ${
-                active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac"
+                active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac hover:bg-plum"
               }`}
             >
               <span className={`font-display font-extrabold text-2xl md:text-3xl leading-none ${active ? "text-green" : ""}`}>
@@ -189,7 +152,7 @@ function ListsContent() {
             return (
               <li key={`${mediaType}-${tmdbId}`}>
                 <Link href={`/title/${mediaType}/${tmdbId}`} className="group flex flex-col gap-2.5">
-                  <span className="relative block aspect-[2/3] rounded-md overflow-hidden bg-eggplant">
+                  <span className="poster-hover relative block aspect-[2/3] rounded-md overflow-hidden bg-eggplant">
                     {minimalSnapshot.posterPath ? (
                       <Image
                         src={`https://image.tmdb.org/t/p/w342${minimalSnapshot.posterPath}`}

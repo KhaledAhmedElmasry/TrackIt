@@ -77,6 +77,40 @@ select:disabled {
   cursor: not-allowed;
 }
 
+/* Hover feedback: every enabled button brightens; explicit hover colours still apply on top */
+button:not(:disabled),
+a.ios-press {
+  transition: filter 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+    transform 0.12s ease;
+}
+
+button:not(:disabled):hover,
+a.ios-press:hover {
+  filter: brightness(1.12);
+}
+
+/* Interactive cards lift and light up on hover */
+.card-hover {
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  background-color: var(--plum-raised);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.4);
+}
+
+/* Poster tiles: lift with a lilac outline */
+.poster-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.group:hover .poster-hover,
+.poster-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 2px var(--lilac), 0 14px 30px rgb(0 0 0 / 0.45);
+}
+
 /* Poster headline: tall condensed uppercase. Big Shoulders picks its display cut at large sizes. */
 .font-display {
   text-transform: uppercase;

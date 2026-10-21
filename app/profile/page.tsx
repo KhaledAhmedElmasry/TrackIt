@@ -36,6 +36,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
+import { clearCache } from "@/lib/client/cache";
 
 interface KeySummary {
   configured: boolean;
@@ -337,6 +338,7 @@ export default function ProfilePage() {
       const json = await res.json();
 
       if (res.ok && json.success) {
+        clearCache();
         router.push("/signup");
         router.refresh();
       } else {
@@ -653,6 +655,9 @@ export default function ProfilePage() {
                 <span>Get a free API key at Google AI Studio</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
+              <p className="text-[11px] leading-relaxed text-dim">
+                Picks are suggested by Gemini, and every title is checked against TMDB before it&rsquo;s shown.
+              </p>
             </div>
           </div>
         </div>

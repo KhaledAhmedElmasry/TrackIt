@@ -23,6 +23,8 @@ import {
 import { TmdbTitleDetail, TmdbSeasonDetail } from "@/lib/services/tmdb.service";
 import { TrackedItemDocument } from "@/lib/models/types";
 import { isEpisodeInRange } from "@/lib/utils/ranges";
+import { useAuth } from "@/components/auth/auth-context";
+import { cacheKey, getCached, setCached } from "@/lib/client/cache";
 
 interface CollectionPart {
   id: number;
@@ -98,6 +100,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
   const tmdbId = parseInt(resolvedParams.id, 10);
 
   const router = useRouter();
+  const { user } = useAuth();
 
   const [details, setDetails] = useState<TmdbTitleDetail | null>(null);
   const [tracked, setTracked] = useState<TrackedItemDocument | null>(null);
@@ -127,37 +130,59 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
   const [isMarkingCollection, setIsMarkingCollection] = useState(false);
 
   // Fetch title details and current user tracking info
-  const loadTitle = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // Title details + your tracking for it, cached per account for instant repeat visits
+  const titleUrl = `/api/tmdb/title?id=${tmdbId}&type=${mediaType}`;
+  const titleCacheKey = user ? cacheKey(user.id, titleUrl) : null;
 
-      const res = await fetch(`/api/tmdb/title?id=${tmdbId}&type=${mediaType}`);
+  const loadTitle = useCallback(async () => {
+    type TitlePayload = { details: TmdbTitleDetail; tracked: TrackedItemDocument | null };
+
+    // Open on the season holding the next episode to watch (else the first season)
+    const pickSeason = (payload: TitlePayload) => {
+      if (mediaType !== "tv") return;
+      const seasons = (payload.details.seasonsSummary || []).filter((s) => s.seasonNumber > 0);
+      const current =
+        seasons.find((s) => countWatchedInSeason(payload.tracked, s.seasonNumber) < s.episodeCount) || seasons[0];
+      if (current) {
+        setExpandedSeason((prev) => prev ?? current.seasonNumber);
+      }
+    };
+
+    const cached = titleCacheKey ? getCached<TitlePayload>(titleCacheKey) : null;
+    if (cached) {
+      setDetails(cached.details);
+      setTracked(cached.tracked || null);
+      pickSeason(cached);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
+
+    try {
+      setError(null);
+      const res = await fetch(titleUrl);
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error || "Failed to load title details");
+        throw new Error(json.error?.message || json.error || "Failed to load title details");
       }
 
       setDetails(json.data.details);
       setTracked(json.data.tracked || null);
-
-      // Open on the season holding the next episode to watch (else the first season)
-      if (mediaType === "tv") {
-        const seasons = ((json.data.details as TmdbTitleDetail).seasonsSummary || []).filter((s) => s.seasonNumber > 0);
-        const current =
-          seasons.find((s) => countWatchedInSeason(json.data.tracked || null, s.seasonNumber) < s.episodeCount) ||
-          seasons[0];
-        if (current) {
-          setExpandedSeason(current.seasonNumber);
-        }
-      }
+      pickSeason(json.data);
     } catch (err) {
-      setError((err as Error).message);
+      if (!cached) setError((err as Error).message);
     } finally {
       setIsLoading(false);
     }
-  }, [tmdbId, mediaType]);
+  }, [mediaType, titleUrl, titleCacheKey]);
+
+  // Keep the cached copy in step with every change made on this page
+  useEffect(() => {
+    if (titleCacheKey && details) {
+      setCached(titleCacheKey, { details, tracked });
+    }
+  }, [titleCacheKey, details, tracked]);
 
   useEffect(() => {
     let mounted = true;
@@ -176,12 +201,21 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
     async (seasonNumber: number) => {
       if (seasonsCache[seasonNumber] || loadingSeason === seasonNumber) return;
 
+      // Episode lists are public TMDB data, so one cache entry serves every account
+      const seasonUrl = `/api/tmdb/season?tvId=${tmdbId}&season=${seasonNumber}`;
+      const seasonKey = cacheKey("tmdb", seasonUrl);
+      const cachedSeason = getCached<TmdbSeasonDetail>(seasonKey);
+      if (cachedSeason) {
+        setSeasonsCache((prev) => ({ ...prev, [seasonNumber]: cachedSeason }));
+      }
+
       try {
-        setLoadingSeason(seasonNumber);
-        const res = await fetch(`/api/tmdb/season?tvId=${tmdbId}&season=${seasonNumber}`);
+        if (!cachedSeason) setLoadingSeason(seasonNumber);
+        const res = await fetch(seasonUrl);
         const json = await res.json();
 
         if (res.ok && json.success) {
+          setCached(seasonKey, json.data);
           setSeasonsCache((prev) => ({
             ...prev,
             [seasonNumber]: json.data,
@@ -1087,7 +1121,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                     aria-selected={active}
                     onClick={() => setExpandedSeason(season.seasonNumber)}
                     className={`min-w-[88px] h-14 px-3.5 rounded-[10px] border flex flex-col items-center justify-center gap-0.5 shrink-0 transition-colors ${
-                      active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac"
+                      active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac hover:bg-plum"
                     }`}
                   >
                     <span className="font-display font-extrabold text-xl leading-none">Season {season.seasonNumber}</span>
@@ -1144,7 +1178,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   return (
                     <li
                       key={ep.episodeNumber}
-                      className={`flex items-center gap-3 md:gap-[18px] py-2.5 border-b border-[#241829] ${
+                      className={`flex items-center gap-3 md:gap-[18px] py-2.5 px-2 -mx-2 rounded-lg border-b border-[#241829] hover:bg-plum transition-colors ${
                         ep.isAired ? "" : "opacity-55"
                       }`}
                     >

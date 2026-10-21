@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
+import { useCachedFetch } from "@/lib/client/cache";
 
 interface SearchResultItem {
   id: number;
@@ -57,7 +58,8 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [trackedMap, setTrackedMap] = useState<TrackedSummary>({});
+  // Titles added on this page, shown immediately while the library cache refreshes
+  const [addedMap, setAddedMap] = useState<TrackedSummary>({});
   const [addingId, setAddingId] = useState<string | null>(null);
 
   // Multi-select bulk state
@@ -68,35 +70,17 @@ export default function SearchPage() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch current user library to display existing badges
-  const loadUserLibrary = useCallback(async () => {
-    if (!user) return;
-    try {
-      const res = await fetch("/api/tracking");
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data?.items) {
-          const map: TrackedSummary = {};
-          for (const item of json.data.items) {
-            map[`${item.mediaType}-${item.tmdbId}`] = { status: item.status };
-          }
-          setTrackedMap(map);
-        }
-      }
-    } catch (err) {
-      console.warn("Failed to load user tracked items:", err);
+  // User library (shared cache with My Lists) to show which results are already tracked
+  const { data: library, refresh: refreshLibrary } = useCachedFetch<{
+    items: Array<{ tmdbId: number; mediaType: string; status: TrackedSummary[string]["status"] }>;
+  }>(user ? "/api/tracking" : null, user?.id);
+  const trackedMap = useMemo(() => {
+    const map: TrackedSummary = {};
+    for (const item of library?.items ?? []) {
+      map[`${item.mediaType}-${item.tmdbId}`] = { status: item.status };
     }
-  }, [user]);
-
-  useEffect(() => {
-    let mounted = true;
-    queueMicrotask(() => {
-      if (mounted) void loadUserLibrary();
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [loadUserLibrary]);
+    return { ...map, ...addedMap };
+  }, [library, addedMap]);
 
   // Execute TMDB search
   const performSearch = useCallback(
@@ -204,10 +188,11 @@ export default function SearchPage() {
       });
 
       if (res.ok) {
-        setTrackedMap((prev) => ({
+        setAddedMap((prev) => ({
           ...prev,
           [key]: { status: "want_to_watch" },
         }));
+        void refreshLibrary();
       } else {
         const json = await res.json();
         alert(json.error || "Failed to add title");
@@ -271,13 +256,14 @@ export default function SearchPage() {
       });
 
       if (res.ok) {
-        setTrackedMap((prev) => {
+        setAddedMap((prev) => {
           const next = { ...prev };
           for (const item of itemsToAdd) {
             next[`${item.mediaType}-${item.tmdbId}`] = { status: "want_to_watch" };
           }
           return next;
         });
+        void refreshLibrary();
         setSelectedKeys(new Set());
         setIsMultiSelect(false);
       } else {
@@ -422,13 +408,13 @@ export default function SearchPage() {
             const isAdding = addingId === itemKey;
 
             return (
-              <li key={itemKey} className="flex flex-col gap-2.5">
+              <li key={itemKey} className="group flex flex-col gap-2.5">
                 <Link
                   href={`/title/${item.mediaType}/${item.id}`}
                   onClick={(e) => {
                     if (isMultiSelect) toggleSelectItem(itemKey, e);
                   }}
-                  className={`group relative block aspect-[2/3] rounded-md overflow-hidden bg-eggplant ${
+                  className={`poster-hover relative block aspect-[2/3] rounded-md overflow-hidden bg-eggplant ${
                     isSelected ? "ring-[3px] ring-green ring-offset-2 ring-offset-ink" : ""
                   }`}
                 >

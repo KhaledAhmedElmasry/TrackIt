@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Check, Loader2, Plus } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 import { Logo } from "@/components/brand/logo";
 import type { HomeSummary } from "@/lib/services/tracking.service";
+import { useCachedFetch } from "@/lib/client/cache";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const episodeCode = (s: number, e: number) => `S${pad(s)} E${pad(e)}`;
@@ -30,31 +31,11 @@ function airDateParts(airDate: string) {
   };
 }
 
-async function fetchHomeSummary(): Promise<HomeSummary | null> {
-  try {
-    const res = await fetch("/api/tracking/home");
-    const json = await res.json();
-    return json.success ? json.data : null;
-  } catch {
-    return null;
-  }
-}
-
 export default function HomePage() {
   const { user, isLoading: authLoading } = useAuth();
-  const [summary, setSummary] = useState<HomeSummary | null>(null);
+  const { data: summary, refresh } = useCachedFetch<HomeSummary>(user ? "/api/tracking/home" : null, user?.id);
   const [markingId, setMarkingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    fetchHomeSummary().then((data) => {
-      if (!cancelled && data) setSummary(data);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
 
   const markWatched = async (item: HomeSummary["nowShowing"][number]) => {
     setMarkingId(item.id);
@@ -69,8 +50,7 @@ export default function HomePage() {
           totalAiredEpisodes: 0,
         }),
       });
-      const data = await fetchHomeSummary();
-      if (data) setSummary(data);
+      await refresh();
     } finally {
       setMarkingId(null);
     }
@@ -157,7 +137,7 @@ export default function HomePage() {
             {nowShowing.map((item) => {
               const pct = item.totalEpisodes ? Math.min(100, Math.round((item.watchedCount / item.totalEpisodes) * 100)) : null;
               return (
-                <article key={item.id} className="flex rounded-[14px] bg-plum overflow-hidden min-h-[196px]">
+                <article key={item.id} className="card-hover flex rounded-[14px] bg-plum overflow-hidden min-h-[196px]">
                   <Link href={`/title/tv/${item.tmdbId}`} className="relative w-[120px] shrink-0 bg-eggplant">
                     {item.posterPath ? (
                       <Image
@@ -232,7 +212,7 @@ export default function HomePage() {
                   <li key={`${u.tmdbId}-${u.season}-${u.episode}`}>
                     <Link
                       href={`/title/tv/${u.tmdbId}`}
-                      className="flex items-center gap-4 py-3 border-b border-[#241829] hover:text-green"
+                      className="flex items-center gap-4 py-3 px-2 -mx-2 rounded-lg border-b border-[#241829] hover:bg-plum hover:text-green transition-colors"
                     >
                       <span className="w-14 shrink-0 flex flex-col items-center border border-plum-line rounded-lg py-1.5">
                         <span className="font-mono text-[10px] tracking-[0.1em] text-lilac">{mon}</span>
@@ -264,7 +244,7 @@ export default function HomePage() {
               <Link
                 key={reel.tab}
                 href={`/lists?tab=${reel.tab}`}
-                className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-plum hover:bg-plum-raised transition-colors"
+                className="card-hover flex items-center gap-4 px-4 py-3.5 rounded-xl bg-plum"
               >
                 <span className="flex-1 font-semibold">{reel.name}</span>
                 <span className="font-display font-extrabold text-3xl text-green">{reel.count ?? "–"}</span>

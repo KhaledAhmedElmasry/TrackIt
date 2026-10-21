@@ -158,6 +158,20 @@ export class NotificationService {
   }
 
   /**
+   * Deletes the given notifications (or all of them when ids is omitted) for one user.
+   * Always scoped by userId, so ids belonging to other users are ignored.
+   */
+  static async deleteNotifications(userId: string | ObjectId, ids?: string[]): Promise<number> {
+    const userObjectId = typeof userId === "string" ? new ObjectId(userId) : userId;
+    const db = await getDb();
+    const filter = ids
+      ? { userId: userObjectId, _id: { $in: ids.map((id) => new ObjectId(id)) } }
+      : { userId: userObjectId };
+    const res = await db.collection("notifications").deleteMany(filter);
+    return res.deletedCount;
+  }
+
+  /**
    * Cleans up read notifications older than 30 days (run by daily cron).
    */
   static async cleanupOldNotifications(days = 30): Promise<number> {

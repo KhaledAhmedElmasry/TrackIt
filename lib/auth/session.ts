@@ -17,6 +17,7 @@ import { SessionDocument, UserDocument } from "../models/types";
 export const SESSION_COOKIE_NAME = "wt_session";
 const SESSION_TTL_DAYS = 30;
 const SESSION_TTL_MS = SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
+const LEGACY_TOPIC_PREFIX = "watchtrack-usr-";
 
 export interface AuthenticatedUser {
   id: string;
@@ -117,6 +118,14 @@ export async function getSessionContext(tokenOverride?: string): Promise<Session
     const user = session?.user;
     if (!user || !user._id) {
       return null;
+    }
+
+    // One-time rename of topics created before the WatchTrack -> TrackIt rebrand
+    if (user.ntfyTopic?.startsWith(LEGACY_TOPIC_PREFIX)) {
+      user.ntfyTopic = `trackit-usr-${user.ntfyTopic.slice(LEGACY_TOPIC_PREFIX.length)}`;
+      await db
+        .collection<UserDocument>("users")
+        .updateOne({ _id: user._id }, { $set: { ntfyTopic: user.ntfyTopic, updatedAt: new Date() } });
     }
 
     return {

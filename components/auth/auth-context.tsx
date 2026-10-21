@@ -3,11 +3,13 @@
 /**
  * Authentication State Context Provider
  *
- * Manages client-side authentication state, session hydration, and sign-out actions.
+ * The signed-in user is read from the client cache first, so pages render
+ * immediately on repeat visits, and is then revalidated against /api/auth/me.
  */
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { createContext, useCallback, useContext } from "react";
 import { useRouter } from "next/navigation";
+import { clearCache, useCachedFetch } from "@/lib/client/cache";
 
 export interface UserProfile {
   id: string;
@@ -36,39 +38,12 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { data, isLoading, refresh } = useCachedFetch<{ user: UserProfile | null }>("/api/auth/me", "session");
 
   const refreshUser = useCallback(async () => {
-    try {
-      const res = await fetch("/api/auth/me", { cache: "no-store" });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data?.user) {
-          setUser(json.data.user);
-          return;
-        }
-      }
-      setUser(null);
-    } catch {
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    queueMicrotask(() => {
-      if (mounted) {
-        void refreshUser();
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [refreshUser]);
+    await refresh();
+  }, [refresh]);
 
   const logout = useCallback(async () => {
     try {
@@ -79,14 +54,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await Promise.all(names.map((name) => caches.delete(name)));
       }
     } finally {
-      setUser(null);
+      clearCache();
       router.push("/login");
       router.refresh();
     }
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, refreshUser, logout }}>
+    <AuthContext.Provider value={{ user: data?.user ?? null, isLoading, refreshUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
