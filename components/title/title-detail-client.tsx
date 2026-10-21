@@ -598,14 +598,14 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
   if (error || !details) {
     return (
       <div className="space-y-4 max-w-lg mx-auto pt-8">
-        <div className="p-5 rounded-2xl bg-[#2a0e0e] border border-[#ff8a80]/30 text-center space-y-3">
+        <div className="p-5 rounded-2xl bg-[#1f1424] border border-[#ff8a80]/30 text-center space-y-3">
           <AlertCircle className="w-8 h-8 text-[#ff8a80] mx-auto" />
           <h2 className="text-sm font-semibold text-cream">Unable to Load Title</h2>
-          <p className="text-xs text-[#ffb3ab]">{error || "Title not found"}</p>
+          <p className="text-xs text-[#ff8a80]">{error || "Title not found"}</p>
           <div className="flex justify-center gap-3 pt-2">
             <button
               onClick={() => router.back()}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-cream"
+              className="px-4 py-2 rounded-xl bg-plum-raised hover:bg-plum-line text-xs font-semibold text-cream"
             >
               Go Back
             </button>
@@ -881,7 +881,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
       </section>
       {/* Movie Franchise Collection Collapsible Dropdown */}
       {isMovie && details.belongsToCollection && (
-        <div className="rounded-2xl overflow-hidden bg-[#1f1424] border border-[rgba(255,255,255,0.08)] shadow-lg transition-all">
+        <div className="rounded-2xl overflow-hidden bg-[#1f1424] border border-plum-line shadow-lg transition-all">
           {/* Accordion Trigger Header */}
           <div
             onClick={() => {
@@ -891,7 +891,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 void fetchCollection(details.belongsToCollection.id);
               }
             }}
-            className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-colors"
+            className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-plum-raised transition-colors"
           >
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -912,14 +912,14 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
               </p>
             </div>
 
-            <div className="p-2 rounded-xl bg-white/5 text-[#b7a9bc] hover:text-cream transition-colors shrink-0">
+            <div className="p-2 rounded-xl bg-plum-raised text-[#b7a9bc] hover:text-cream transition-colors shrink-0">
               {isCollectionExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </div>
           </div>
 
           {/* Expanded Dropdown Content */}
           {isCollectionExpanded && (
-            <div className="border-t border-[rgba(255,255,255,0.06)] p-4 sm:p-5 space-y-4 bg-black/25">
+            <div className="border-t border-plum-line p-4 sm:p-5 space-y-4 bg-ink/">
               {isLoadingCollection ? (
                 <div className="py-8 text-center space-y-2">
                   <Loader2 className="w-5 h-5 text-[#4fd27f] animate-spin mx-auto" />
@@ -928,11 +928,11 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
               ) : collectionDetail ? (
                 <div className="space-y-3">
                   {/* Actions Bar */}
-                  <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b border-white/[0.06]">
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b border-plum-line">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={handleToggleSelectAllParts}
-                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-cream flex items-center gap-1.5 transition-colors"
+                        className="px-2.5 py-1 rounded-lg bg-plum-raised hover:bg-plum-raised text-xs font-semibold text-cream flex items-center gap-1.5 transition-colors"
                       >
                         {selectedPartIds.size === collectionDetail.parts.length ? (
                           <>
@@ -993,8 +993,8 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                           className={`p-2.5 rounded-xl border flex items-center gap-3 cursor-pointer transition-all ${
                             isSelected
                               ? "bg-[#4fd27f]/[0.08] border-[#4fd27f]/40"
-                              : "bg-[#161618] border-white/[0.04] hover:border-white/10"
-                          } ${isCurrent ? "ring-1 ring-[#e9b44c]/40" : ""}`}
+                              : "bg-[#160e19] border-plum-line hover:border-plum-line"
+                          } ${isCurrent ? "ring-1 ring-[#b48cc0]/50" : ""}`}
                         >
                           {/* Checkbox */}
                           <div className="p-1 text-cream shrink-0">
@@ -1006,7 +1006,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                           </div>
 
                           {/* Thumbnail */}
-                          <div className="relative w-9 h-13 rounded-lg overflow-hidden bg-[#222] shrink-0 border border-white/10">
+                          <div className="relative w-9 h-13 rounded-lg overflow-hidden bg-[#2c1b33] shrink-0 border border-plum-line">
                             {part.posterPath ? (
                               <Image
                                 src={`https://image.tmdb.org/t/p/w92${part.posterPath}`}
@@ -1031,7 +1031,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                                 {part.title}
                               </h4>
                               {isCurrent && (
-                                <span className="px-1 py-0.2 rounded bg-[#e9b44c]/20 text-[#e9b44c] text-[9px] font-bold">
+                                <span className="px-1 py-0.2 rounded bg-[#b48cc0]/20 text-[#b48cc0] text-[9px] font-bold">
                                   Current
                                 </span>
                               )}
@@ -1049,7 +1049,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                                 <span>Watched</span>
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[#b7a9bc] text-[10px] font-medium">
+                              <span className="px-2 py-0.5 rounded-md bg-plum-raised border border-plum-line text-[#b7a9bc] text-[10px] font-medium">
                                 Unwatched
                               </span>
                             )}
@@ -1218,9 +1218,9 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/ backdrop-blur-md animate-in fade-in"
         >
-          <div className="w-full max-w-sm rounded-3xl bg-[#1f1424] border border-[rgba(255,255,255,0.12)] p-5 shadow-2xl space-y-4">
+          <div className="w-full max-w-sm rounded-3xl bg-[#1f1424] border border-plum-line p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-[#4fd27f] fill-[#4fd27f]" />
@@ -1249,7 +1249,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   value={ratingInput}
                   onChange={(e) => setRatingInput(e.target.value)}
                   placeholder="e.g. 8.5 or 9.25"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#2c1b33] border border-white/10 text-cream font-bold text-sm focus:outline-none focus:border-[#4fd27f] transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream font-bold text-sm focus:outline-none focus:border-[#4fd27f] transition-colors"
                 />
                 <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#b7a9bc]">
                   / 10
@@ -1266,7 +1266,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                     key={preset}
                     type="button"
                     onClick={() => setRatingInput(String(preset))}
-                    className="py-1 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-cream border border-white/5 transition-colors"
+                    className="py-1 rounded-lg bg-plum-raised hover:bg-plum-line text-xs font-semibold text-cream border border-plum-line transition-colors"
                   >
                     {preset.toFixed(1)}
                   </button>
@@ -1275,7 +1275,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-2 flex items-center justify-between gap-2 border-t border-white/[0.06]">
+            <div className="pt-2 flex items-center justify-between gap-2 border-t border-plum-line">
               {tracked?.rating !== undefined && tracked?.rating !== null ? (
                 <button
                   type="button"
@@ -1291,7 +1291,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 <button
                   type="button"
                   onClick={() => setIsRatingModalOpen(false)}
-                  className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-[#b7a9bc] hover:text-cream"
+                  className="px-3 py-2 rounded-xl bg-plum-raised hover:bg-plum-raised text-xs font-semibold text-[#b7a9bc] hover:text-cream"
                 >
                   Cancel
                 </button>

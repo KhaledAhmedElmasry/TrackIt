@@ -46,24 +46,24 @@ export function UnverifiedBanner() {
   return (
     <div
       role="alert"
-      className="mb-6 p-4 rounded-2xl bg-[#2a1b0a]/90 border border-[#f59e0b]/40 backdrop-blur-xl animate-in fade-in"
+      className="mb-6 p-4 rounded-2xl bg-[#1f1424]/90 border border-[#e9b44c]/40 backdrop-blur-xl animate-in fade-in"
     >
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-xl bg-[#f59e0b]/20 text-[#fbbf24] shrink-0 mt-0.5 sm:mt-0">
+          <div className="p-2 rounded-xl bg-[#e9b44c]/20 text-[#e9b44c] shrink-0 mt-0.5 sm:mt-0">
             <AlertTriangle className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-[#fef3c7] uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#f2ece4] uppercase tracking-wider">
               Verify Your Email Address
             </h3>
-            <p className="text-xs text-[#fde68a]/90 mt-0.5">
+            <p className="text-xs text-[#f2ece4]/90 mt-0.5">
               Unverified accounts are automatically deleted after 7 days. Password resets require a verified email.
             </p>
             {statusMessage && (
               <p
                 className={`text-[11px] font-semibold mt-1.5 ${
-                  isSuccess ? "text-[#4fd27f]" : "text-[#f87171]"
+                  isSuccess ? "text-[#4fd27f]" : "text-[#ff8a80]"
                 }`}
               >
                 {statusMessage}
@@ -75,7 +75,7 @@ export function UnverifiedBanner() {
         <button
           onClick={handleResend}
           disabled={isSending}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f59e0b] hover:bg-[#d97706] text-black text-xs font-bold transition-all ios-press shrink-0 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#e9b44c] hover:bg-[#e9b44c] text-ink text-xs font-bold transition-all ios-press shrink-0 disabled:opacity-50"
         >
           {isSending ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />

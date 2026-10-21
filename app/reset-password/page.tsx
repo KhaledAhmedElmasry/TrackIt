@@ -87,7 +87,7 @@ function ResetPasswordContent() {
 
         <div className="ios-card p-6 md:p-8 space-y-5">
           {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.06)] text-xs font-semibold">
+          <div className="grid grid-cols-2 p-1 rounded-xl bg-[#2c1b33] border border-plum-line text-xs font-semibold">
             <button
               type="button"
               onClick={() => {
@@ -151,7 +151,7 @@ function ResetPasswordContent() {
                     placeholder="Paste reset token here..."
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream text-xs font-mono focus:outline-none focus:border-[#4fd27f] transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream text-xs font-mono focus:outline-none focus:border-[#4fd27f] transition-all"
                   />
                 </div>
               ) : (
@@ -171,7 +171,7 @@ function ResetPasswordContent() {
                         placeholder="name@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                       />
                     </div>
                   </div>
@@ -191,7 +191,7 @@ function ResetPasswordContent() {
                         placeholder="XXXX-XXXX-XXXX"
                         value={recoveryCode}
                         onChange={(e) => setRecoveryCode(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm font-mono tracking-wider focus:outline-none focus:border-[#4fd27f] transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm font-mono tracking-wider focus:outline-none focus:border-[#4fd27f] transition-all"
                       />
                     </div>
                   </div>
@@ -213,7 +213,7 @@ function ResetPasswordContent() {
                     placeholder="At least 8 characters with letter & number"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                   />
                 </div>
               </div>
@@ -221,7 +221,7 @@ function ResetPasswordContent() {
               <button
                 type="submit"
                 disabled={isLoading || newPassword.length < 8}
-                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 shadow-lg shadow-[#4fd27f]/20 disabled:opacity-50 mt-2"
+                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

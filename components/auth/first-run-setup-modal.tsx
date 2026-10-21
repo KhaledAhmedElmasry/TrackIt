@@ -59,9 +59,9 @@ export function FirstRunSetupModal() {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/ backdrop-blur-md animate-in fade-in"
     >
-      <div className="w-full max-w-lg rounded-3xl bg-[#160e19] border border-[rgba(255,255,255,0.12)] p-6 md:p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-lg rounded-3xl bg-[#160e19] border border-plum-line p-6 md:p-8 shadow-2xl space-y-6">
         {/* Header */}
         <div className="flex items-start gap-3.5">
           <div className="p-3 rounded-2xl bg-[#4fd27f]/20 text-[#4fd27f] shrink-0">
@@ -81,7 +81,7 @@ export function FirstRunSetupModal() {
         </div>
 
         {/* Free Tier Guarantee Callout */}
-        <div className="p-3.5 rounded-2xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] space-y-2">
+        <div className="p-3.5 rounded-2xl bg-plum-raised border border-plum-line space-y-2">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#4fd27f]">
             <ShieldCheck className="w-4 h-4" />
             <span>Zero-Cost & AES-256-GCM Encrypted</span>
@@ -114,7 +114,7 @@ export function FirstRunSetupModal() {
               onChange={(e) => setApiKey(e.target.value)}
               disabled={isLoading || isSuccess}
               required
-              className="w-full px-4 py-3 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.1)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all disabled:opacity-50"
+              className="w-full px-4 py-3 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all disabled:opacity-50"
             />
           </div>
 

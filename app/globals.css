@@ -55,6 +55,28 @@ body {
   min-height: 100dvh;
 }
 
+/* Tailwind v4 no longer gives buttons a pointer cursor; restore it for everything clickable */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+[role="tab"],
+[role="switch"],
+select,
+summary,
+label[for],
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+input[type="file"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"],
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+}
+
 /* Poster headline: tall condensed uppercase. Big Shoulders picks its display cut at large sizes. */
 .font-display {
   text-transform: uppercase;

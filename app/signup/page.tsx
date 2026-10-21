@@ -138,7 +138,7 @@ export default function SignupPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   minLength={2}
                   maxLength={30}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function SignupPage() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function SignupPage() {
                   placeholder="At least 8 characters with letter & number"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
               <p className="text-[11px] text-[#b7a9bc] pl-1">
@@ -191,7 +191,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading || !email || password.length < 8}
-              className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 shadow-lg shadow-[#4fd27f]/20 disabled:opacity-50 mt-2"
+              className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -205,7 +205,7 @@ export default function SignupPage() {
           </form>
 
           {/* Privacy Note */}
-          <div className="pt-2 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-center gap-2 text-[11px] text-[#b7a9bc]">
+          <div className="pt-2 border-t border-plum-line flex items-center justify-center gap-2 text-[11px] text-[#b7a9bc]">
             <ShieldCheck className="w-3.5 h-3.5 text-[#4fd27f]" />
             <span>Fully private. No social sharing. No tracking.</span>
           </div>
@@ -225,9 +225,9 @@ export default function SignupPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/ backdrop-blur-md animate-in fade-in"
         >
-          <div className="w-full max-w-lg rounded-3xl bg-[#160e19] border border-[rgba(255,255,255,0.12)] p-6 md:p-8 shadow-2xl space-y-6">
+          <div className="w-full max-w-lg rounded-3xl bg-[#160e19] border border-plum-line p-6 md:p-8 shadow-2xl space-y-6">
             <div className="flex items-start gap-3.5">
               <div className="p-3 rounded-2xl bg-[#e9b44c]/20 text-[#e9b44c] shrink-0">
                 <ShieldAlert className="w-6 h-6" />
@@ -246,12 +246,12 @@ export default function SignupPage() {
             </div>
 
             {/* Codes Grid */}
-            <div className="p-4 rounded-2xl bg-[#0d0d0f] border border-[rgba(255,255,255,0.08)]">
+            <div className="p-4 rounded-2xl bg-[#0b090c] border border-plum-line">
               <div className="grid grid-cols-2 gap-2 text-center font-mono text-xs text-[#f2ece4] tracking-wider select-text">
                 {recoveryCodes.map((code, idx) => (
                   <div
                     key={code}
-                    className="p-2 rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.04)]"
+                    className="p-2 rounded-lg bg-plum-raised border border-plum-line"
                   >
                     <span className="text-[#b7a9bc] text-[10px] mr-1.5">{idx + 1}.</span>
                     <span className="font-semibold text-cream">{code}</span>
@@ -265,7 +265,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={handleCopyCodes}
-                className="w-full py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.14)] text-cream text-xs font-semibold flex items-center justify-center gap-2 transition-all ios-press"
+                className="w-full py-2.5 rounded-xl bg-plum-line hover:bg-plum-line text-cream text-xs font-semibold flex items-center justify-center gap-2 transition-all ios-press"
               >
                 {copiedCodes ? (
                   <>
@@ -285,7 +285,7 @@ export default function SignupPage() {
                   type="checkbox"
                   checked={hasConfirmedSaved}
                   onChange={(e) => setHasConfirmedSaved(e.target.checked)}
-                  className="mt-0.5 rounded border-zinc-700 bg-zinc-800 text-[#4fd27f] focus:ring-0"
+                  className="mt-0.5 rounded border-plum-line bg-plum-raised text-[#4fd27f] focus:ring-0"
                 />
                 <span className="text-xs text-[#b7a9bc] leading-snug">
                   I have copied or written down these backup recovery codes and understand they will not be shown again.
@@ -296,7 +296,7 @@ export default function SignupPage() {
                 type="button"
                 onClick={handleFinishSignup}
                 disabled={!hasConfirmedSaved}
-                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#4fd27f]/20"
+                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Continue to TrackIt
               </button>

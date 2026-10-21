@@ -69,7 +69,7 @@ function VerifyEmailContent() {
           </div>
         ) : isSuccess ? (
           <div className="space-y-4 py-4">
-            <div className="w-16 h-16 rounded-full bg-[#4fd27f]/20 text-[#4fd27f] flex items-center justify-center mx-auto shadow-lg shadow-[#4fd27f]/15">
+            <div className="w-16 h-16 rounded-full bg-[#4fd27f]/20 text-[#4fd27f] flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-9 h-9" />
             </div>
             <div>
@@ -78,7 +78,7 @@ function VerifyEmailContent() {
             </div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press mt-2 shadow-lg shadow-[#4fd27f]/20"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press mt-2"
             >
               <span>Go to TrackIt</span>
               <ArrowRight className="w-4 h-4" />
@@ -86,7 +86,7 @@ function VerifyEmailContent() {
           </div>
         ) : (
           <div className="space-y-4 py-4">
-            <div className="w-16 h-16 rounded-full bg-[#ff8a80]/20 text-[#ff8a80] flex items-center justify-center mx-auto shadow-lg shadow-[#ff8a80]/15">
+            <div className="w-16 h-16 rounded-full bg-[#ff8a80]/20 text-[#ff8a80] flex items-center justify-center mx-auto">
               <XCircle className="w-9 h-9" />
             </div>
             <div>
@@ -96,7 +96,7 @@ function VerifyEmailContent() {
             <div className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-semibold transition-all ios-press"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-plum-line hover:bg-plum-line text-cream text-xs font-semibold transition-all ios-press"
               >
                 <span>Back to Sign In</span>
               </Link>

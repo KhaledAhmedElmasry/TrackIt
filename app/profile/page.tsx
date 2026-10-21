@@ -360,7 +360,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="ios-card p-10 text-center space-y-4 max-w-md mx-auto my-12 animate-in fade-in">
-        <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] text-[#b7a9bc] flex items-center justify-center mx-auto">
+        <div className="w-12 h-12 rounded-2xl bg-plum-raised text-[#b7a9bc] flex items-center justify-center mx-auto">
           <Key className="w-6 h-6" />
         </div>
         <div>
@@ -378,7 +378,7 @@ export default function ProfilePage() {
           </Link>
           <Link
             href="/signup"
-            className="px-5 py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] text-cream text-xs font-semibold ios-press"
+            className="px-5 py-2.5 rounded-xl bg-plum-line text-cream text-xs font-semibold ios-press"
           >
             Create Account
           </Link>
@@ -402,7 +402,7 @@ export default function ProfilePage() {
 
         <button
           onClick={logout}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[#ff8a80]/20 hover:text-[#ff8a80] text-xs font-semibold text-cream transition-colors ios-press shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-plum-line hover:bg-[#ff8a80]/20 hover:text-[#ff8a80] text-xs font-semibold text-cream transition-colors ios-press shrink-0"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
@@ -432,7 +432,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Display Username Configuration */}
-        <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-3">
+        <div className="pt-4 border-t border-plum-line space-y-3">
           <div>
             <label htmlFor="username-input" className="text-xs font-bold text-cream flex items-center gap-1.5">
               <UserIcon className="w-3.5 h-3.5 text-[#4fd27f]" />
@@ -453,7 +453,7 @@ export default function ProfilePage() {
                 placeholder="Enter display username (e.g. MovieLover)"
                 minLength={2}
                 maxLength={30}
-                className="w-full px-3.5 py-2 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.1)] text-xs text-cream placeholder-[#8a7c90] focus:outline-none focus:border-[#4fd27f] transition-colors"
+                className="w-full px-3.5 py-2 rounded-xl bg-[#2c1b33] border border-plum-line text-xs text-cream placeholder:text-dim focus:outline-none focus:border-[#4fd27f] transition-colors"
               />
             </div>
             <button
@@ -523,14 +523,14 @@ export default function ProfilePage() {
               </p>
 
               {keys?.tmdb.configured && (
-                <div className="p-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.06)] font-mono text-xs text-cream flex items-center justify-between">
+                <div className="p-2.5 rounded-xl bg-[#2c1b33] border border-plum-line font-mono text-xs text-cream flex items-center justify-between">
                   <span>••••••••••••{keys.tmdb.lastFour}</span>
                   <span className="text-[10px] text-[#b7a9bc] font-sans">Encrypted at rest</span>
                 </div>
               )}
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+            <div className="space-y-2 pt-2 border-t border-plum-line">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -558,7 +558,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteKey("tmdb")}
-                    className="p-2 rounded-xl bg-[rgba(255,255,255,0.06)] hover:bg-[#ff8a80]/20 text-[#b7a9bc] hover:text-[#ff8a80] transition-colors ios-press"
+                    className="p-2 rounded-xl bg-plum-raised hover:bg-[#ff8a80]/20 text-[#b7a9bc] hover:text-[#ff8a80] transition-colors ios-press"
                     aria-label="Delete TMDB key"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -590,7 +590,7 @@ export default function ProfilePage() {
                   className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                     keys?.gemini.configured
                       ? "bg-[#4fd27f]/15 text-[#4fd27f]"
-                      : "bg-[rgba(255,255,255,0.08)] text-[#b7a9bc]"
+                      : "bg-plum-line text-[#b7a9bc]"
                   }`}
                 >
                   {keys?.gemini.configured ? "Connected" : "Optional"}
@@ -601,14 +601,14 @@ export default function ProfilePage() {
               </p>
 
               {keys?.gemini.configured && (
-                <div className="p-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.06)] font-mono text-xs text-cream flex items-center justify-between">
+                <div className="p-2.5 rounded-xl bg-[#2c1b33] border border-plum-line font-mono text-xs text-cream flex items-center justify-between">
                   <span>••••••••••••{keys.gemini.lastFour}</span>
                   <span className="text-[10px] text-[#b7a9bc] font-sans">Encrypted at rest</span>
                 </div>
               )}
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+            <div className="space-y-2 pt-2 border-t border-plum-line">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -617,7 +617,7 @@ export default function ProfilePage() {
                     setInputKey("");
                     setKeyError(null);
                   }}
-                  className="flex-1 py-2 rounded-xl bg-[#b48cc0] hover:bg-[#5a2e63] text-cream text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 rounded-xl bg-eggplant hover:bg-plum-line text-cream text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
                 >
                   {keys?.gemini.configured ? (
                     <>
@@ -636,7 +636,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteKey("gemini")}
-                    className="p-2 rounded-xl bg-[rgba(255,255,255,0.06)] hover:bg-[#ff8a80]/20 text-[#b7a9bc] hover:text-[#ff8a80] transition-colors ios-press"
+                    className="p-2 rounded-xl bg-plum-raised hover:bg-[#ff8a80]/20 text-[#b7a9bc] hover:text-[#ff8a80] transition-colors ios-press"
                     aria-label="Delete Gemini key"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -661,7 +661,7 @@ export default function ProfilePage() {
       {/* Push Notifications Section */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-[#e9b44c]" />
+          <Bell className="w-5 h-5 text-lilac" />
           <h2 className="text-base font-bold text-cream">Push Notifications (ntfy.sh & Bark)</h2>
         </div>
 
@@ -675,14 +675,14 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] flex items-center justify-between gap-3">
-              <span className="font-mono text-xs text-[#e9b44c] truncate select-all">
+            <div className="p-3 rounded-xl bg-[#2c1b33] border border-plum-line flex items-center justify-between gap-3">
+              <span className="font-mono text-xs text-lilac truncate select-all">
                 {user.ntfyTopic}
               </span>
               <button
                 type="button"
                 onClick={handleCopyTopic}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-semibold transition-all ios-press shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-plum-line hover:bg-plum-line text-cream text-xs font-semibold transition-all ios-press shrink-0"
               >
                 {copiedTopic ? <Check className="w-3.5 h-3.5 text-[#4fd27f]" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedTopic ? "Copied" : "Copy"}</span>
@@ -703,7 +703,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Channel 2: Bark */}
-          <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2.5">
+          <div className="pt-4 border-t border-plum-line space-y-2.5">
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-xs font-semibold text-cream">Bark (iOS Push)</p>
@@ -724,14 +724,14 @@ export default function ProfilePage() {
                 value={barkKeyInput}
                 onChange={(e) => setBarkKeyInput(e.target.value)}
                 placeholder="e.g. your_bark_key or https://api.day.app/..."
-                className="flex-1 px-3 py-2 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream text-xs font-mono placeholder:text-[#555] focus:outline-none focus:border-[#e9b44c]"
+                className="flex-1 px-3 py-2 rounded-xl bg-[#2c1b33] border border-plum-line text-cream text-xs font-mono placeholder:text-[#8a7c90] focus:outline-none focus:border-green"
               />
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={handleSaveBarkKey}
                   disabled={isSavingBarkKey || !barkKeyInput.trim() || barkKeyInput.trim() === user.barkKey}
-                  className="px-3 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-semibold transition-all ios-press disabled:opacity-40"
+                  className="px-3 py-2 rounded-xl bg-plum-line hover:bg-plum-line text-cream text-xs font-semibold transition-all ios-press disabled:opacity-40"
                 >
                   {isSavingBarkKey ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save Bark Key"}
                 </button>
@@ -754,7 +754,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Combined Test Notification Dispatcher */}
-          <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap items-center justify-between gap-3">
+          <div className="pt-4 border-t border-plum-line flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs text-[#b7a9bc]">
               Send a test push to all configured services:
             </span>
@@ -763,7 +763,7 @@ export default function ProfilePage() {
               type="button"
               onClick={handleSendTestPush}
               disabled={isSendingTestPush}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#e9b44c]/15 hover:bg-[#e9b44c]/25 border border-[#e9b44c]/30 text-[#e9b44c] text-xs font-bold transition-all ios-press disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-transparent hover:bg-green hover:text-ink border border-green text-green text-xs font-bold transition-all ios-press disabled:opacity-50"
             >
               {isSendingTestPush ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -817,14 +817,14 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={handleExportData}
-              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center gap-2 shadow-md shadow-[#4fd27f]/20"
+              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center gap-2"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Library (JSON)</span>
             </button>
 
             {/* Import Button */}
-            <label className="px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-bold transition-all ios-press flex items-center gap-2 cursor-pointer border border-white/10">
+            <label className="px-4 py-2 rounded-xl bg-plum-line hover:bg-plum-line text-cream text-xs font-bold transition-all ios-press flex items-center gap-2 cursor-pointer border border-plum-line">
               {isImporting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-[#4fd27f]" />
               ) : (
@@ -856,8 +856,8 @@ export default function ProfilePage() {
       </section>
 
       {/* Danger Zone: Account Deletion */}
-      <section className="space-y-3 pt-4 border-t border-[rgba(255,255,255,0.08)]">
-        <div className="p-5 rounded-2xl bg-[#2a0e0e]/50 border border-[#ff8a80]/25 space-y-3">
+      <section className="space-y-3 pt-4 border-t border-plum-line">
+        <div className="p-5 rounded-2xl bg-[#1f1424]/50 border border-[#ff8a80]/25 space-y-3">
           <div>
             <h3 className="text-sm font-bold text-[#ff8a80]">Danger Zone</h3>
             <p className="text-xs text-[#b7a9bc] mt-0.5">
@@ -884,9 +884,9 @@ export default function ProfilePage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/ backdrop-blur-md animate-in fade-in"
         >
-          <div className="w-full max-w-md rounded-3xl bg-[#160e19] border border-[rgba(255,255,255,0.12)] p-6 space-y-5 shadow-2xl">
+          <div className="w-full max-w-md rounded-3xl bg-[#160e19] border border-plum-line p-6 space-y-5 shadow-2xl">
             <div className="flex items-start gap-3">
               <div className="p-2.5 rounded-xl bg-[#4fd27f]/20 text-[#4fd27f]">
                 <Key className="w-5 h-5" />
@@ -914,7 +914,7 @@ export default function ProfilePage() {
                   placeholder={`Paste your ${editingKeyType.toUpperCase()} key...`}
                   value={inputKey}
                   onChange={(e) => setInputKey(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
 
@@ -947,7 +947,7 @@ export default function ProfilePage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/ backdrop-blur-md animate-in fade-in"
         >
           <div className="w-full max-w-md rounded-3xl bg-[#160e19] border border-[#ff8a80]/30 p-6 space-y-5 shadow-2xl">
             <div className="flex items-start gap-3">
@@ -974,7 +974,7 @@ export default function ProfilePage() {
                   placeholder="Enter your current password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#ff8a80] transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#ff8a80] transition-all"
                 />
               </div>
 
@@ -993,7 +993,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={isDeletingAccount || !deletePassword}
-                  className="px-5 py-2 rounded-xl bg-[#ff8a80] hover:bg-[#e5736a] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-[#ff8a80] hover:bg-[#ff8a80] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {isDeletingAccount && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Confirm Delete</span>

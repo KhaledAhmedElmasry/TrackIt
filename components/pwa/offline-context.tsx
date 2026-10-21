@@ -67,17 +67,17 @@ export function OfflineBanner() {
       aria-live="polite"
       className="fixed top-14 left-0 right-0 z-50 px-4 py-2 pointer-events-none transition-all duration-300 animate-in fade-in slide-in-from-top-2"
     >
-      <div className="max-w-md mx-auto flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#2c1a0e]/90 border border-[#f59e0b]/30 backdrop-blur-xl shadow-2xl pointer-events-auto">
+      <div className="max-w-md mx-auto flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#1f1424]/90 border border-[#e9b44c]/30 backdrop-blur-xl shadow-2xl pointer-events-auto">
         <div className="flex items-center gap-2.5">
-          <div className="p-1 rounded-full bg-[#f59e0b]/20 text-[#fbbf24]">
+          <div className="p-1 rounded-full bg-[#e9b44c]/20 text-[#e9b44c]">
             <WifiOff className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#fef3c7]">Offline Mode</p>
-            <p className="text-[11px] text-[#fde68a]/80">Viewing cached data. Write actions are disabled.</p>
+            <p className="text-xs font-semibold text-[#f2ece4]">Offline Mode</p>
+            <p className="text-[11px] text-[#f2ece4]/80">Viewing cached data. Write actions are disabled.</p>
           </div>
         </div>
-        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#f59e0b]/20 text-[#fde68a]">
+        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#e9b44c]/20 text-[#f2ece4]">
           Read-Only
         </span>
       </div>

@@ -221,7 +221,7 @@ export default function NotificationsPage() {
           <button
             onClick={handleMarkAllRead}
             disabled={isMarkingAll}
-            className="px-3.5 py-1.5 rounded-full bg-[#1f1424] hover:bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-xs font-semibold text-[#4fd27f] flex items-center gap-1.5 transition-all disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-full bg-[#1f1424] hover:bg-[#2c1b33] border border-plum-line text-xs font-semibold text-[#4fd27f] flex items-center gap-1.5 transition-all disabled:opacity-50"
           >
             {isMarkingAll ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -238,7 +238,7 @@ export default function NotificationsPage() {
         <div className="ios-card p-4 sm:p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-[#e9b44c]" />
+              <Smartphone className="w-5 h-5 text-lilac" />
               <h2 className="text-sm sm:text-base font-bold text-cream">
                 Mobile Push Channels (Bark & ntfy.sh)
               </h2>
@@ -246,7 +246,7 @@ export default function NotificationsPage() {
             <button
               onClick={handleSendTestPush}
               disabled={isSendingTest}
-              className="px-3 py-1.5 rounded-xl bg-[#e9b44c]/15 hover:bg-[#e9b44c]/25 border border-[#e9b44c]/30 text-[#e9b44c] text-xs font-bold transition-all ios-press flex items-center gap-1.5 disabled:opacity-40"
+              className="px-3 py-1.5 rounded-xl bg-transparent hover:bg-green hover:text-ink border border-green text-green text-xs font-bold transition-all ios-press flex items-center gap-1.5 disabled:opacity-40"
             >
               {isSendingTest ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
               <span>Test Push</span>
@@ -255,7 +255,7 @@ export default function NotificationsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
             {/* Bark iOS Setup */}
-            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-white/[0.06] space-y-2">
+            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-plum-line space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-cream">Bark (iOS Push)</span>
                 {user.barkKey ? (
@@ -278,7 +278,7 @@ export default function NotificationsPage() {
                   value={barkKeyInput}
                   onChange={(e) => setBarkKeyInput(e.target.value)}
                   placeholder="Paste Bark device key..."
-                  className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-white/10 text-cream text-xs font-mono placeholder-[#8a7c90] focus:outline-none focus:border-[#e9b44c]"
+                  className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream text-xs font-mono placeholder:text-dim focus:outline-none focus:border-green"
                 />
                 <button
                   onClick={handleSaveBark}
@@ -304,7 +304,7 @@ export default function NotificationsPage() {
             </div>
 
             {/* ntfy.sh Setup */}
-            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-white/[0.06] space-y-2">
+            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-plum-line space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-cream">ntfy.sh (Free Server)</span>
                 <span className="px-2 py-0.5 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[10px] font-bold border border-[#4fd27f]/30">
@@ -316,7 +316,7 @@ export default function NotificationsPage() {
               </p>
 
               <div className="flex items-center gap-2 pt-1">
-                <div className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-white/10 text-[#e9b44c] text-xs font-mono truncate select-all">
+                <div className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-plum-line text-lilac text-xs font-mono truncate select-all">
                   {user.ntfyTopic}
                 </div>
                 <button
@@ -325,7 +325,7 @@ export default function NotificationsPage() {
                     setCopiedTopic(true);
                     setTimeout(() => setCopiedTopic(false), 2000);
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream text-xs font-semibold shrink-0 flex items-center gap-1 transition-all"
+                  className="px-3 py-1.5 rounded-xl bg-plum-raised hover:bg-plum-line text-cream text-xs font-semibold shrink-0 flex items-center gap-1 transition-all"
                 >
                   {copiedTopic ? <Check className="w-3 h-3 text-[#4fd27f]" /> : <Copy className="w-3 h-3" />}
                   <span>{copiedTopic ? "Copied" : "Copy"}</span>
@@ -349,7 +349,7 @@ export default function NotificationsPage() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-2xl bg-[#1f1424] border border-[rgba(255,255,255,0.06)] animate-pulse h-20"
+              className="p-4 rounded-2xl bg-[#1f1424] border border-plum-line animate-pulse h-20"
             />
           ))}
         </div>
@@ -364,7 +364,7 @@ export default function NotificationsPage() {
                 className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 ${
                   !notif.read
                     ? "bg-[#1f1424] border-[#4fd27f]/30 shadow-md hover:border-[#4fd27f]/60"
-                    : "bg-[#160e19]/60 border-white/[0.04] hover:border-white/[0.1] opacity-75 hover:opacity-100"
+                    : "bg-[#160e19]/60 border-plum-line hover:border-plum-line opacity-75 hover:opacity-100"
                 }`}
               >
                 {/* Icon */}
@@ -412,7 +412,7 @@ export default function NotificationsPage() {
       ) : (
         /* Empty State */
         <div className="ios-card p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center mx-auto text-[#b7a9bc]">
+          <div className="w-12 h-12 rounded-2xl bg-plum-raised border border-plum-line flex items-center justify-center mx-auto text-[#b7a9bc]">
             <Bell className="w-6 h-6" />
           </div>
           <div>

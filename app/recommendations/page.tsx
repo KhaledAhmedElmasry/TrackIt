@@ -148,7 +148,7 @@ export default function RecommendationsPage() {
           <button
             onClick={() => handleGenerateRecommendations(true)}
             disabled={isLoading}
-            className="self-start sm:self-auto px-4 py-2 rounded-xl bg-[#2c1b33] hover:bg-[#3a2541] border border-white/10 text-cream text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50"
+            className="self-start sm:self-auto px-4 py-2 rounded-xl bg-[#2c1b33] hover:bg-[#3a2541] border border-plum-line text-cream text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-[#b48cc0]" : ""}`} />
             <span>Refresh Picks</span>
@@ -158,7 +158,7 @@ export default function RecommendationsPage() {
 
       {/* Key Requirement Banners */}
       {!hasGeminiKey && (
-        <div className="p-4 rounded-2xl bg-[#2b1736] border border-[#b48cc0]/40 backdrop-blur-xl flex items-start gap-3.5">
+        <div className="p-4 rounded-2xl bg-[#1f1424] border border-[#b48cc0]/40 backdrop-blur-xl flex items-start gap-3.5">
           <Key className="w-5 h-5 text-[#b48cc0] shrink-0 mt-0.5" />
           <div className="space-y-1 text-xs">
             <h3 className="font-semibold text-cream">Google Gemini API Key Required</h3>
@@ -188,7 +188,7 @@ export default function RecommendationsPage() {
 
       {/* Error Callout */}
       {error && (
-        <div className="p-4 rounded-2xl bg-[#2a0e0e] border border-[#ff8a80]/40 text-xs text-[#ffb3ab] flex items-start gap-2.5">
+        <div className="p-4 rounded-2xl bg-[#1f1424] border border-[#ff8a80]/40 text-xs text-[#ff8a80] flex items-start gap-2.5">
           <AlertCircle className="w-4 h-4 text-[#ff8a80] shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="font-bold">Recommendation Notice</p>
@@ -203,7 +203,7 @@ export default function RecommendationsPage() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-2xl bg-[#1f1424] border border-[rgba(255,255,255,0.06)] animate-pulse h-40"
+              className="p-4 rounded-2xl bg-[#1f1424] border border-plum-line animate-pulse h-40"
             />
           ))}
         </div>
@@ -224,13 +224,13 @@ export default function RecommendationsPage() {
               return (
                 <div
                   key={key}
-                  className="rounded-2xl overflow-hidden bg-[#1f1424] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.2)] transition-all flex flex-col justify-between p-3.5 space-y-3"
+                  className="rounded-2xl overflow-hidden bg-[#1f1424] border border-plum-line hover:border-plum-line transition-all flex flex-col justify-between p-3.5 space-y-3"
                 >
                   <div className="flex gap-3">
                     {/* Poster */}
                     <Link
                       href={`/title/${item.mediaType}/${item.tmdbId}`}
-                      className="relative w-16 h-24 rounded-xl overflow-hidden bg-[#160e19] shrink-0 border border-white/10"
+                      className="relative w-16 h-24 rounded-xl overflow-hidden bg-[#160e19] shrink-0 border border-plum-line"
                     >
                       {item.posterPath ? (
                         <Image
@@ -253,15 +253,15 @@ export default function RecommendationsPage() {
                     {/* Metadata & Reason */}
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span className="px-1.5 py-0.2 rounded bg-black/60 text-[9px] font-bold text-cream uppercase border border-white/10">
+                        <span className="px-1.5 py-0.2 rounded bg-ink/ text-[9px] font-bold text-cream uppercase border border-plum-line">
                           {item.mediaType === "movie" ? "Movie" : "Series"}
                         </span>
                         <span className="text-[10px] text-[#b7a9bc]">
                           {item.yearRange || "TBA"}
                         </span>
                         {item.predictedRating !== undefined && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#e9b44c]/15 border border-[#e9b44c]/30 text-[9px] font-bold text-[#e9b44c]">
-                            <Star className="w-2.5 h-2.5 fill-[#e9b44c]" />
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#4fd27f]/15 border border-[#4fd27f]/30 text-[9px] font-bold text-[#4fd27f]">
+                            <Star className="w-2.5 h-2.5 fill-[#4fd27f]" />
                             <span>{item.predictedRating}/10 Match</span>
                           </span>
                         )}
@@ -282,7 +282,7 @@ export default function RecommendationsPage() {
                   </div>
 
                   {/* Card Bottom Strip */}
-                  <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between gap-2">
+                  <div className="pt-2 border-t border-plum-line flex items-center justify-between gap-2">
                     <div className="inline-flex items-center gap-1 text-[10px] text-[#4fd27f] font-medium">
                       <ShieldCheck className="w-3.5 h-3.5" />
                       <span>TMDB Verified</span>
@@ -311,7 +311,7 @@ export default function RecommendationsPage() {
       ) : (
         /* Empty State */
         <div className="ios-card p-10 text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#b48cc0]/15 text-[#b48cc0] border border-[#b48cc0]/30 flex items-center justify-center mx-auto shadow-lg shadow-[#b48cc0]/10">
+          <div className="w-14 h-14 rounded-2xl bg-[#b48cc0]/15 text-[#b48cc0] border border-[#b48cc0]/30 flex items-center justify-center mx-auto">
             <Sparkles className="w-7 h-7" />
           </div>
           <div className="space-y-1">
@@ -325,7 +325,7 @@ export default function RecommendationsPage() {
             <button
               onClick={() => handleGenerateRecommendations(false)}
               disabled={isLoading || !hasGeminiKey || !hasTmdbKey}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#b48cc0] hover:bg-[#5a2e63] text-cream text-xs font-bold transition-all shadow-md shadow-[#b48cc0]/20 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-eggplant hover:bg-plum-line text-cream text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

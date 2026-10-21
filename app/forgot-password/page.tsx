@@ -94,7 +94,7 @@ export default function ForgotPasswordPage() {
                     placeholder="name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                   />
                 </div>
               </div>
@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading || !email}
-                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 shadow-lg shadow-[#4fd27f]/20 disabled:opacity-50"
+                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -117,16 +117,16 @@ export default function ForgotPasswordPage() {
           )}
 
           {/* Guaranteed Recovery Code Alternative */}
-          <div className="pt-4 border-t border-[rgba(255,255,255,0.06)]">
+          <div className="pt-4 border-t border-plum-line">
             <Link
               href="/reset-password?mode=recovery"
-              className="p-3 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] flex items-center gap-3 group hover:border-[#e9b44c]/30 transition-colors"
+              className="p-3 rounded-xl bg-plum-raised border border-plum-line flex items-center gap-3 group hover:border-[#b48cc0]/30 transition-colors"
             >
-              <div className="p-2 rounded-lg bg-[#e9b44c]/20 text-[#e9b44c]">
+              <div className="p-2 rounded-lg bg-[#b48cc0]/20 text-[#b48cc0]">
                 <KeyRound className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-cream group-hover:text-[#e9b44c] transition-colors">
+                <p className="text-xs font-bold text-cream group-hover:text-[#b48cc0] transition-colors">
                   Have a backup recovery code?
                 </p>
                 <p className="text-[11px] text-[#b7a9bc]">
