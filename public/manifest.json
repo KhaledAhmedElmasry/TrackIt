@@ -4,8 +4,8 @@
   "description": "Private, fast, and secure movie and TV series tracker with Apple iOS design.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#0b090c",
+  "theme_color": "#0b090c",
   "orientation": "portrait-primary",
   "icons": [
     {

@@ -63,7 +63,7 @@ export function UnverifiedBanner() {
             {statusMessage && (
               <p
                 className={`text-[11px] font-semibold mt-1.5 ${
-                  isSuccess ? "text-[#34d399]" : "text-[#f87171]"
+                  isSuccess ? "text-[#4fd27f]" : "text-[#f87171]"
                 }`}
               >
                 {statusMessage}

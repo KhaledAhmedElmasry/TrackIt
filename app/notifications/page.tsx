@@ -209,10 +209,10 @@ export default function NotificationsPage() {
       {/* Title Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="font-display font-black text-5xl md:text-[64px] leading-[0.9]">
             Notifications
           </h1>
-          <p className="text-sm text-[#8e8e93] mt-0.5">
+          <p className="text-sm text-[#b7a9bc] mt-0.5">
             Aired episode updates and system alerts.
           </p>
         </div>
@@ -221,7 +221,7 @@ export default function NotificationsPage() {
           <button
             onClick={handleMarkAllRead}
             disabled={isMarkingAll}
-            className="px-3.5 py-1.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-[rgba(255,255,255,0.08)] text-xs font-semibold text-[#0a84ff] flex items-center gap-1.5 transition-all disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-full bg-[#1f1424] hover:bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-xs font-semibold text-[#4fd27f] flex items-center gap-1.5 transition-all disabled:opacity-50"
           >
             {isMarkingAll ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -238,15 +238,15 @@ export default function NotificationsPage() {
         <div className="ios-card p-4 sm:p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-[#ffd60a]" />
-              <h2 className="text-sm sm:text-base font-bold text-white">
+              <Smartphone className="w-5 h-5 text-[#e9b44c]" />
+              <h2 className="text-sm sm:text-base font-bold text-cream">
                 Mobile Push Channels (Bark & ntfy.sh)
               </h2>
             </div>
             <button
               onClick={handleSendTestPush}
               disabled={isSendingTest}
-              className="px-3 py-1.5 rounded-xl bg-[#ffd60a]/15 hover:bg-[#ffd60a]/25 border border-[#ffd60a]/30 text-[#ffd60a] text-xs font-bold transition-all ios-press flex items-center gap-1.5 disabled:opacity-40"
+              className="px-3 py-1.5 rounded-xl bg-[#e9b44c]/15 hover:bg-[#e9b44c]/25 border border-[#e9b44c]/30 text-[#e9b44c] text-xs font-bold transition-all ios-press flex items-center gap-1.5 disabled:opacity-40"
             >
               {isSendingTest ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
               <span>Test Push</span>
@@ -255,20 +255,20 @@ export default function NotificationsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
             {/* Bark iOS Setup */}
-            <div className="p-3.5 rounded-2xl bg-[#141416] border border-white/[0.06] space-y-2">
+            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-white/[0.06] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white">Bark (iOS Push)</span>
+                <span className="text-xs font-bold text-cream">Bark (iOS Push)</span>
                 {user.barkKey ? (
-                  <span className="px-2 py-0.5 rounded-full bg-[#32d74b]/15 text-[#32d74b] text-[10px] font-bold border border-[#32d74b]/30">
+                  <span className="px-2 py-0.5 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[10px] font-bold border border-[#4fd27f]/30">
                     Connected
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[10px] font-bold border border-[#ff9f0a]/30">
+                  <span className="px-2 py-0.5 rounded-full bg-[#e9b44c]/15 text-[#e9b44c] text-[10px] font-bold border border-[#e9b44c]/30">
                     Not Configured
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-[#8e8e93]">
+              <p className="text-[11px] text-[#b7a9bc]">
                 Receive instant alerts on your iPhone via the Bark app.
               </p>
 
@@ -278,12 +278,12 @@ export default function NotificationsPage() {
                   value={barkKeyInput}
                   onChange={(e) => setBarkKeyInput(e.target.value)}
                   placeholder="Paste Bark device key..."
-                  className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#222226] border border-white/10 text-white text-xs font-mono placeholder-[#636366] focus:outline-none focus:border-[#ffd60a]"
+                  className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-white/10 text-cream text-xs font-mono placeholder-[#8a7c90] focus:outline-none focus:border-[#e9b44c]"
                 />
                 <button
                   onClick={handleSaveBark}
                   disabled={isSavingBark || !barkKeyInput.trim() || barkKeyInput.trim() === user.barkKey}
-                  className="px-3 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold shrink-0 transition-all disabled:opacity-40"
+                  className="px-3 py-1.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold shrink-0 transition-all disabled:opacity-40"
                 >
                   {isSavingBark ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save"}
                 </button>
@@ -291,7 +291,7 @@ export default function NotificationsPage() {
                   <button
                     onClick={handleDeleteBark}
                     disabled={isSavingBark}
-                    className="p-1.5 rounded-xl bg-[#ff453a]/15 text-[#ff453a] hover:bg-[#ff453a]/25 transition-colors shrink-0"
+                    className="p-1.5 rounded-xl bg-[#ff8a80]/15 text-[#ff8a80] hover:bg-[#ff8a80]/25 transition-colors shrink-0"
                     title="Remove Bark key"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -299,24 +299,24 @@ export default function NotificationsPage() {
                 )}
               </div>
               {barkFeedback && (
-                <p className="text-[10px] text-[#32d74b] font-medium">{barkFeedback}</p>
+                <p className="text-[10px] text-[#4fd27f] font-medium">{barkFeedback}</p>
               )}
             </div>
 
             {/* ntfy.sh Setup */}
-            <div className="p-3.5 rounded-2xl bg-[#141416] border border-white/[0.06] space-y-2">
+            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-white/[0.06] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white">ntfy.sh (Free Server)</span>
-                <span className="px-2 py-0.5 rounded-full bg-[#32d74b]/15 text-[#32d74b] text-[10px] font-bold border border-[#32d74b]/30">
+                <span className="text-xs font-bold text-cream">ntfy.sh (Free Server)</span>
+                <span className="px-2 py-0.5 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[10px] font-bold border border-[#4fd27f]/30">
                   Active
                 </span>
               </div>
-              <p className="text-[11px] text-[#8e8e93]">
+              <p className="text-[11px] text-[#b7a9bc]">
                 Subscribe to your private topic in the ntfy app (iOS/Android).
               </p>
 
               <div className="flex items-center gap-2 pt-1">
-                <div className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#222226] border border-white/10 text-[#ffd60a] text-xs font-mono truncate select-all">
+                <div className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-white/10 text-[#e9b44c] text-xs font-mono truncate select-all">
                   {user.ntfyTopic}
                 </div>
                 <button
@@ -325,9 +325,9 @@ export default function NotificationsPage() {
                     setCopiedTopic(true);
                     setTimeout(() => setCopiedTopic(false), 2000);
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold shrink-0 flex items-center gap-1 transition-all"
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream text-xs font-semibold shrink-0 flex items-center gap-1 transition-all"
                 >
-                  {copiedTopic ? <Check className="w-3 h-3 text-[#32d74b]" /> : <Copy className="w-3 h-3" />}
+                  {copiedTopic ? <Check className="w-3 h-3 text-[#4fd27f]" /> : <Copy className="w-3 h-3" />}
                   <span>{copiedTopic ? "Copied" : "Copy"}</span>
                 </button>
               </div>
@@ -335,7 +335,7 @@ export default function NotificationsPage() {
           </div>
 
           {testPushStatus && (
-            <p className="text-xs text-[#32d74b] font-medium pt-1 flex items-center gap-1.5">
+            <p className="text-xs text-[#4fd27f] font-medium pt-1 flex items-center gap-1.5">
               <Check className="w-4 h-4" />
               <span>{testPushStatus}</span>
             </p>
@@ -349,7 +349,7 @@ export default function NotificationsPage() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-2xl bg-[#1c1c1e] border border-[rgba(255,255,255,0.06)] animate-pulse h-20"
+              className="p-4 rounded-2xl bg-[#1f1424] border border-[rgba(255,255,255,0.06)] animate-pulse h-20"
             />
           ))}
         </div>
@@ -363,16 +363,16 @@ export default function NotificationsPage() {
                 onClick={() => handleNotificationClick(notif)}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 ${
                   !notif.read
-                    ? "bg-[#1c1c1e] border-[#0a84ff]/30 shadow-md hover:border-[#0a84ff]/60"
-                    : "bg-[#141416]/60 border-white/[0.04] hover:border-white/[0.1] opacity-75 hover:opacity-100"
+                    ? "bg-[#1f1424] border-[#4fd27f]/30 shadow-md hover:border-[#4fd27f]/60"
+                    : "bg-[#160e19]/60 border-white/[0.04] hover:border-white/[0.1] opacity-75 hover:opacity-100"
                 }`}
               >
                 {/* Icon */}
                 <div
                   className={`p-2.5 rounded-xl shrink-0 ${
                     isEpisode
-                      ? "bg-[#0a84ff]/15 text-[#0a84ff]"
-                      : "bg-[#32d74b]/15 text-[#32d74b]"
+                      ? "bg-[#4fd27f]/15 text-[#4fd27f]"
+                      : "bg-[#4fd27f]/15 text-[#4fd27f]"
                   }`}
                 >
                   {isEpisode ? <Tv className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
@@ -381,25 +381,25 @@ export default function NotificationsPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-xs sm:text-sm font-bold text-white truncate">
+                    <h3 className="text-xs sm:text-sm font-bold text-cream truncate">
                       {notif.title}
                     </h3>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] text-[#8e8e93]">
+                      <span className="text-[10px] text-[#b7a9bc]">
                         {formatTimeAgo(notif.createdAt)}
                       </span>
                       {!notif.read && (
-                        <span className="w-2 h-2 rounded-full bg-[#0a84ff]" />
+                        <span className="w-2 h-2 rounded-full bg-[#4fd27f]" />
                       )}
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#8e8e93] mt-1 leading-relaxed">
+                  <p className="text-xs text-[#b7a9bc] mt-1 leading-relaxed">
                     {notif.message}
                   </p>
 
                   {notif.link && (
-                    <div className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-[#0a84ff]">
+                    <div className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-[#4fd27f]">
                       <span>Open series details</span>
                       <ExternalLink className="w-3 h-3" />
                     </div>
@@ -412,12 +412,12 @@ export default function NotificationsPage() {
       ) : (
         /* Empty State */
         <div className="ios-card p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center mx-auto text-[#8e8e93]">
+          <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center mx-auto text-[#b7a9bc]">
             <Bell className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white">All caught up!</h3>
-            <p className="text-xs text-[#8e8e93] max-w-sm mx-auto mt-1">
+            <h3 className="text-sm font-semibold text-cream">All caught up!</h3>
+            <p className="text-xs text-[#b7a9bc] max-w-sm mx-auto mt-1">
               When new episodes air for series you follow with notifications enabled, alerts will appear right here.
             </p>
           </div>

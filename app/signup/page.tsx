@@ -11,9 +11,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
 import { useRouter } from "next/navigation";
 import {
-  Film,
   Lock,
   Mail,
   Loader2,
@@ -99,13 +99,11 @@ export default function SignupPage() {
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-3xl bg-gradient-to-br from-[#0a84ff] to-[#005bb5] flex items-center justify-center mx-auto shadow-xl shadow-[#0a84ff]/20">
-            <Film className="w-7 h-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
+          <Logo size="lg" className="justify-center mb-4" />
+          <h1 className="font-display font-black text-5xl leading-[0.9]">
             Create Your Account
           </h1>
-          <p className="text-xs text-[#8e8e93]">
+          <p className="text-xs text-[#b7a9bc]">
             Free, private, and fully encrypted movie & series tracker
           </p>
         </div>
@@ -115,7 +113,7 @@ export default function SignupPage() {
           {errorMessage && (
             <div
               role="alert"
-              className="p-3.5 rounded-xl bg-[#ff453a]/15 border border-[#ff453a]/30 text-[#ff453a] text-xs font-medium"
+              className="p-3.5 rounded-xl bg-[#ff8a80]/15 border border-[#ff8a80]/30 text-[#ff8a80] text-xs font-medium"
             >
               {errorMessage}
             </div>
@@ -123,12 +121,12 @@ export default function SignupPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label htmlFor="signup-username" className="text-xs font-semibold text-white flex items-center justify-between">
+              <label htmlFor="signup-username" className="text-xs font-semibold text-cream flex items-center justify-between">
                 <span>Display Username</span>
-                <span className="text-[10px] text-[#8e8e93] font-normal">Optional</span>
+                <span className="text-[10px] text-[#b7a9bc] font-normal">Optional</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8e8e93]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#b7a9bc]">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -140,17 +138,17 @@ export default function SignupPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   minLength={2}
                   maxLength={30}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="signup-email" className="text-xs font-semibold text-white">
+              <label htmlFor="signup-email" className="text-xs font-semibold text-cream">
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8e8e93]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#b7a9bc]">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
@@ -161,17 +159,17 @@ export default function SignupPage() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="signup-password" className="text-xs font-semibold text-white">
+              <label htmlFor="signup-password" className="text-xs font-semibold text-cream">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8e8e93]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#b7a9bc]">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -182,10 +180,10 @@ export default function SignupPage() {
                   placeholder="At least 8 characters with letter & number"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
-              <p className="text-[11px] text-[#8e8e93] pl-1">
+              <p className="text-[11px] text-[#b7a9bc] pl-1">
                 Minimum 8 characters with at least one letter and one number.
               </p>
             </div>
@@ -193,7 +191,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading || !email || password.length < 8}
-              className="w-full py-3 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 shadow-lg shadow-[#0a84ff]/20 disabled:opacity-50 mt-2"
+              className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 shadow-lg shadow-[#4fd27f]/20 disabled:opacity-50 mt-2"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -207,16 +205,16 @@ export default function SignupPage() {
           </form>
 
           {/* Privacy Note */}
-          <div className="pt-2 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-center gap-2 text-[11px] text-[#8e8e93]">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#32d74b]" />
+          <div className="pt-2 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-center gap-2 text-[11px] text-[#b7a9bc]">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#4fd27f]" />
             <span>Fully private. No social sharing. No tracking.</span>
           </div>
         </div>
 
         {/* Existing account footer */}
-        <div className="text-center text-xs text-[#8e8e93]">
+        <div className="text-center text-xs text-[#b7a9bc]">
           Already have an account?{" "}
-          <Link href="/login" className="text-[#0a84ff] font-semibold hover:underline">
+          <Link href="/login" className="text-[#4fd27f] font-semibold hover:underline">
             Sign In
           </Link>
         </div>
@@ -229,19 +227,19 @@ export default function SignupPage() {
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in"
         >
-          <div className="w-full max-w-lg rounded-3xl bg-[#161619] border border-[rgba(255,255,255,0.12)] p-6 md:p-8 shadow-2xl space-y-6">
+          <div className="w-full max-w-lg rounded-3xl bg-[#160e19] border border-[rgba(255,255,255,0.12)] p-6 md:p-8 shadow-2xl space-y-6">
             <div className="flex items-start gap-3.5">
-              <div className="p-3 rounded-2xl bg-[#ffd60a]/20 text-[#ffd60a] shrink-0">
+              <div className="p-3 rounded-2xl bg-[#e9b44c]/20 text-[#e9b44c] shrink-0">
                 <ShieldAlert className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#ffd60a]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#e9b44c]">
                   Guaranteed Account Backup
                 </span>
-                <h2 className="text-xl font-extrabold text-white tracking-tight">
+                <h2 className="text-xl font-extrabold text-cream tracking-tight">
                   Save Your Recovery Codes
                 </h2>
-                <p className="text-xs text-[#8e8e93] mt-1 leading-relaxed">
+                <p className="text-xs text-[#b7a9bc] mt-1 leading-relaxed">
                   These 10 one-time recovery codes are your <strong>guaranteed fallback</strong> to reset your password if you ever lose access to your email. Each code can only be used once.
                 </p>
               </div>
@@ -249,14 +247,14 @@ export default function SignupPage() {
 
             {/* Codes Grid */}
             <div className="p-4 rounded-2xl bg-[#0d0d0f] border border-[rgba(255,255,255,0.08)]">
-              <div className="grid grid-cols-2 gap-2 text-center font-mono text-xs text-[#f5f5f7] tracking-wider select-text">
+              <div className="grid grid-cols-2 gap-2 text-center font-mono text-xs text-[#f2ece4] tracking-wider select-text">
                 {recoveryCodes.map((code, idx) => (
                   <div
                     key={code}
                     className="p-2 rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.04)]"
                   >
-                    <span className="text-[#8e8e93] text-[10px] mr-1.5">{idx + 1}.</span>
-                    <span className="font-semibold text-white">{code}</span>
+                    <span className="text-[#b7a9bc] text-[10px] mr-1.5">{idx + 1}.</span>
+                    <span className="font-semibold text-cream">{code}</span>
                   </div>
                 ))}
               </div>
@@ -267,12 +265,12 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={handleCopyCodes}
-                className="w-full py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.14)] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all ios-press"
+                className="w-full py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.14)] text-cream text-xs font-semibold flex items-center justify-center gap-2 transition-all ios-press"
               >
                 {copiedCodes ? (
                   <>
-                    <Check className="w-4 h-4 text-[#32d74b]" />
-                    <span className="text-[#32d74b]">All 10 Codes Copied to Clipboard!</span>
+                    <Check className="w-4 h-4 text-[#4fd27f]" />
+                    <span className="text-[#4fd27f]">All 10 Codes Copied to Clipboard!</span>
                   </>
                 ) : (
                   <>
@@ -287,9 +285,9 @@ export default function SignupPage() {
                   type="checkbox"
                   checked={hasConfirmedSaved}
                   onChange={(e) => setHasConfirmedSaved(e.target.checked)}
-                  className="mt-0.5 rounded border-zinc-700 bg-zinc-800 text-[#0a84ff] focus:ring-0"
+                  className="mt-0.5 rounded border-zinc-700 bg-zinc-800 text-[#4fd27f] focus:ring-0"
                 />
-                <span className="text-xs text-[#8e8e93] leading-snug">
+                <span className="text-xs text-[#b7a9bc] leading-snug">
                   I have copied or written down these backup recovery codes and understand they will not be shown again.
                 </span>
               </label>
@@ -298,7 +296,7 @@ export default function SignupPage() {
                 type="button"
                 onClick={handleFinishSignup}
                 disabled={!hasConfirmedSaved}
-                className="w-full py-3 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#0a84ff]/20"
+                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#4fd27f]/20"
               >
                 Continue to TrackIt
               </button>

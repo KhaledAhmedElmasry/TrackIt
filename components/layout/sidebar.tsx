@@ -1,78 +1,114 @@
 "use client";
 
 /**
- * Desktop Left Sidebar Navigation Component
+ * Desktop Sidebar Navigation (md and above)
  *
- * Provides persistent navigation on PC/desktop screens (md and above).
- * Incorporates Apple macOS/iOS sidebar styling with subtle translucency,
- * active link pills, and mandatory TMDB attribution in the footer.
+ * Wordmark, a search box that opens the Search page, primary links with the
+ * unread notification badge, and the profile card plus TMDB attribution at the foot.
  */
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Film } from "lucide-react";
-import { NAV_ITEMS } from "./bottom-nav";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Bell, Clapperboard, Home, Layers, Search } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useAuth } from "@/components/auth/auth-context";
+import { Logo } from "@/components/brand/logo";
+import { useUnreadCount } from "./use-unread-count";
+
+const LINKS = [
+  { name: "Home", href: "/", icon: Home },
+  { name: "My Lists", href: "/lists", icon: Layers },
+  { name: "Picks for you", href: "/recommendations", icon: Clapperboard },
+  { name: "Notifications", href: "/notifications", icon: Bell },
+];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
+  const unread = useUnreadCount();
+  const [query, setQuery] = useState("");
+
+  const displayName = user?.username || user?.email?.split("@")[0] || "";
 
   return (
     <aside
-      aria-label="Desktop Navigation Sidebar"
-      className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 z-30 glass-bar border-r border-[rgba(255,255,255,0.08)] p-4 select-none"
+      aria-label="Main navigation"
+      className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 z-30 bg-night px-5 py-7 gap-7"
     >
-      {/* Brand Header */}
-      <div className="flex items-center gap-3 px-3 py-4 mb-4">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0a84ff] to-[#005bb5] flex items-center justify-center shadow-lg shadow-[#0a84ff]/20">
-          <Film className="w-5 h-5 text-white" />
-        </div>
-        <div>
-          <h1 className="text-base font-bold tracking-tight text-white">
-            TrackIt
-          </h1>
-          <p className="text-[11px] text-[#8e8e93]">
-            {user?.username ? `Hi, ${user.username}` : "Your personal tracker"}
-          </p>
-        </div>
-      </div>
+      <Link href="/" aria-label="TrackIt home">
+        <Logo />
+      </Link>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 space-y-1.5">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+      <form
+        role="search"
+        className="relative"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const q = query.trim();
+          router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+        }}
+      >
+        <label htmlFor="sidebar-search" className="sr-only">
+          Search films and series
+        </label>
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-smoke pointer-events-none" />
+        <input
+          id="sidebar-search"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search films & series"
+          className="w-full h-11 rounded-[10px] border border-plum-line bg-ink pl-10 pr-3 text-sm font-medium text-cream placeholder:text-dim focus:border-green focus:outline-none"
+        />
+      </form>
 
+      <nav className="flex flex-col gap-1">
+        {LINKS.map(({ name, href, icon: Icon }) => {
+          const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
             <Link
-              key={item.href}
-              href={item.href}
-              aria-label={item.ariaLabel}
+              key={href}
+              href={href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ios-press",
-                isActive
-                  ? "bg-[#0A84FF] text-white shadow-md shadow-[#0A84FF]/25 font-semibold"
-                  : "text-[#8E8E93] hover:text-[#f5f5f7] hover:bg-[rgba(255,255,255,0.05)]"
+                "flex items-center gap-3 h-11 px-3.5 rounded-[10px] text-[15px] transition-colors",
+                isActive ? "bg-plum-raised font-semibold text-cream" : "font-medium text-smoke hover:text-cream hover:bg-plum"
               )}
             >
-              <Icon
-                className={cn(
-                  "w-5 h-5 transition-transform",
-                  isActive ? "stroke-[2.25]" : "stroke-[1.75]"
-                )}
-              />
-              <span>{item.name === "Picks" ? "Recommendations" : item.name}</span>
+              <Icon className={cn("w-5 h-5", isActive && "text-green")} strokeWidth={isActive ? 2.25 : 1.75} />
+              {name}
+              {href === "/notifications" && unread > 0 && (
+                <span className="ml-auto min-w-[22px] h-[22px] px-1.5 rounded-full bg-green text-ink font-mono text-xs font-semibold flex items-center justify-center">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
             </Link>
           );
         })}
       </nav>
+
+      <div className="mt-auto flex flex-col gap-4">
+        {user && (
+          <Link
+            href="/profile"
+            aria-current={pathname.startsWith("/profile") ? "page" : undefined}
+            className="flex items-center gap-3 p-2.5 rounded-xl bg-plum hover:bg-plum-raised transition-colors"
+          >
+            <span className="w-10 h-10 rounded-full bg-eggplant flex items-center justify-center font-display font-extrabold text-lg">
+              {displayName.charAt(0)}
+            </span>
+            <span className="flex flex-col min-w-0">
+              <span className="text-sm font-semibold truncate">{displayName}</span>
+              <span className="text-xs text-smoke">Profile &amp; settings</span>
+            </span>
+          </Link>
+        )}
+        <p className="text-[11px] leading-relaxed text-dim">
+          Film and TV data from TMDB. Not endorsed or certified by TMDB.
+        </p>
+      </div>
     </aside>
   );
 }
-

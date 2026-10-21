@@ -24,7 +24,9 @@ import {
   MediaType,
   SeasonWatchRange,
   MinimalSnapshot,
+  MetadataCacheDocument,
 } from "../models/types";
+import type { TmdbSeasonDetail, TmdbTitleDetail } from "./tmdb.service";
 import { NotFoundError, ValidationError } from "../errors/app-error";
 
 export * from "../utils/ranges";
@@ -510,4 +512,114 @@ export class TrackingService {
 
     return results;
   }
+  /**
+   * Everything the home screen needs in one request: in-progress series with their
+   * next episode, upcoming air dates and list counts. Episode names, totals and air
+   * dates come only from the shared TMDB metadata cache, so this never calls TMDB.
+   */
+  static async getHomeSummary(userId: string | ObjectId): Promise<HomeSummary> {
+    const userObjectId = typeof userId === "string" ? new ObjectId(userId) : userId;
+    const db = await getDb();
+    const tracked = db.collection<TrackedItemDocument>("tracked_items");
+
+    const [inProgress, alertSeries, statusCounts] = await Promise.all([
+      this.getContinueWatchingRow(userObjectId),
+      tracked
+        .find(
+          { userId: userObjectId, mediaType: "tv", $or: [{ notify: true }, { status: "currently_watching" }] },
+          { projection: { tmdbId: 1, minimalSnapshot: 1 } }
+        )
+        .limit(100)
+        .toArray(),
+      tracked
+        .aggregate<{ _id: WatchStatus; count: number }>([
+          { $match: { userId: userObjectId } },
+          { $group: { _id: "$status", count: { $sum: 1 } } },
+        ])
+        .toArray(),
+    ]);
+
+    const detailKey = (tmdbId: number) => `tmdb:detail:tv:${tmdbId}`;
+    const seasonKey = (tmdbId: number, season: number) => `tmdb:season:${tmdbId}:${season}`;
+    const keys = new Set<string>();
+    for (const { item, nextEpisode } of inProgress) {
+      keys.add(detailKey(item.tmdbId));
+      keys.add(seasonKey(item.tmdbId, nextEpisode.season));
+      keys.add(seasonKey(item.tmdbId, nextEpisode.season + 1));
+    }
+    for (const item of alertSeries) keys.add(detailKey(item.tmdbId));
+
+    const cacheDocs = await db
+      .collection<MetadataCacheDocument>("metadata_cache")
+      .find({ cacheKey: { $in: [...keys] } }, { projection: { cacheKey: 1, data: 1 } })
+      .toArray();
+    const cache = new Map(cacheDocs.map((doc) => [doc.cacheKey, doc.data]));
+    const detailOf = (tmdbId: number) => cache.get(detailKey(tmdbId)) as TmdbTitleDetail | undefined;
+    const seasonOf = (tmdbId: number, season: number) =>
+      cache.get(seasonKey(tmdbId, season)) as TmdbSeasonDetail | undefined;
+
+    const nowShowing: HomeSummary["nowShowing"] = [];
+    for (const { item, nextEpisode } of inProgress) {
+      let { season, episode } = nextEpisode;
+      // Finished the last episode of a season: roll over to the next season's premiere
+      const currentSeason = seasonOf(item.tmdbId, season);
+      if (currentSeason && episode > currentSeason.totalEpisodes) {
+        season += 1;
+        episode = 1;
+      }
+      const details = detailOf(item.tmdbId);
+      const episodeInfo = seasonOf(item.tmdbId, season)?.episodes.find((e) => e.episodeNumber === episode);
+
+      nowShowing.push({
+        id: item._id!.toHexString(),
+        tmdbId: item.tmdbId,
+        title: item.minimalSnapshot.title,
+        posterPath: item.minimalSnapshot.posterPath,
+        season,
+        episode,
+        episodeName: episodeInfo?.name || null,
+        episodeAired: episodeInfo ? episodeInfo.isAired : true,
+        watchedCount: countTotalWatchedStandardEpisodes(item.watchedEpisodes || []),
+        totalEpisodes: details?.totalEpisodes ?? null,
+      });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const upcoming = alertSeries
+      .map((item) => ({ item, next: detailOf(item.tmdbId)?.nextEpisodeToAir }))
+      .filter(({ next }) => next?.airDate && next.airDate >= today)
+      .map(({ item, next }) => ({
+        tmdbId: item.tmdbId,
+        title: item.minimalSnapshot.title,
+        season: next!.seasonNumber,
+        episode: next!.episodeNumber,
+        airDate: next!.airDate,
+      }))
+      .sort((a, b) => a.airDate.localeCompare(b.airDate))
+      .slice(0, 6);
+
+    const counts = { want_to_watch: 0, currently_watching: 0, watched: 0 };
+    for (const { _id, count } of statusCounts) {
+      if (_id in counts) counts[_id] = count;
+    }
+
+    return { nowShowing, upcoming, counts };
+  }
+}
+
+export interface HomeSummary {
+  nowShowing: Array<{
+    id: string;
+    tmdbId: number;
+    title: string;
+    posterPath: string | null;
+    season: number;
+    episode: number;
+    episodeName: string | null;
+    episodeAired: boolean;
+    watchedCount: number;
+    totalEpisodes: number | null;
+  }>;
+  upcoming: Array<{ tmdbId: number; title: string; season: number; episode: number; airDate: string }>;
+  counts: Record<WatchStatus, number>;
 }

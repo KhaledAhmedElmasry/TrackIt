@@ -352,7 +352,7 @@ export default function ProfilePage() {
   if (isAuthLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#0a84ff] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#4fd27f] animate-spin" />
       </div>
     );
   }
@@ -360,25 +360,25 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="ios-card p-10 text-center space-y-4 max-w-md mx-auto my-12 animate-in fade-in">
-        <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] text-[#8e8e93] flex items-center justify-center mx-auto">
+        <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] text-[#b7a9bc] flex items-center justify-center mx-auto">
           <Key className="w-6 h-6" />
         </div>
         <div>
-          <h2 className="text-base font-bold text-white">Sign In Required</h2>
-          <p className="text-xs text-[#8e8e93] mt-1">
+          <h2 className="text-base font-bold text-cream">Sign In Required</h2>
+          <p className="text-xs text-[#b7a9bc] mt-1">
             Please sign in or create an account to configure your private keys and tracker settings.
           </p>
         </div>
         <div className="flex items-center justify-center gap-3 pt-2">
           <Link
             href="/login"
-            className="px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold ios-press"
+            className="px-5 py-2.5 rounded-xl bg-[#4fd27f] text-ink text-xs font-bold ios-press"
           >
             Sign In
           </Link>
           <Link
             href="/signup"
-            className="px-5 py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] text-white text-xs font-semibold ios-press"
+            className="px-5 py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] text-cream text-xs font-semibold ios-press"
           >
             Create Account
           </Link>
@@ -392,17 +392,17 @@ export default function ProfilePage() {
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="font-display font-black text-5xl md:text-[64px] leading-[0.9]">
             Settings & Account
           </h1>
-          <p className="text-xs md:text-sm text-[#8e8e93] mt-0.5">
+          <p className="text-xs md:text-sm text-[#b7a9bc] mt-0.5">
             Manage your credentials, AES-256-GCM encrypted keys, and notification channels.
           </p>
         </div>
 
         <button
           onClick={logout}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[#ff453a]/20 hover:text-[#ff453a] text-xs font-semibold text-white transition-colors ios-press shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[#ff8a80]/20 hover:text-[#ff8a80] text-xs font-semibold text-cream transition-colors ios-press shrink-0"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
@@ -413,17 +413,17 @@ export default function ProfilePage() {
       <div className="ios-card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <p className="text-xs text-[#8e8e93]">Signed in as</p>
-            <p className="text-sm font-bold text-white">{user.email}</p>
+            <p className="text-xs text-[#b7a9bc]">Signed in as</p>
+            <p className="text-sm font-bold text-cream">{user.email}</p>
           </div>
           <div>
             {user.isVerified ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#32d74b]/15 text-[#32d74b] text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[11px] font-bold">
                 <Check className="w-3.5 h-3.5" />
                 <span>Verified</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffd60a]/15 text-[#ffd60a] text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e9b44c]/15 text-[#e9b44c] text-[11px] font-bold">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>Unverified</span>
               </span>
@@ -434,11 +434,11 @@ export default function ProfilePage() {
         {/* Display Username Configuration */}
         <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-3">
           <div>
-            <label htmlFor="username-input" className="text-xs font-bold text-white flex items-center gap-1.5">
-              <UserIcon className="w-3.5 h-3.5 text-[#0a84ff]" />
+            <label htmlFor="username-input" className="text-xs font-bold text-cream flex items-center gap-1.5">
+              <UserIcon className="w-3.5 h-3.5 text-[#4fd27f]" />
               <span>Display Username</span>
             </label>
-            <p className="text-[11px] text-[#8e8e93] mt-0.5">
+            <p className="text-[11px] text-[#b7a9bc] mt-0.5">
               Set your personal username displayed across the app and greeting banners.
             </p>
           </div>
@@ -453,13 +453,13 @@ export default function ProfilePage() {
                 placeholder="Enter display username (e.g. MovieLover)"
                 minLength={2}
                 maxLength={30}
-                className="w-full px-3.5 py-2 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.1)] text-xs text-white placeholder-[#636366] focus:outline-none focus:border-[#0a84ff] transition-colors"
+                className="w-full px-3.5 py-2 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.1)] text-xs text-cream placeholder-[#8a7c90] focus:outline-none focus:border-[#4fd27f] transition-colors"
               />
             </div>
             <button
               type="submit"
               disabled={isSavingUsername || !usernameInput.trim() || usernameInput.trim() === (user.username || "")}
-              className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-bold transition-all ios-press shrink-0 flex items-center justify-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] disabled:opacity-50 disabled:pointer-events-none text-ink text-xs font-bold transition-all ios-press shrink-0 flex items-center justify-center gap-1.5"
             >
               {isSavingUsername ? (
                 <>
@@ -473,13 +473,13 @@ export default function ProfilePage() {
           </form>
 
           {usernameFeedback && (
-            <p className="text-[11px] text-[#32d74b] font-medium flex items-center gap-1">
+            <p className="text-[11px] text-[#4fd27f] font-medium flex items-center gap-1">
               <Check className="w-3.5 h-3.5" />
               <span>{usernameFeedback}</span>
             </p>
           )}
           {usernameError && (
-            <p className="text-[11px] text-[#ff453a] font-medium flex items-center gap-1">
+            <p className="text-[11px] text-[#ff8a80] font-medium flex items-center gap-1">
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>{usernameError}</span>
             </p>
@@ -491,10 +491,10 @@ export default function ProfilePage() {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Key className="w-5 h-5 text-[#0a84ff]" />
-            <h2 className="text-base font-bold text-white">Encrypted API Keys</h2>
+            <Key className="w-5 h-5 text-[#4fd27f]" />
+            <h2 className="text-base font-bold text-cream">Encrypted API Keys</h2>
           </div>
-          <span className="text-[11px] text-[#32d74b] font-semibold flex items-center gap-1">
+          <span className="text-[11px] text-[#4fd27f] font-semibold flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>AES-256-GCM</span>
           </span>
@@ -505,27 +505,27 @@ export default function ProfilePage() {
           <div className="ios-card p-5 space-y-4 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white uppercase tracking-wider">
+                <span className="text-xs font-bold text-cream uppercase tracking-wider">
                   TMDB API Key
                 </span>
                 <span
                   className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                     keys?.tmdb.configured
-                      ? "bg-[#32d74b]/15 text-[#32d74b]"
-                      : "bg-[#ff453a]/15 text-[#ff453a]"
+                      ? "bg-[#4fd27f]/15 text-[#4fd27f]"
+                      : "bg-[#ff8a80]/15 text-[#ff8a80]"
                   }`}
                 >
                   {keys?.tmdb.configured ? "Connected" : "Required"}
                 </span>
               </div>
-              <p className="text-xs text-[#8e8e93]">
+              <p className="text-xs text-[#b7a9bc]">
                 Required for movie/series metadata, search, and episode tracking.
               </p>
 
               {keys?.tmdb.configured && (
-                <div className="p-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.06)] font-mono text-xs text-white flex items-center justify-between">
+                <div className="p-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.06)] font-mono text-xs text-cream flex items-center justify-between">
                   <span>••••••••••••{keys.tmdb.lastFour}</span>
-                  <span className="text-[10px] text-[#8e8e93] font-sans">Encrypted at rest</span>
+                  <span className="text-[10px] text-[#b7a9bc] font-sans">Encrypted at rest</span>
                 </div>
               )}
             </div>
@@ -539,7 +539,7 @@ export default function ProfilePage() {
                     setInputKey("");
                     setKeyError(null);
                   }}
-                  className="flex-1 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
                 >
                   {keys?.tmdb.configured ? (
                     <>
@@ -558,7 +558,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteKey("tmdb")}
-                    className="p-2 rounded-xl bg-[rgba(255,255,255,0.06)] hover:bg-[#ff453a]/20 text-[#8e8e93] hover:text-[#ff453a] transition-colors ios-press"
+                    className="p-2 rounded-xl bg-[rgba(255,255,255,0.06)] hover:bg-[#ff8a80]/20 text-[#b7a9bc] hover:text-[#ff8a80] transition-colors ios-press"
                     aria-label="Delete TMDB key"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -570,7 +570,7 @@ export default function ProfilePage() {
                 href="https://www.themoviedb.org/settings/api"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[11px] text-[#8e8e93] hover:text-[#0a84ff] transition-colors"
+                className="inline-flex items-center gap-1.5 text-[11px] text-[#b7a9bc] hover:text-[#4fd27f] transition-colors"
               >
                 <span>Get a free developer key at themoviedb.org</span>
                 <ExternalLink className="w-3 h-3" />
@@ -582,28 +582,28 @@ export default function ProfilePage() {
           <div className="ios-card p-5 space-y-4 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#bf5af2]" />
+                <span className="text-xs font-bold text-cream uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#b48cc0]" />
                   <span>Google Gemini Key</span>
                 </span>
                 <span
                   className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                     keys?.gemini.configured
-                      ? "bg-[#32d74b]/15 text-[#32d74b]"
-                      : "bg-[rgba(255,255,255,0.08)] text-[#8e8e93]"
+                      ? "bg-[#4fd27f]/15 text-[#4fd27f]"
+                      : "bg-[rgba(255,255,255,0.08)] text-[#b7a9bc]"
                   }`}
                 >
                   {keys?.gemini.configured ? "Connected" : "Optional"}
                 </span>
               </div>
-              <p className="text-xs text-[#8e8e93]">
+              <p className="text-xs text-[#b7a9bc]">
                 Optional until you request AI watch recommendations in Phase 5.
               </p>
 
               {keys?.gemini.configured && (
-                <div className="p-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.06)] font-mono text-xs text-white flex items-center justify-between">
+                <div className="p-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.06)] font-mono text-xs text-cream flex items-center justify-between">
                   <span>••••••••••••{keys.gemini.lastFour}</span>
-                  <span className="text-[10px] text-[#8e8e93] font-sans">Encrypted at rest</span>
+                  <span className="text-[10px] text-[#b7a9bc] font-sans">Encrypted at rest</span>
                 </div>
               )}
             </div>
@@ -617,7 +617,7 @@ export default function ProfilePage() {
                     setInputKey("");
                     setKeyError(null);
                   }}
-                  className="flex-1 py-2 rounded-xl bg-[#bf5af2] hover:bg-[#a332d9] text-white text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 rounded-xl bg-[#b48cc0] hover:bg-[#5a2e63] text-cream text-xs font-bold transition-all ios-press flex items-center justify-center gap-1.5"
                 >
                   {keys?.gemini.configured ? (
                     <>
@@ -636,7 +636,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteKey("gemini")}
-                    className="p-2 rounded-xl bg-[rgba(255,255,255,0.06)] hover:bg-[#ff453a]/20 text-[#8e8e93] hover:text-[#ff453a] transition-colors ios-press"
+                    className="p-2 rounded-xl bg-[rgba(255,255,255,0.06)] hover:bg-[#ff8a80]/20 text-[#b7a9bc] hover:text-[#ff8a80] transition-colors ios-press"
                     aria-label="Delete Gemini key"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -648,7 +648,7 @@ export default function ProfilePage() {
                 href="https://aistudio.google.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[11px] text-[#8e8e93] hover:text-[#bf5af2] transition-colors"
+                className="inline-flex items-center gap-1.5 text-[11px] text-[#b7a9bc] hover:text-[#b48cc0] transition-colors"
               >
                 <span>Get a free API key at Google AI Studio</span>
                 <ExternalLink className="w-3 h-3" />
@@ -661,30 +661,30 @@ export default function ProfilePage() {
       {/* Push Notifications Section */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-[#ffd60a]" />
-          <h2 className="text-base font-bold text-white">Push Notifications (ntfy.sh & Bark)</h2>
+          <Bell className="w-5 h-5 text-[#e9b44c]" />
+          <h2 className="text-base font-bold text-cream">Push Notifications (ntfy.sh & Bark)</h2>
         </div>
 
         <div className="ios-card p-5 space-y-5">
           {/* Channel 1: ntfy.sh */}
           <div className="space-y-2.5">
             <div>
-              <p className="text-xs font-semibold text-white">ntfy.sh (Free Public Server)</p>
-              <p className="text-xs text-[#8e8e93] mt-0.5">
+              <p className="text-xs font-semibold text-cream">ntfy.sh (Free Public Server)</p>
+              <p className="text-xs text-[#b7a9bc] mt-0.5">
                 Each user receives a unique, long random topic. Subscribe to this topic in the free <strong>ntfy</strong> app (iOS / Android / Web) to get alerts for new aired episodes.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] flex items-center justify-between gap-3">
-              <span className="font-mono text-xs text-[#ffd60a] truncate select-all">
+            <div className="p-3 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] flex items-center justify-between gap-3">
+              <span className="font-mono text-xs text-[#e9b44c] truncate select-all">
                 {user.ntfyTopic}
               </span>
               <button
                 type="button"
                 onClick={handleCopyTopic}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-semibold transition-all ios-press shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-semibold transition-all ios-press shrink-0"
               >
-                {copiedTopic ? <Check className="w-3.5 h-3.5 text-[#32d74b]" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedTopic ? <Check className="w-3.5 h-3.5 text-[#4fd27f]" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedTopic ? "Copied" : "Copy"}</span>
               </button>
             </div>
@@ -694,7 +694,7 @@ export default function ProfilePage() {
                 href={`https://ntfy.sh/${user.ntfyTopic}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0a84ff] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4fd27f] hover:underline"
               >
                 <span>Open topic on ntfy.sh</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -706,14 +706,14 @@ export default function ProfilePage() {
           <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2.5">
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-xs font-semibold text-white">Bark (iOS Push)</p>
+                <p className="text-xs font-semibold text-cream">Bark (iOS Push)</p>
                 {user.barkKey && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#32d74b]/15 text-[#32d74b] border border-[#32d74b]/30">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#4fd27f]/15 text-[#4fd27f] border border-[#4fd27f]/30">
                     Connected
                   </span>
                 )}
               </div>
-              <p className="text-xs text-[#8e8e93] mt-0.5">
+              <p className="text-xs text-[#b7a9bc] mt-0.5">
                 Paste your device key from the Bark iOS app (or your custom server URL) to receive native iOS notifications.
               </p>
             </div>
@@ -724,14 +724,14 @@ export default function ProfilePage() {
                 value={barkKeyInput}
                 onChange={(e) => setBarkKeyInput(e.target.value)}
                 placeholder="e.g. your_bark_key or https://api.day.app/..."
-                className="flex-1 px-3 py-2 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white text-xs font-mono placeholder:text-[#555] focus:outline-none focus:border-[#ffd60a]"
+                className="flex-1 px-3 py-2 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream text-xs font-mono placeholder:text-[#555] focus:outline-none focus:border-[#e9b44c]"
               />
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={handleSaveBarkKey}
                   disabled={isSavingBarkKey || !barkKeyInput.trim() || barkKeyInput.trim() === user.barkKey}
-                  className="px-3 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-semibold transition-all ios-press disabled:opacity-40"
+                  className="px-3 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-semibold transition-all ios-press disabled:opacity-40"
                 >
                   {isSavingBarkKey ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save Bark Key"}
                 </button>
@@ -740,7 +740,7 @@ export default function ProfilePage() {
                     type="button"
                     onClick={handleDeleteBarkKey}
                     disabled={isSavingBarkKey}
-                    className="px-2.5 py-2 rounded-xl bg-[#ff453a]/15 hover:bg-[#ff453a]/25 text-[#ff453a] text-xs font-semibold transition-all ios-press"
+                    className="px-2.5 py-2 rounded-xl bg-[#ff8a80]/15 hover:bg-[#ff8a80]/25 text-[#ff8a80] text-xs font-semibold transition-all ios-press"
                     title="Remove Bark key"
                   >
                     Remove
@@ -749,13 +749,13 @@ export default function ProfilePage() {
               </div>
             </div>
             {barkFeedback && (
-              <p className="text-[11px] text-[#32d74b] font-semibold">{barkFeedback}</p>
+              <p className="text-[11px] text-[#4fd27f] font-semibold">{barkFeedback}</p>
             )}
           </div>
 
           {/* Combined Test Notification Dispatcher */}
           <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap items-center justify-between gap-3">
-            <span className="text-xs text-[#8e8e93]">
+            <span className="text-xs text-[#b7a9bc]">
               Send a test push to all configured services:
             </span>
 
@@ -763,7 +763,7 @@ export default function ProfilePage() {
               type="button"
               onClick={handleSendTestPush}
               disabled={isSendingTestPush}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#ffd60a]/15 hover:bg-[#ffd60a]/25 border border-[#ffd60a]/30 text-[#ffd60a] text-xs font-bold transition-all ios-press disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#e9b44c]/15 hover:bg-[#e9b44c]/25 border border-[#e9b44c]/30 text-[#e9b44c] text-xs font-bold transition-all ios-press disabled:opacity-50"
             >
               {isSendingTestPush ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -775,7 +775,7 @@ export default function ProfilePage() {
           </div>
 
           {testPushFeedback && (
-            <p className="text-[11px] text-[#32d74b] font-semibold pt-1">
+            <p className="text-[11px] text-[#4fd27f] font-semibold pt-1">
               {testPushFeedback}
             </p>
           )}
@@ -785,13 +785,13 @@ export default function ProfilePage() {
       {/* Security & Recovery Section */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <Shield className="w-5 h-5 text-[#32d74b]" />
-          <h2 className="text-base font-bold text-white">Account Recovery</h2>
+          <Shield className="w-5 h-5 text-[#4fd27f]" />
+          <h2 className="text-base font-bold text-cream">Account Recovery</h2>
         </div>
 
         <div className="ios-card p-5 space-y-2">
-          <p className="text-xs text-white font-semibold">One-Time Backup Recovery Codes</p>
-          <p className="text-xs text-[#8e8e93] leading-relaxed">
+          <p className="text-xs text-cream font-semibold">One-Time Backup Recovery Codes</p>
+          <p className="text-xs text-[#b7a9bc] leading-relaxed">
             Your 10 one-time recovery codes generated at signup remain active until used. They allow you to reset your password instantly at any time, even if you cannot access your email.
           </p>
         </div>
@@ -800,14 +800,14 @@ export default function ProfilePage() {
       {/* Data Management Section (Phase 6) */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <FileJson className="w-5 h-5 text-[#0a84ff]" />
-          <h2 className="text-base font-bold text-white">Data Management</h2>
+          <FileJson className="w-5 h-5 text-[#4fd27f]" />
+          <h2 className="text-base font-bold text-cream">Data Management</h2>
         </div>
 
         <div className="ios-card p-5 space-y-4">
           <div>
-            <h3 className="text-xs font-semibold text-white">Export & Import Your Watchlist</h3>
-            <p className="text-xs text-[#8e8e93] mt-0.5 leading-relaxed">
+            <h3 className="text-xs font-semibold text-cream">Export & Import Your Watchlist</h3>
+            <p className="text-xs text-[#b7a9bc] mt-0.5 leading-relaxed">
               Your library belongs to you. Export your entire tracked watchlist, ratings, and episode progress as an offline JSON backup, or import to restore or migrate data.
             </p>
           </div>
@@ -817,16 +817,16 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={handleExportData}
-              className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press flex items-center gap-2 shadow-md shadow-[#0a84ff]/20"
+              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center gap-2 shadow-md shadow-[#4fd27f]/20"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Library (JSON)</span>
             </button>
 
             {/* Import Button */}
-            <label className="px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-bold transition-all ios-press flex items-center gap-2 cursor-pointer border border-white/10">
+            <label className="px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-bold transition-all ios-press flex items-center gap-2 cursor-pointer border border-white/10">
               {isImporting ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0a84ff]" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#4fd27f]" />
               ) : (
                 <Upload className="w-3.5 h-3.5" />
               )}
@@ -842,13 +842,13 @@ export default function ProfilePage() {
           </div>
 
           {importStatus && (
-            <div className="p-3 rounded-xl bg-[#32d74b]/15 border border-[#32d74b]/30 text-xs text-[#32d74b] font-semibold">
+            <div className="p-3 rounded-xl bg-[#4fd27f]/15 border border-[#4fd27f]/30 text-xs text-[#4fd27f] font-semibold">
               {importStatus}
             </div>
           )}
 
           {importError && (
-            <div className="p-3 rounded-xl bg-[#ff453a]/15 border border-[#ff453a]/30 text-xs text-[#ff453a] font-semibold">
+            <div className="p-3 rounded-xl bg-[#ff8a80]/15 border border-[#ff8a80]/30 text-xs text-[#ff8a80] font-semibold">
               {importError}
             </div>
           )}
@@ -857,10 +857,10 @@ export default function ProfilePage() {
 
       {/* Danger Zone: Account Deletion */}
       <section className="space-y-3 pt-4 border-t border-[rgba(255,255,255,0.08)]">
-        <div className="p-5 rounded-2xl bg-[#2a0e0e]/50 border border-[#ff453a]/25 space-y-3">
+        <div className="p-5 rounded-2xl bg-[#2a0e0e]/50 border border-[#ff8a80]/25 space-y-3">
           <div>
-            <h3 className="text-sm font-bold text-[#ff453a]">Danger Zone</h3>
-            <p className="text-xs text-[#8e8e93] mt-0.5">
+            <h3 className="text-sm font-bold text-[#ff8a80]">Danger Zone</h3>
+            <p className="text-xs text-[#b7a9bc] mt-0.5">
               Permanently delete your account, API keys, tracked lists, and notification history. This action cannot be undone.
             </p>
           </div>
@@ -872,7 +872,7 @@ export default function ProfilePage() {
               setDeletePassword("");
               setDeleteError(null);
             }}
-            className="px-4 py-2 rounded-xl bg-[#ff453a]/20 hover:bg-[#ff453a] text-[#ff453a] hover:text-white text-xs font-bold transition-all ios-press"
+            className="px-4 py-2 rounded-xl bg-[#ff8a80]/20 hover:bg-[#ff8a80] text-[#ff8a80] hover:text-cream text-xs font-bold transition-all ios-press"
           >
             Delete Account Permanently
           </button>
@@ -886,17 +886,17 @@ export default function ProfilePage() {
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
         >
-          <div className="w-full max-w-md rounded-3xl bg-[#161619] border border-[rgba(255,255,255,0.12)] p-6 space-y-5 shadow-2xl">
+          <div className="w-full max-w-md rounded-3xl bg-[#160e19] border border-[rgba(255,255,255,0.12)] p-6 space-y-5 shadow-2xl">
             <div className="flex items-start gap-3">
-              <div className="p-2.5 rounded-xl bg-[#0a84ff]/20 text-[#0a84ff]">
+              <div className="p-2.5 rounded-xl bg-[#4fd27f]/20 text-[#4fd27f]">
                 <Key className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-white">
+                <h3 className="text-base font-extrabold text-cream">
                   {keys?.[editingKeyType].configured ? "Replace" : "Connect"}{" "}
                   {editingKeyType.toUpperCase()} Key
                 </h3>
-                <p className="text-xs text-[#8e8e93] mt-0.5">
+                <p className="text-xs text-[#b7a9bc] mt-0.5">
                   Encrypted at rest with AES-256-GCM.
                 </p>
               </div>
@@ -904,7 +904,7 @@ export default function ProfilePage() {
 
             <form onSubmit={handleSaveKey} className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="key-input" className="text-xs font-semibold text-white">
+                <label htmlFor="key-input" className="text-xs font-semibold text-cream">
                   API Key
                 </label>
                 <input
@@ -914,24 +914,24 @@ export default function ProfilePage() {
                   placeholder={`Paste your ${editingKeyType.toUpperCase()} key...`}
                   value={inputKey}
                   onChange={(e) => setInputKey(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                 />
               </div>
 
-              {keyError && <p className="text-xs text-[#ff453a] font-medium">{keyError}</p>}
+              {keyError && <p className="text-xs text-[#ff8a80] font-medium">{keyError}</p>}
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setEditingKeyType(null)}
-                  className="px-4 py-2 rounded-xl text-xs text-[#8e8e93] hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs text-[#b7a9bc] hover:text-cream"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingKey || !inputKey.trim()}
-                  className="px-5 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {isSavingKey && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Save & Encrypt</span>
@@ -949,14 +949,14 @@ export default function ProfilePage() {
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in"
         >
-          <div className="w-full max-w-md rounded-3xl bg-[#161619] border border-[#ff453a]/30 p-6 space-y-5 shadow-2xl">
+          <div className="w-full max-w-md rounded-3xl bg-[#160e19] border border-[#ff8a80]/30 p-6 space-y-5 shadow-2xl">
             <div className="flex items-start gap-3">
-              <div className="p-2.5 rounded-xl bg-[#ff453a]/20 text-[#ff453a]">
+              <div className="p-2.5 rounded-xl bg-[#ff8a80]/20 text-[#ff8a80]">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-white">Delete Account</h3>
-                <p className="text-xs text-[#8e8e93] mt-0.5">
+                <h3 className="text-base font-extrabold text-cream">Delete Account</h3>
+                <p className="text-xs text-[#b7a9bc] mt-0.5">
                   Confirm your password to permanently delete all your data.
                 </p>
               </div>
@@ -964,7 +964,7 @@ export default function ProfilePage() {
 
             <form onSubmit={handleDeleteAccount} className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="del-pw" className="text-xs font-semibold text-white">
+                <label htmlFor="del-pw" className="text-xs font-semibold text-cream">
                   Current Password
                 </label>
                 <input
@@ -974,26 +974,26 @@ export default function ProfilePage() {
                   placeholder="Enter your current password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#ff453a] transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#ff8a80] transition-all"
                 />
               </div>
 
               {deleteError && (
-                <p className="text-xs text-[#ff453a] font-medium">{deleteError}</p>
+                <p className="text-xs text-[#ff8a80] font-medium">{deleteError}</p>
               )}
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs text-[#8e8e93] hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs text-[#b7a9bc] hover:text-cream"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isDeletingAccount || !deletePassword}
-                  className="px-5 py-2 rounded-xl bg-[#ff453a] hover:bg-[#d9382f] text-white text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-[#ff8a80] hover:bg-[#e5736a] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {isDeletingAccount && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Confirm Delete</span>

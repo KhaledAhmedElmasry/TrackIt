@@ -1,94 +1,112 @@
 @import "tailwindcss";
 
+/*
+ * TrackIt palette: "cinema marquee"
+ * Ink ground, eggplant surfaces, one ticket-green action color, cream text.
+ */
 :root {
-  --background: #000000;
-  --foreground: #f5f5f7;
-  --surface: #121215;
-  --surface-hover: #1c1c1f;
-  --surface-active: #242429;
-  --surface-glass: rgba(18, 18, 22, 0.75);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-highlight: rgba(255, 255, 255, 0.16);
-  --accent: #0a84ff;
-  --accent-hover: #0071e3;
-  --accent-muted: rgba(10, 132, 255, 0.15);
-  --text-primary: #ffffff;
-  --text-secondary: #8e8e93;
-  --text-tertiary: #636366;
-  --danger: #ff453a;
-  --danger-muted: rgba(255, 69, 58, 0.15);
-  --success: #32d74b;
-  --success-muted: rgba(50, 215, 75, 0.15);
-  --warning: #ffd60a;
+  --ink: #0b090c;
+  --night: #160e19;
+  --plum: #1f1424;
+  --plum-raised: #2c1b33;
+  --plum-line: #3a2541;
+  --eggplant: #5a2e63;
+  --lilac: #b48cc0;
+  --green: #4fd27f;
+  --green-hover: #3fbf6d;
+  --cream: #f2ece4;
+  --smoke: #b7a9bc;
+  --dim: #8a7c90;
+  --danger: #ff8a80;
+  --gold: #e9b44c;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-hover: var(--surface-hover);
-  --color-surface-active: var(--surface-active);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-text-secondary: var(--text-secondary);
+  --color-ink: var(--ink);
+  --color-night: var(--night);
+  --color-plum: var(--plum);
+  --color-plum-raised: var(--plum-raised);
+  --color-plum-line: var(--plum-line);
+  --color-eggplant: var(--eggplant);
+  --color-lilac: var(--lilac);
+  --color-green: var(--green);
+  --color-green-hover: var(--green-hover);
+  --color-cream: var(--cream);
+  --color-smoke: var(--smoke);
+  --color-dim: var(--dim);
+  --color-danger: var(--danger);
+  --color-gold: var(--gold);
+
+  --font-sans: var(--font-instrument), system-ui, sans-serif;
+  --font-display: var(--font-shoulders), Impact, "Arial Narrow", sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-/* Force dark theme everywhere - No light mode allowed */
 html,
 body {
-  background-color: #000000 !important;
-  color: #f5f5f7 !important;
+  background-color: var(--ink);
+  color: var(--cream);
   color-scheme: dark;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-instrument), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
-  user-select: none;
   overflow-x: hidden;
   min-height: 100dvh;
 }
 
-/* Allow text selection inside inputs and readouts */
-input, textarea, [contenteditable="true"], .selectable-text {
-  user-select: text;
+/* Poster headline: tall condensed uppercase. Big Shoulders picks its display cut at large sizes. */
+.font-display {
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-optical-sizing: auto;
 }
 
-/* iOS Glassmorphism translucent blurred bars */
+/* Solid bars (replaces the old frosted-glass look) */
 .glass-bar {
-  background: var(--surface-glass);
-  backdrop-filter: blur(24px) saturate(190%);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
-  border-color: var(--border-subtle);
+  background: var(--night);
+  border-color: #241829;
 }
 
 .glass-card {
-  background: rgba(22, 22, 26, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
+  background: var(--plum);
+  border: 1px solid #241829;
 }
 
-/* iOS Card styling */
+/* Card surface */
 .ios-card {
-  background-color: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 1.25rem;
-  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  background-color: var(--plum);
+  border: 1px solid transparent;
+  border-radius: 0.875rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .ios-card:hover {
-  border-color: var(--border-highlight);
-  background-color: var(--surface-hover);
+  border-color: var(--plum-line);
 }
 
-/* Native feel active press animation */
+/* Press feedback */
 .ios-press {
   transition: transform 0.12s ease, opacity 0.12s ease;
 }
 
 .ios-press:active {
-  transform: scale(0.96);
-  opacity: 0.85;
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* Ticket-stub perforation between a poster and its card body */
+.ticket-perf {
+  background-image: radial-gradient(circle at 50% 50%, var(--ink) 4px, transparent 4.5px);
+  background-size: 12px 14px;
+  background-repeat: repeat-y;
+  background-position: center;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
 }
 
 /* Safe area insets for notches, home indicator, status bars */
@@ -108,7 +126,6 @@ input, textarea, [contenteditable="true"], .selectable-text {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-/* Clean minimal scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -119,10 +136,10 @@ input, textarea, [contenteditable="true"], .selectable-text {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--plum-line);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--eggplant);
 }

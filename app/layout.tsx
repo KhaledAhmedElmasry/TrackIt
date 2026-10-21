@@ -1,20 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Big_Shoulders, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/layout/app-shell";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const shoulders = Big_Shoulders({
+  variable: "--font-shoulders",
+  subsets: ["latin"],
+  axes: ["opsz"],
+  // next/font has no metrics for this family, so name the fallback stack explicitly
+  adjustFontFallback: false,
+  fallback: ["Impact", "Arial Narrow", "sans-serif"],
+});
+
+const instrument = Instrument_Sans({
+  variable: "--font-instrument",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#0b090c",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -55,10 +65,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full`}
+      className={`${shoulders.variable} ${instrument.variable} ${plexMono.variable} dark h-full`}
       style={{ colorScheme: "dark" }}
     >
-      <body className="min-h-full bg-black text-[#f5f5f7] antialiased">
+      <body className="min-h-full bg-ink text-cream font-sans antialiased">
         <AppShell>{children}</AppShell>
       </body>
     </html>

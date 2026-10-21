@@ -5,22 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  Lock,
   ChevronLeft,
   Star,
-  Bell,
-  BellOff,
   Film,
-  Tv,
   Check,
   CheckCircle2,
-  Clock,
-  Calendar,
-  Layers,
   ChevronDown,
   ChevronUp,
   AlertCircle,
   Loader2,
-  Trash2,
   Plus,
   CheckSquare,
   Square,
@@ -49,6 +43,48 @@ interface CollectionDetail {
   parts: CollectionPart[];
 }
 
+/** Number of regular episodes the user has watched in one season. */
+function countWatchedInSeason(tracked: TrackedItemDocument | null, seasonNumber: number): number {
+  const entry = tracked?.watchedEpisodes?.find((e) => e.season === seasonNumber);
+  return entry ? entry.ranges.reduce((sum, [from, to]) => sum + (to - from + 1), 0) : 0;
+}
+
+function SeasonProgress({
+  watched,
+  season,
+  onMarkSeason,
+}: {
+  watched: number;
+  season: TmdbSeasonDetail;
+  onMarkSeason: () => void;
+}) {
+  const upcoming = season.totalEpisodes - season.airedEpisodesCount;
+  const pct = Math.min(100, Math.round((watched / Math.max(1, season.totalEpisodes)) * 100));
+
+  return (
+    <div className="flex flex-wrap items-center gap-4 px-4 py-3.5 rounded-xl bg-night">
+      <div className="flex-1 min-w-[220px] flex flex-col gap-2">
+        <span className="font-mono text-xs tracking-[0.08em] text-smoke">
+          {watched} OF {season.airedEpisodesCount} AIRED
+          {upcoming > 0 && ` · ${upcoming} UPCOMING`}
+        </span>
+        <div className="h-3 rounded-[3px] bg-plum-raised overflow-hidden">
+          <div className="h-3 bg-green transition-[width]" style={{ width: `${pct}%` }} />
+        </div>
+      </div>
+      {season.airedEpisodesCount > 0 && watched < season.airedEpisodesCount && (
+        <button
+          type="button"
+          onClick={onMarkSeason}
+          className="h-11 px-[18px] rounded-[10px] border border-green text-green text-sm font-semibold ios-press"
+        >
+          Mark season watched
+        </button>
+      )}
+    </div>
+  );
+}
+
 interface TitleDetailClientProps {
   params: Promise<{
     type: string;
@@ -70,9 +106,9 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
 
   // Seasons episode cache: seasonNumber -> TmdbSeasonDetail
   const [seasonsCache, setSeasonsCache] = useState<Record<number, TmdbSeasonDetail>>({});
+  // Season shown in the episode checklist (0 = specials)
   const [expandedSeason, setExpandedSeason] = useState<number | null>(null);
   const [loadingSeason, setLoadingSeason] = useState<number | null>(null);
-  const [isSpecialsExpanded, setIsSpecialsExpanded] = useState(false);
 
   // 0-10 Rating Modal State
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -106,13 +142,14 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
       setDetails(json.data.details);
       setTracked(json.data.tracked || null);
 
-      // Auto expand Season 1 by default for series
-      if (mediaType === "tv" && json.data.details.seasonsSummary?.length) {
-        const firstRegular = json.data.details.seasonsSummary.find(
-          (s: { seasonNumber: number }) => s.seasonNumber > 0
-        );
-        if (firstRegular) {
-          setExpandedSeason(firstRegular.seasonNumber);
+      // Open on the season holding the next episode to watch (else the first season)
+      if (mediaType === "tv") {
+        const seasons = ((json.data.details as TmdbTitleDetail).seasonsSummary || []).filter((s) => s.seasonNumber > 0);
+        const current =
+          seasons.find((s) => countWatchedInSeason(json.data.tracked || null, s.seasonNumber) < s.episodeCount) ||
+          seasons[0];
+        if (current) {
+          setExpandedSeason(current.seasonNumber);
         }
       }
     } catch (err) {
@@ -552,8 +589,8 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-8 h-8 text-[#0a84ff] animate-spin" />
-        <p className="text-xs text-[#8e8e93]">Loading title details...</p>
+        <Loader2 className="w-8 h-8 text-[#4fd27f] animate-spin" />
+        <p className="text-xs text-[#b7a9bc]">Loading title details...</p>
       </div>
     );
   }
@@ -561,20 +598,20 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
   if (error || !details) {
     return (
       <div className="space-y-4 max-w-lg mx-auto pt-8">
-        <div className="p-5 rounded-2xl bg-[#2a0e0e] border border-[#ff453a]/30 text-center space-y-3">
-          <AlertCircle className="w-8 h-8 text-[#ff453a] mx-auto" />
-          <h2 className="text-sm font-semibold text-white">Unable to Load Title</h2>
-          <p className="text-xs text-[#ff9f98]">{error || "Title not found"}</p>
+        <div className="p-5 rounded-2xl bg-[#2a0e0e] border border-[#ff8a80]/30 text-center space-y-3">
+          <AlertCircle className="w-8 h-8 text-[#ff8a80] mx-auto" />
+          <h2 className="text-sm font-semibold text-cream">Unable to Load Title</h2>
+          <p className="text-xs text-[#ffb3ab]">{error || "Title not found"}</p>
           <div className="flex justify-center gap-3 pt-2">
             <button
               onClick={() => router.back()}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white"
+              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-cream"
             >
               Go Back
             </button>
             <Link
               href="/profile"
-              className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-xs font-semibold text-white"
+              className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-xs font-semibold text-ink"
             >
               Verify API Key in Settings
             </Link>
@@ -587,272 +624,264 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
   const isMovie = mediaType === "movie";
   const regularSeasons = details.seasonsSummary?.filter((s) => s.seasonNumber > 0) || [];
   const specialsSeason = details.seasonsSummary?.find((s) => s.seasonNumber === 0);
+  const hasRating = tracked?.rating !== undefined && tracked?.rating !== null;
+
+  // Next episode to watch: first aired, unwatched episode of the first unfinished season
+  const nextSeasonSummary = regularSeasons.find(
+    (s) => countWatchedInSeason(tracked, s.seasonNumber) < s.episodeCount
+  );
+  const nextSeasonDetail = nextSeasonSummary ? seasonsCache[nextSeasonSummary.seasonNumber] : undefined;
+  const upNext = nextSeasonDetail?.episodes.find(
+    (ep) => ep.isAired && !checkIsWatched(nextSeasonDetail.seasonNumber, ep.episodeNumber)
+  );
+  const totalWatched = regularSeasons.reduce((sum, s) => sum + countWatchedInSeason(tracked, s.seasonNumber), 0);
+
+  const metaLine = [
+    isMovie ? "FILM" : "SERIES",
+    details.yearRange,
+    details.ageRating,
+    !isMovie && details.totalSeasons ? `${details.totalSeasons} ${details.totalSeasons === 1 ? "SEASON" : "SEASONS"}` : null,
+    details.averageRuntimeMinutes ? `${details.averageRuntimeMinutes} MIN` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const selectedSeasonDetail = expandedSeason !== null ? seasonsCache[expandedSeason] : undefined;
+  const selectedFirstUnwatched = selectedSeasonDetail?.episodes.find(
+    (ep) => ep.isAired && !checkIsWatched(selectedSeasonDetail.seasonNumber, ep.episodeNumber)
+  )?.episodeNumber;
 
   return (
-    <div className="space-y-6 pb-24 animate-in fade-in duration-300">
-      {/* Top Bar Navigation */}
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-10 pb-12">
+      {/* Hero: poster, poster-style title, meta line and overview */}
+      <section className="-mx-4 md:-mx-14 -mt-6 md:-mt-10 bg-plum px-4 md:px-14 pt-4 md:pt-8 pb-8 flex flex-col gap-6">
         <button
+          type="button"
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-[#0a84ff] hover:underline"
+          className="self-start h-11 -ml-2 px-2 inline-flex items-center gap-1 text-sm font-semibold text-smoke hover:text-cream"
         >
-          <ChevronLeft className="w-4 h-4" />
-          <span>Back</span>
+          <ChevronLeft className="w-4 h-4" strokeWidth={2.4} />
+          Back
         </button>
 
-        {tracked && (
-          <button
-            onClick={handleRemoveFromLibrary}
-            className="p-1.5 rounded-full text-[#8e8e93] hover:text-[#ff453a] hover:bg-white/5 transition-colors"
-            title="Remove from library"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
-      </div>
-
-      {/* Hero Header Card with Backdrop Blur */}
-      <div className="relative rounded-3xl overflow-hidden bg-[#1c1c1e] border border-[rgba(255,255,255,0.08)] shadow-2xl">
-        {/* Backdrop Image */}
-        {details.backdropPath && (
-          <div className="absolute inset-0 h-56 sm:h-64 w-full overflow-hidden opacity-30">
-            <Image
-              src={`https://image.tmdb.org/t/p/w780${details.backdropPath}`}
-              alt=""
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1c1c1e]/80 to-[#1c1c1e]" />
-          </div>
-        )}
-
-        <div className="relative p-5 sm:p-6 pt-24 sm:pt-28 flex flex-col sm:flex-row gap-5 items-start">
-          {/* Poster Card */}
-          <div className="relative w-28 sm:w-36 aspect-[2/3] rounded-2xl overflow-hidden bg-[#141416] border border-white/10 shadow-2xl shrink-0 mx-auto sm:mx-0">
+        <div className="flex flex-col sm:flex-row gap-6 md:gap-10 sm:items-end">
+          <div className="relative w-[120px] sm:w-[160px] md:w-[220px] aspect-[2/3] rounded-md overflow-hidden bg-eggplant shrink-0 shadow-[0_24px_48px_rgba(0,0,0,0.45)]">
             {details.posterPath ? (
               <Image
                 src={`https://image.tmdb.org/t/p/w342${details.posterPath}`}
                 alt={details.title}
                 fill
+                sizes="220px"
                 className="object-cover"
                 priority
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#8e8e93]">
-                {isMovie ? <Film className="w-8 h-8 opacity-40" /> : <Tv className="w-8 h-8 opacity-40" />}
-              </div>
+              <span className="absolute inset-0 p-4 flex items-end font-display font-black text-4xl leading-[0.88]">
+                {details.title}
+              </span>
             )}
           </div>
 
-          {/* Details Content */}
-          <div className="flex-1 space-y-3 w-full">
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider border border-white/10">
-                  {isMovie ? "Movie" : "Series"}
-                </span>
-
-                {details.ageRating && (
-                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-bold text-white border border-white/10">
-                    {details.ageRating}
-                  </span>
-                )}
-
-                <span className="text-xs text-[#8e8e93] font-medium">
-                  {isMovie
-                    ? (details.releaseDate ? `Released: ${details.releaseDate}` : details.yearRange)
-                    : details.yearRange}
-                </span>
-
-                {details.status && (
-                  <span className="text-xs text-[#0a84ff] font-semibold">
-                    • {details.status}
-                  </span>
-                )}
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                {details.title}
-              </h1>
-
-              {details.genres.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {details.genres.map((genre) => (
-                    <span
-                      key={genre}
-                      className="px-2 py-0.5 rounded-lg bg-[#2c2c2e] text-[11px] font-medium text-[#8e8e93]"
-                    >
-                      {genre}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Quick Metadata Row */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-[#8e8e93] pt-1">
-              {details.averageRuntimeMinutes && (
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>
-                    {isMovie
-                      ? `${details.averageRuntimeMinutes}m`
-                      : `~${details.averageRuntimeMinutes}m / ep`}
-                  </span>
-                </div>
-              )}
-
-              {!isMovie && details.totalEpisodes !== undefined && (
-                <div className="flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>
-                    {details.totalSeasons} {details.totalSeasons === 1 ? "Season" : "Seasons"} • {details.totalEpisodes} Episodes
-                  </span>
-                </div>
-              )}
-
-              {!isMovie && details.nextEpisodeToAir && (
-                <div className="flex items-center gap-1.5 text-[#32d74b]">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>
-                    Next: S{details.nextEpisodeToAir.seasonNumber}E{details.nextEpisodeToAir.episodeNumber} ({details.nextEpisodeToAir.airDate})
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Overview */}
+          <div className="flex-1 min-w-0 flex flex-col gap-3.5">
+            <span className="font-mono text-xs md:text-[13px] tracking-[0.12em] text-lilac">{metaLine}</span>
+            <h1 className="font-display font-black text-5xl sm:text-6xl md:text-[96px] leading-[0.85] break-words">
+              {details.title}
+            </h1>
             {details.overview && (
-              <p className="text-xs sm:text-sm text-[#8e8e93] leading-relaxed pt-1">
-                {details.overview}
-              </p>
+              <p className="max-w-[640px] text-[15px] md:text-base leading-relaxed text-[#d9cedc]">{details.overview}</p>
             )}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-smoke">
+              {details.genres.length > 0 && <span>{details.genres.join(" / ").toUpperCase()}</span>}
+              {details.status && <span className="text-green">{details.status.toUpperCase()}</span>}
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Tracking & Actions Strip */}
-        <div className="p-4 sm:p-5 bg-black/40 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap items-center justify-between gap-4">
-          {/* Status or Add Button */}
-          <div>
-            {!tracked ? (
+      {/* Action deck: the main action first, then rating, status and alerts */}
+      <section aria-label="Your tracking" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {!tracked ? (
+          <div className="md:col-span-2 xl:col-span-3 rounded-[14px] bg-plum p-5 md:p-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <span className="font-display font-extrabold text-3xl">Not on your lists yet</span>
+              <span className="text-sm text-smoke">
+                {isMovie ? "Save it for later or mark it as seen." : "Add it, or tick an episode below to start tracking."}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {isMovie && (
+                <button
+                  type="button"
+                  onClick={handleToggleMovieWatched}
+                  className="h-12 px-5 rounded-[10px] border border-green text-green font-bold flex items-center gap-2 ios-press"
+                >
+                  <Check className="w-4 h-4" strokeWidth={2.6} />
+                  I&rsquo;ve seen it
+                </button>
+              )}
               <button
+                type="button"
                 onClick={handleAddToLibrary}
                 disabled={isSubmitting}
-                className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50"
+                className="h-12 px-6 rounded-[10px] bg-green text-ink font-bold flex items-center gap-2 ios-press disabled:opacity-60"
               >
-                {isSubmitting ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Plus className="w-3.5 h-3.5" />
-                )}
-                <span>Add to Watchlist</span>
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" strokeWidth={2.6} />}
+                Want to watch
               </button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <div
-                  className={`px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 ${
-                    tracked.status === "watched"
-                      ? "bg-[#32d74b]/15 text-[#32d74b] border border-[#32d74b]/30"
-                      : tracked.status === "currently_watching"
-                      ? "bg-[#0a84ff]/15 text-[#0a84ff] border border-[#0a84ff]/30"
-                      : "bg-[#ff9f0a]/15 text-[#ff9f0a] border border-[#ff9f0a]/30"
+            </div>
+          </div>
+        ) : (
+          <>
+            {isMovie ? (
+              <div
+                className={`md:col-span-2 xl:col-span-3 rounded-[14px] flex flex-wrap items-center justify-between gap-4 p-5 md:p-6 ${
+                  tracked.status === "watched" ? "bg-plum" : "bg-green text-ink"
+                }`}
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="font-mono text-xs font-semibold tracking-[0.12em]">
+                    {tracked.status === "watched" ? "IN YOUR WATCHED LIST" : "ON YOUR WATCHLIST"}
+                  </span>
+                  <span className="font-display font-black text-4xl leading-none">
+                    {tracked.status === "watched" ? "Seen it" : "Watched it yet?"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleMovieWatched}
+                  className={`h-[52px] px-6 rounded-[10px] font-bold flex items-center gap-2.5 ios-press ${
+                    tracked.status === "watched" ? "border border-plum-line text-smoke" : "bg-ink text-green"
                   }`}
                 >
-                  <Check className="w-3.5 h-3.5" />
-                  <span className="capitalize">{tracked.status.replace(/_/g, " ")}</span>
+                  {tracked.status === "watched" ? (
+                    "Mark unwatched"
+                  ) : (
+                    <>
+                      <Check className="w-[18px] h-[18px]" strokeWidth={2.6} />
+                      Mark watched
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="md:col-span-2 xl:col-span-3 rounded-[14px] bg-green text-ink flex flex-wrap items-stretch overflow-hidden">
+                <div className="flex-1 min-w-[220px] p-5 md:p-6 flex flex-col gap-1.5">
+                  {upNext ? (
+                    <>
+                      <span className="font-mono text-xs font-semibold tracking-[0.12em]">
+                        UP NEXT · S{String(upNext.seasonNumber).padStart(2, "0")} E{String(upNext.episodeNumber).padStart(2, "0")}
+                      </span>
+                      <span className="font-display font-black text-3xl md:text-[40px] leading-[0.95]">{upNext.name}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-mono text-xs font-semibold tracking-[0.12em]">ALL CAUGHT UP</span>
+                      <span className="font-display font-black text-3xl md:text-[40px] leading-[0.95]">
+                        {details.nextEpisodeToAir
+                          ? `Next airs ${details.nextEpisodeToAir.airDate}`
+                          : nextSeasonSummary && !nextSeasonDetail
+                          ? "Loading…"
+                          : "Nothing left to watch"}
+                      </span>
+                    </>
+                  )}
+                  <span className="text-sm font-medium">
+                    {totalWatched} of {details.totalEpisodes ?? "?"} episodes watched
+                  </span>
                 </div>
-
-                {/* Status Override Selector */}
-                <select
-                  value={tracked.override || "normal"}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    handleOverride(val === "normal" ? null : (val as "dropped" | "on_hold"));
-                  }}
-                  className="bg-[#2c2c2e] text-[#8e8e93] hover:text-white text-xs font-semibold rounded-xl px-2.5 py-1 border border-white/10 focus:outline-none"
-                >
-                  <option value="normal">Active</option>
-                  <option value="on_hold">On Hold</option>
-                  <option value="dropped">Dropped</option>
-                </select>
+                {upNext && (
+                  <>
+                    <div className="hidden sm:block border-l-2 border-dashed border-ink/35" aria-hidden="true" />
+                    <div className="p-5 md:p-6 pt-0 sm:pt-5 flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleEpisode(upNext.seasonNumber, upNext.episodeNumber)}
+                        className="h-[52px] px-6 rounded-[10px] bg-ink text-green font-bold flex items-center gap-2.5 ios-press"
+                      >
+                        <Check className="w-[18px] h-[18px]" strokeWidth={2.6} />
+                        Mark watched
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
-          </div>
 
-          {/* Interactive Controls (Rating & Notifications) */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            {/* 0-10 Rating Button */}
-            <button
-              onClick={() => {
-                setRatingInput(
-                  tracked?.rating !== undefined && tracked?.rating !== null
-                    ? String(tracked.rating)
-                    : ""
-                );
-                setIsRatingModalOpen(true);
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ios-press ${
-                tracked?.rating !== undefined && tracked?.rating !== null
-                  ? "bg-[#ffd60a]/15 text-[#ffd60a] border-[#ffd60a]/30 shadow-sm"
-                  : "bg-[#2c2c2e]/60 text-[#8e8e93] hover:text-[#ffd60a] border-white/10"
-              }`}
-              title="Rate this title (0.00 to 10.00)"
-            >
-              <Star
-                className={`w-3.5 h-3.5 ${
-                  tracked?.rating !== undefined && tracked?.rating !== null
-                    ? "fill-[#ffd60a] text-[#ffd60a]"
-                    : "text-[#ffd60a]"
-                }`}
-              />
-              <span>
-                {tracked?.rating !== undefined && tracked?.rating !== null
-                  ? `${tracked.rating}/10`
-                  : "Rate / 10"}
-              </span>
-            </button>
+            <div className="rounded-[14px] bg-plum p-5 flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-semibold">Your rating</span>
+                <span>
+                  <span className="font-display font-black text-[40px] leading-none text-green">
+                    {hasRating ? tracked.rating : "–"}
+                  </span>
+                  <span className="font-mono text-[13px] text-smoke"> /10</span>
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setRatingInput(hasRating ? String(tracked.rating) : "");
+                  setIsRatingModalOpen(true);
+                }}
+                className="h-11 px-4 rounded-[10px] border border-plum-line text-sm font-semibold hover:border-green ios-press"
+              >
+                {hasRating ? "Change" : "Rate it"}
+              </button>
+            </div>
 
-            {/* Notification Bell (for Series) */}
+            <div className="rounded-[14px] bg-plum p-5 flex flex-col gap-3">
+              <span className="text-sm font-semibold">Status</span>
+              <div role="group" aria-label="Status" className="grid grid-cols-3 gap-1 p-1 rounded-[10px] bg-ink">
+                {([
+                  [null, tracked.status === "want_to_watch" ? "Want to watch" : tracked.status === "watched" ? "Watched" : "Watching"],
+                  ["on_hold", "On hold"],
+                  ["dropped", "Dropped"],
+                ] as const).map(([value, label]) => {
+                  const active = (tracked.override ?? null) === value;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => handleOverride(value)}
+                      className={`h-10 rounded-[7px] text-[13px] font-semibold transition-colors ${
+                        active ? "bg-eggplant text-cream" : "text-smoke hover:text-cream"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              {!isMovie && <span className="text-xs text-dim">The first option follows your episodes automatically.</span>}
+            </div>
+
             {!isMovie && (
-              <button
-                onClick={handleToggleNotify}
-                className={`p-2 rounded-xl border transition-all ${
-                  tracked?.notify
-                    ? "bg-[#0a84ff]/15 border-[#0a84ff]/40 text-[#0a84ff]"
-                    : "bg-[#2c2c2e]/60 border-white/10 text-[#8e8e93] hover:text-white"
-                }`}
-                title={tracked?.notify ? "Notifications enabled" : "Enable notifications"}
-              >
-                {tracked?.notify ? (
-                  <Bell className="w-4 h-4" />
-                ) : (
-                  <BellOff className="w-4 h-4 opacity-50" />
-                )}
-              </button>
+              <div className="rounded-[14px] bg-plum p-5 flex items-center gap-4">
+                <span className="flex-1 flex flex-col gap-1">
+                  <span className="text-sm font-semibold">New episode alerts</span>
+                  <span className="text-xs text-smoke">Push to your phone when an episode airs</span>
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={Boolean(tracked.notify)}
+                  aria-label="New episode alerts"
+                  onClick={handleToggleNotify}
+                  className={`w-14 h-8 rounded-full p-[3px] flex transition-colors ${
+                    tracked.notify ? "bg-green justify-end" : "bg-plum-line justify-start"
+                  }`}
+                >
+                  <span className="w-[26px] h-[26px] rounded-full bg-cream" />
+                </button>
+              </div>
             )}
-
-            {/* Movie Watched Button */}
-            {isMovie && (
-              <button
-                onClick={handleToggleMovieWatched}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all ${
-                  tracked?.status === "watched"
-                    ? "bg-[#32d74b] text-black border-[#32d74b]"
-                    : "bg-[#2c2c2e] text-white border-white/10 hover:border-white/30"
-                }`}
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{tracked?.status === "watched" ? "Watched" : "Mark Watched"}</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
+          </>
+        )}
+      </section>
       {/* Movie Franchise Collection Collapsible Dropdown */}
       {isMovie && details.belongsToCollection && (
-        <div className="rounded-2xl overflow-hidden bg-[#1c1c1e] border border-[rgba(255,255,255,0.08)] shadow-lg transition-all">
+        <div className="rounded-2xl overflow-hidden bg-[#1f1424] border border-[rgba(255,255,255,0.08)] shadow-lg transition-all">
           {/* Accordion Trigger Header */}
           <div
             onClick={() => {
@@ -866,24 +895,24 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
           >
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-[#0a84ff] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-[#4fd27f] uppercase tracking-wider">
                   Franchise Collection
                 </span>
                 {collectionDetail && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-bold border border-[#0a84ff]/30">
+                  <span className="px-2 py-0.5 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[10px] font-bold border border-[#4fd27f]/30">
                     {collectionDetail.parts.filter((p) => p.isWatched).length} / {collectionDetail.parts.length} Watched
                   </span>
                 )}
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <h3 className="text-sm sm:text-base font-bold text-cream flex items-center gap-2">
                 <span>{details.belongsToCollection.name}</span>
               </h3>
-              <p className="text-xs text-[#8e8e93]">
+              <p className="text-xs text-[#b7a9bc]">
                 Tap to view all franchise movies and mark all or select titles as watched.
               </p>
             </div>
 
-            <div className="p-2 rounded-xl bg-white/5 text-[#8e8e93] hover:text-white transition-colors shrink-0">
+            <div className="p-2 rounded-xl bg-white/5 text-[#b7a9bc] hover:text-cream transition-colors shrink-0">
               {isCollectionExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </div>
           </div>
@@ -893,8 +922,8 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
             <div className="border-t border-[rgba(255,255,255,0.06)] p-4 sm:p-5 space-y-4 bg-black/25">
               {isLoadingCollection ? (
                 <div className="py-8 text-center space-y-2">
-                  <Loader2 className="w-5 h-5 text-[#0a84ff] animate-spin mx-auto" />
-                  <p className="text-xs text-[#8e8e93]">Loading franchise movies...</p>
+                  <Loader2 className="w-5 h-5 text-[#4fd27f] animate-spin mx-auto" />
+                  <p className="text-xs text-[#b7a9bc]">Loading franchise movies...</p>
                 </div>
               ) : collectionDetail ? (
                 <div className="space-y-3">
@@ -903,21 +932,21 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={handleToggleSelectAllParts}
-                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-white flex items-center gap-1.5 transition-colors"
+                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-cream flex items-center gap-1.5 transition-colors"
                       >
                         {selectedPartIds.size === collectionDetail.parts.length ? (
                           <>
-                            <CheckSquare className="w-3.5 h-3.5 text-[#0a84ff]" />
+                            <CheckSquare className="w-3.5 h-3.5 text-[#4fd27f]" />
                             <span>Deselect All</span>
                           </>
                         ) : (
                           <>
-                            <Square className="w-3.5 h-3.5 text-[#8e8e93]" />
+                            <Square className="w-3.5 h-3.5 text-[#b7a9bc]" />
                             <span>Select All</span>
                           </>
                         )}
                       </button>
-                      <span className="text-xs text-[#8e8e93]">
+                      <span className="text-xs text-[#b7a9bc]">
                         {selectedPartIds.size} of {collectionDetail.parts.length} selected
                       </span>
                     </div>
@@ -926,7 +955,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                       <button
                         onClick={handleMarkSelectedCollectionWatched}
                         disabled={isUpdatingCollectionParts || selectedPartIds.size === 0}
-                        className="px-3 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] disabled:opacity-40 text-white text-xs font-bold flex items-center gap-1.5 transition-all ios-press"
+                        className="px-3 py-1.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] disabled:opacity-40 text-ink text-xs font-bold flex items-center gap-1.5 transition-all ios-press"
                       >
                         {isUpdatingCollectionParts ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -939,7 +968,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                       <button
                         onClick={() => handleMarkEntireCollectionWatched(details.belongsToCollection!.id)}
                         disabled={isMarkingCollection}
-                        className="px-3 py-1.5 rounded-xl bg-[#32d74b]/15 hover:bg-[#32d74b]/25 border border-[#32d74b]/30 text-[#32d74b] text-xs font-bold flex items-center gap-1.5 transition-all ios-press disabled:opacity-40"
+                        className="px-3 py-1.5 rounded-xl bg-[#4fd27f]/15 hover:bg-[#4fd27f]/25 border border-[#4fd27f]/30 text-[#4fd27f] text-xs font-bold flex items-center gap-1.5 transition-all ios-press disabled:opacity-40"
                       >
                         {isMarkingCollection ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -963,16 +992,16 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                           onClick={() => handleToggleSelectPart(part.id)}
                           className={`p-2.5 rounded-xl border flex items-center gap-3 cursor-pointer transition-all ${
                             isSelected
-                              ? "bg-[#0a84ff]/[0.08] border-[#0a84ff]/40"
+                              ? "bg-[#4fd27f]/[0.08] border-[#4fd27f]/40"
                               : "bg-[#161618] border-white/[0.04] hover:border-white/10"
-                          } ${isCurrent ? "ring-1 ring-[#ffd60a]/40" : ""}`}
+                          } ${isCurrent ? "ring-1 ring-[#e9b44c]/40" : ""}`}
                         >
                           {/* Checkbox */}
-                          <div className="p-1 text-white shrink-0">
+                          <div className="p-1 text-cream shrink-0">
                             {isSelected ? (
-                              <CheckSquare className="w-4 h-4 text-[#0a84ff]" />
+                              <CheckSquare className="w-4 h-4 text-[#4fd27f]" />
                             ) : (
-                              <Square className="w-4 h-4 text-[#636366]" />
+                              <Square className="w-4 h-4 text-[#8a7c90]" />
                             )}
                           </div>
 
@@ -986,7 +1015,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                                 className="object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-[#8e8e93]">
+                              <div className="w-full h-full flex items-center justify-center text-[#b7a9bc]">
                                 <Film className="w-3.5 h-3.5 opacity-40" />
                               </div>
                             )}
@@ -996,18 +1025,18 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5">
                               <h4
-                                className="text-xs font-bold text-white truncate"
+                                className="text-xs font-bold text-cream truncate"
                                 title={part.title}
                               >
                                 {part.title}
                               </h4>
                               {isCurrent && (
-                                <span className="px-1 py-0.2 rounded bg-[#ffd60a]/20 text-[#ffd60a] text-[9px] font-bold">
+                                <span className="px-1 py-0.2 rounded bg-[#e9b44c]/20 text-[#e9b44c] text-[9px] font-bold">
                                   Current
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] text-[#8e8e93] mt-0.5">
+                            <p className="text-[10px] text-[#b7a9bc] mt-0.5">
                               {part.yearRange || "TBA"}
                             </p>
                           </div>
@@ -1015,12 +1044,12 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                           {/* Status Badge */}
                           <div className="shrink-0">
                             {part.isWatched ? (
-                              <span className="px-2 py-0.5 rounded-md bg-[#32d74b]/15 border border-[#32d74b]/30 text-[#32d74b] text-[10px] font-bold flex items-center gap-1">
+                              <span className="px-2 py-0.5 rounded-md bg-[#4fd27f]/15 border border-[#4fd27f]/30 text-[#4fd27f] text-[10px] font-bold flex items-center gap-1">
                                 <Check className="w-3 h-3" />
                                 <span>Watched</span>
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[#8e8e93] text-[10px] font-medium">
+                              <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[#b7a9bc] text-[10px] font-medium">
                                 Unwatched
                               </span>
                             )}
@@ -1031,248 +1060,157 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-[#ff453a]">Unable to load franchise collection.</p>
+                <p className="text-xs text-[#ff8a80]">Unable to load franchise collection.</p>
               )}
             </div>
           )}
         </div>
       )}
 
-      {/* Series Seasons & Episodes Explorer */}
-      {!isMovie && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white tracking-tight">Seasons & Episodes</h2>
-            <span className="text-xs text-[#8e8e93]">
-              Check off episodes to update your watching progress
-            </span>
-          </div>
-
-          {/* Season Accordions */}
-          <div className="space-y-3">
-            {regularSeasons.map((season) => {
-              const seasonNum = season.seasonNumber;
-              const isExpanded = expandedSeason === seasonNum;
-              const seasonDetail = seasonsCache[seasonNum];
-              const isLoadingCurrent = loadingSeason === seasonNum;
-
-              return (
-                <div
-                  key={seasonNum}
-                  className="rounded-2xl overflow-hidden bg-[#1c1c1e] border border-[rgba(255,255,255,0.06)]"
-                >
-                  {/* Season Header Accordion Trigger */}
-                  <div
-                    onClick={() => setExpandedSeason(isExpanded ? null : seasonNum)}
-                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-colors"
+      {/* Episode checklist: season tabs, progress strip, one row per episode */}
+      {!isMovie && regularSeasons.length > 0 && (
+        <section aria-labelledby="episodes-heading" className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h2 id="episodes-heading" className="font-display font-black text-[40px] md:text-[44px] leading-none">
+              Episodes
+            </h2>
+            <div role="tablist" aria-label="Seasons" className="flex gap-2 overflow-x-auto max-w-full pb-1">
+              {regularSeasons.map((season) => {
+                const active = expandedSeason === season.seasonNumber;
+                const watched = countWatchedInSeason(tracked, season.seasonNumber);
+                const complete = watched >= season.episodeCount && season.episodeCount > 0;
+                return (
+                  <button
+                    key={season.seasonNumber}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setExpandedSeason(season.seasonNumber)}
+                    className={`min-w-[88px] h-14 px-3.5 rounded-[10px] border flex flex-col items-center justify-center gap-0.5 shrink-0 transition-colors ${
+                      active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac"
+                    }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-[#2c2c2e] flex items-center justify-center text-xs font-bold text-white">
-                        {seasonNum}
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-white">
-                          {season.name || `Season ${seasonNum}`}
-                        </h3>
-                        <p className="text-[11px] text-[#8e8e93]">
-                          {season.episodeCount} Episodes {season.airDate ? `• ${season.airDate.slice(0, 4)}` : ""}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      {isExpanded ? (
-                        <ChevronUp className="w-4 h-4 text-[#8e8e93]" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#8e8e93]" />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Expanded Season Episodes View */}
-                  {isExpanded && (
-                    <div className="border-t border-[rgba(255,255,255,0.06)] p-4 space-y-4 bg-black/20">
-                      {/* Season Action Row */}
-                      <div className="flex items-center justify-between pb-2 border-b border-white/[0.04]">
-                        <span className="text-xs text-[#8e8e93] font-medium">
-                          {seasonDetail ? `${seasonDetail.airedEpisodesCount} of ${seasonDetail.totalEpisodes} aired` : "Loading..."}
-                        </span>
-
-                        {seasonDetail && seasonDetail.airedEpisodesCount > 0 && (
-                          <button
-                            onClick={() =>
-                              handleMarkSeasonWatched(seasonNum, seasonDetail.airedEpisodesCount)
-                            }
-                            className="px-3 py-1 rounded-lg bg-[#32d74b]/15 hover:bg-[#32d74b]/25 border border-[#32d74b]/30 text-[#32d74b] text-xs font-semibold flex items-center gap-1 transition-all"
-                          >
-                            <Check className="w-3 h-3" />
-                            <span>Mark Season Watched</span>
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Episodes List */}
-                      {isLoadingCurrent ? (
-                        <div className="py-8 text-center">
-                          <Loader2 className="w-5 h-5 text-[#0a84ff] animate-spin mx-auto" />
-                          <p className="text-xs text-[#8e8e93] mt-2">Fetching season episodes...</p>
-                        </div>
-                      ) : seasonDetail ? (
-                        <div className="space-y-2.5">
-                          {seasonDetail.episodes.map((ep) => {
-                            const isWatched = checkIsWatched(seasonNum, ep.episodeNumber);
-                            const isAired = ep.isAired;
-
-                            return (
-                              <div
-                                key={ep.episodeNumber}
-                                className={`p-3 rounded-xl border transition-all flex items-start gap-3 ${
-                                  isWatched
-                                    ? "bg-[#32d74b]/[0.04] border-[#32d74b]/20"
-                                    : "bg-[#141416]/50 border-white/[0.04]"
-                                }`}
-                              >
-                                {/* Checkbox */}
-                                <button
-                                  onClick={() => handleToggleEpisode(seasonNum, ep.episodeNumber)}
-                                  disabled={!isAired}
-                                  className={`mt-1 w-5 h-5 rounded-md flex items-center justify-center border transition-all shrink-0 ${
-                                    isWatched
-                                      ? "bg-[#32d74b] border-[#32d74b] text-black font-bold"
-                                      : isAired
-                                      ? "border-white/20 hover:border-white/50 text-transparent"
-                                      : "border-white/10 opacity-40 cursor-not-allowed"
-                                  }`}
-                                  title={!isAired ? "Cannot mark unaired episode" : "Toggle watched"}
-                                >
-                                  {isWatched && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                                </button>
-
-                                {/* Episode Info */}
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-xs font-bold text-white">
-                                      {ep.episodeNumber}. {ep.name}
-                                    </span>
-
-                                    {ep.airDate && (
-                                      <span className="text-[11px] text-[#8e8e93]">
-                                        ({ep.airDate})
-                                      </span>
-                                    )}
-
-                                    {!isAired && (
-                                      <span className="px-1.5 py-0.2 rounded bg-[#ff9f0a]/15 text-[#ff9f0a] text-[10px] font-semibold border border-[#ff9f0a]/30">
-                                        Unaired
-                                      </span>
-                                    )}
-
-                                    {ep.runtime && (
-                                      <span className="text-[10px] text-[#8e8e93]">
-                                        {ep.runtime}m
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  {ep.overview && (
-                                    <p className="text-[11px] text-[#8e8e93] line-clamp-2 mt-1">
-                                      {ep.overview}
-                                    </p>
-                                  )}
-                                </div>
-
-                                {/* "Mark up to here" Button */}
-                                {isAired && !isWatched && (
-                                  <button
-                                    onClick={() =>
-                                      handleMarkAllUpToHere(seasonNum, ep.episodeNumber)
-                                    }
-                                    className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-[10px] text-[#8e8e93] hover:text-white transition-colors shrink-0"
-                                    title="Mark all episodes up to this one as watched"
-                                  >
-                                    Mark up to here
-                                  </button>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <p className="text-xs text-[#8e8e93]">Failed to load episodes.</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Season 0 Specials Section (Collapsed by Default, Excluded from Totals) */}
-            {specialsSeason && (
-              <div className="rounded-2xl overflow-hidden bg-[#1c1c1e]/60 border border-[rgba(255,255,255,0.04)]">
-                <div
-                  onClick={() => {
-                    setIsSpecialsExpanded(!isSpecialsExpanded);
-                    if (!isSpecialsExpanded) fetchSeasonEpisodes(0);
-                  }}
-                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/[0.02]"
+                    <span className="font-display font-extrabold text-xl leading-none">Season {season.seasonNumber}</span>
+                    <span className={`font-mono text-[11px] ${complete ? "text-green" : "text-smoke"}`}>
+                      {complete ? "COMPLETE" : `${watched}/${season.episodeCount}`}
+                    </span>
+                  </button>
+                );
+              })}
+              {specialsSeason && (
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={expandedSeason === 0}
+                  onClick={() => setExpandedSeason(0)}
+                  className={`min-w-[88px] h-14 px-3.5 rounded-[10px] border flex flex-col items-center justify-center gap-0.5 shrink-0 transition-colors ${
+                    expandedSeason === 0 ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac"
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-[#2c2c2e]/60 flex items-center justify-center text-xs font-bold text-[#8e8e93]">
-                      0
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-[#8e8e93]">
-                        Season 0 (Specials)
-                      </h3>
-                      <p className="text-[10px] text-[#8e8e93]/70">
-                        {specialsSeason.episodeCount} Specials • Does not affect series progress
-                      </p>
-                    </div>
-                  </div>
-
-                  {isSpecialsExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-[#8e8e93]" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-[#8e8e93]" />
-                  )}
-                </div>
-
-                {isSpecialsExpanded && seasonsCache[0] && (
-                  <div className="border-t border-[rgba(255,255,255,0.04)] p-4 space-y-2 bg-black/20">
-                    {seasonsCache[0].episodes.map((ep) => {
-                      const isWatched = checkIsWatched(0, ep.episodeNumber);
-                      return (
-                        <div
-                          key={ep.episodeNumber}
-                          className="p-2.5 rounded-xl bg-[#141416]/50 flex items-center justify-between gap-3 text-xs"
-                        >
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleToggleEpisode(0, ep.episodeNumber)}
-                              className={`w-4 h-4 rounded flex items-center justify-center border ${
-                                isWatched
-                                  ? "bg-[#32d74b] border-[#32d74b] text-black font-bold"
-                                  : "border-white/20 text-transparent"
-                              }`}
-                            >
-                              {isWatched && <Check className="w-3 h-3 stroke-[3]" />}
-                            </button>
-                            <span className="text-white font-medium">
-                              S00E{ep.episodeNumber} • {ep.name}
-                            </span>
-                          </div>
-                          {ep.airDate && (
-                            <span className="text-[10px] text-[#8e8e93]">{ep.airDate}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+                  <span className="font-display font-extrabold text-xl leading-none">Specials</span>
+                  <span className="font-mono text-[11px] text-smoke">{specialsSeason.episodeCount} EPS</span>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+
+          {expandedSeason !== null && !selectedSeasonDetail && loadingSeason === expandedSeason ? (
+            <div className="py-10 flex justify-center">
+              <Loader2 className="w-6 h-6 text-green animate-spin" />
+            </div>
+          ) : selectedSeasonDetail ? (
+            <>
+              {expandedSeason === 0 ? (
+                <p className="text-sm text-smoke">Specials don&rsquo;t count towards your series progress.</p>
+              ) : (
+                <SeasonProgress
+                  watched={countWatchedInSeason(tracked, selectedSeasonDetail.seasonNumber)}
+                  season={selectedSeasonDetail}
+                  onMarkSeason={() =>
+                    handleMarkSeasonWatched(selectedSeasonDetail.seasonNumber, selectedSeasonDetail.airedEpisodesCount)
+                  }
+                />
+              )}
+
+              <ol className="flex flex-col">
+                {selectedSeasonDetail.episodes.map((ep) => {
+                  const isWatched = checkIsWatched(selectedSeasonDetail.seasonNumber, ep.episodeNumber);
+                  const canMarkUpTo =
+                    expandedSeason !== 0 &&
+                    ep.isAired &&
+                    !isWatched &&
+                    selectedFirstUnwatched !== undefined &&
+                    ep.episodeNumber > selectedFirstUnwatched;
+                  return (
+                    <li
+                      key={ep.episodeNumber}
+                      className={`flex items-center gap-3 md:gap-[18px] py-2.5 border-b border-[#241829] ${
+                        ep.isAired ? "" : "opacity-55"
+                      }`}
+                    >
+                      {ep.isAired ? (
+                        <button
+                          type="button"
+                          aria-pressed={isWatched}
+                          aria-label={`Episode ${ep.episodeNumber}, ${isWatched ? "watched" : "not watched"}`}
+                          onClick={() => handleToggleEpisode(selectedSeasonDetail.seasonNumber, ep.episodeNumber)}
+                          className={`w-11 h-11 shrink-0 rounded-[10px] border-2 flex items-center justify-center transition-colors ios-press ${
+                            isWatched ? "bg-green border-green" : "border-eggplant hover:border-green"
+                          }`}
+                        >
+                          {isWatched && <Check className="w-5 h-5 text-ink" strokeWidth={3} />}
+                        </button>
+                      ) : (
+                        <span
+                          className="w-11 h-11 shrink-0 rounded-[10px] border-2 border-dashed border-plum-line flex items-center justify-center"
+                          title="Not aired yet"
+                        >
+                          <Lock className="w-[18px] h-[18px] text-dim" />
+                        </span>
+                      )}
+                      <span
+                        className={`w-9 md:w-12 shrink-0 font-display font-extrabold text-[22px] md:text-[26px] ${
+                          isWatched ? "text-eggplant" : ""
+                        }`}
+                      >
+                        {String(ep.episodeNumber).padStart(2, "0")}
+                      </span>
+                      <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+                        <span className="font-semibold text-[15px] truncate">{ep.name}</span>
+                        <span className="font-mono text-[11px] md:text-xs text-smoke">
+                          {ep.airDate ? `${ep.isAired ? "AIRED" : "AIRS"} ${ep.airDate}` : "TBA"}
+                          {ep.runtime ? ` · ${ep.runtime} MIN` : ""}
+                        </span>
+                      </span>
+                      {canMarkUpTo && (
+                        <button
+                          type="button"
+                          onClick={() => handleMarkAllUpToHere(selectedSeasonDetail.seasonNumber, ep.episodeNumber)}
+                          className="hidden sm:block h-9 px-3.5 rounded-lg border border-plum-line text-smoke hover:text-cream text-[13px] font-semibold shrink-0"
+                        >
+                          Watched up to here
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </>
+          ) : (
+            <p className="text-sm text-smoke">Couldn&rsquo;t load this season&rsquo;s episodes.</p>
+          )}
+        </section>
+      )}
+
+      {tracked && (
+        <button
+          type="button"
+          onClick={handleRemoveFromLibrary}
+          disabled={isSubmitting}
+          className="self-start h-10 text-danger text-sm font-semibold hover:underline"
+        >
+          Remove from my lists
+        </button>
       )}
 
       {/* 0-10 Rating Modal */}
@@ -1282,22 +1220,22 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
         >
-          <div className="w-full max-w-sm rounded-3xl bg-[#1c1c1e] border border-[rgba(255,255,255,0.12)] p-5 shadow-2xl space-y-4">
+          <div className="w-full max-w-sm rounded-3xl bg-[#1f1424] border border-[rgba(255,255,255,0.12)] p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-[#ffd60a] fill-[#ffd60a]" />
-                <h3 className="text-base font-extrabold text-white">Rate Title</h3>
+                <Star className="w-5 h-5 text-[#4fd27f] fill-[#4fd27f]" />
+                <h3 className="text-base font-extrabold text-cream">Rate Title</h3>
               </div>
               <button
                 onClick={() => setIsRatingModalOpen(false)}
-                className="p-1 rounded-full text-[#8e8e93] hover:text-white"
+                className="p-1 rounded-full text-[#b7a9bc] hover:text-cream"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-[#8e8e93]">
-              Enter a score from <strong className="text-white">0.00 to 10.00</strong> (decimals supported up to 2 places).
+            <p className="text-xs text-[#b7a9bc]">
+              Enter a score from <strong className="text-cream">0.00 to 10.00</strong> (decimals supported up to 2 places).
             </p>
 
             {/* Custom Input */}
@@ -1311,9 +1249,9 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   value={ratingInput}
                   onChange={(e) => setRatingInput(e.target.value)}
                   placeholder="e.g. 8.5 or 9.25"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#2c2c2e] border border-white/10 text-white font-bold text-sm focus:outline-none focus:border-[#ffd60a] transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#2c1b33] border border-white/10 text-cream font-bold text-sm focus:outline-none focus:border-[#4fd27f] transition-colors"
                 />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#8e8e93]">
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#b7a9bc]">
                   / 10
                 </span>
               </div>
@@ -1321,14 +1259,14 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
 
             {/* Quick Preset Buttons */}
             <div>
-              <p className="text-[11px] font-semibold text-[#8e8e93] mb-1.5">Quick Presets</p>
+              <p className="text-[11px] font-semibold text-[#b7a9bc] mb-1.5">Quick Presets</p>
               <div className="grid grid-cols-4 gap-1.5">
                 {[5.0, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0].map((preset) => (
                   <button
                     key={preset}
                     type="button"
                     onClick={() => setRatingInput(String(preset))}
-                    className="py-1 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-white border border-white/5 transition-colors"
+                    className="py-1 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-cream border border-white/5 transition-colors"
                   >
                     {preset.toFixed(1)}
                   </button>
@@ -1343,7 +1281,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                   type="button"
                   onClick={() => handleSaveRating(null)}
                   disabled={isSavingRating}
-                  className="px-3 py-2 rounded-xl bg-[#ff453a]/15 hover:bg-[#ff453a]/25 text-[#ff453a] text-xs font-semibold transition-colors"
+                  className="px-3 py-2 rounded-xl bg-[#ff8a80]/15 hover:bg-[#ff8a80]/25 text-[#ff8a80] text-xs font-semibold transition-colors"
                 >
                   Clear
                 </button>
@@ -1353,7 +1291,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                 <button
                   type="button"
                   onClick={() => setIsRatingModalOpen(false)}
-                  className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-[#8e8e93] hover:text-white"
+                  className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-[#b7a9bc] hover:text-cream"
                 >
                   Cancel
                 </button>
@@ -1372,7 +1310,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
                     void handleSaveRating(num);
                   }}
                   disabled={isSavingRating || !ratingInput.trim()}
-                  className="px-4 py-2 rounded-xl bg-[#ffd60a] hover:bg-[#eac408] text-black text-xs font-bold transition-all shadow-md disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all shadow-md disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {isSavingRating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                   <span>Save Rating</span>

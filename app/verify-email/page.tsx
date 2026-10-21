@@ -63,22 +63,22 @@ function VerifyEmailContent() {
       <div className="w-full max-w-md ios-card p-8 text-center space-y-6">
         {isLoading ? (
           <div className="space-y-4 py-8">
-            <Loader2 className="w-12 h-12 text-[#0a84ff] animate-spin mx-auto" />
-            <h2 className="text-base font-bold text-white">Verifying Account...</h2>
-            <p className="text-xs text-[#8e8e93]">{message}</p>
+            <Loader2 className="w-12 h-12 text-[#4fd27f] animate-spin mx-auto" />
+            <h2 className="text-base font-bold text-cream">Verifying Account...</h2>
+            <p className="text-xs text-[#b7a9bc]">{message}</p>
           </div>
         ) : isSuccess ? (
           <div className="space-y-4 py-4">
-            <div className="w-16 h-16 rounded-full bg-[#32d74b]/20 text-[#32d74b] flex items-center justify-center mx-auto shadow-lg shadow-[#32d74b]/15">
+            <div className="w-16 h-16 rounded-full bg-[#4fd27f]/20 text-[#4fd27f] flex items-center justify-center mx-auto shadow-lg shadow-[#4fd27f]/15">
               <CheckCircle2 className="w-9 h-9" />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-white">Email Verified!</h2>
-              <p className="text-xs text-[#8e8e93] mt-1 max-w-xs mx-auto">{message}</p>
+              <h2 className="text-xl font-extrabold text-cream">Email Verified!</h2>
+              <p className="text-xs text-[#b7a9bc] mt-1 max-w-xs mx-auto">{message}</p>
             </div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press mt-2 shadow-lg shadow-[#0a84ff]/20"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press mt-2 shadow-lg shadow-[#4fd27f]/20"
             >
               <span>Go to TrackIt</span>
               <ArrowRight className="w-4 h-4" />
@@ -86,17 +86,17 @@ function VerifyEmailContent() {
           </div>
         ) : (
           <div className="space-y-4 py-4">
-            <div className="w-16 h-16 rounded-full bg-[#ff453a]/20 text-[#ff453a] flex items-center justify-center mx-auto shadow-lg shadow-[#ff453a]/15">
+            <div className="w-16 h-16 rounded-full bg-[#ff8a80]/20 text-[#ff8a80] flex items-center justify-center mx-auto shadow-lg shadow-[#ff8a80]/15">
               <XCircle className="w-9 h-9" />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-white">Verification Failed</h2>
-              <p className="text-xs text-[#ff453a] mt-1 max-w-xs mx-auto">{message}</p>
+              <h2 className="text-xl font-extrabold text-cream">Verification Failed</h2>
+              <p className="text-xs text-[#ff8a80] mt-1 max-w-xs mx-auto">{message}</p>
             </div>
             <div className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-white text-xs font-semibold transition-all ios-press"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.15)] text-cream text-xs font-semibold transition-all ios-press"
               >
                 <span>Back to Sign In</span>
               </Link>
@@ -113,7 +113,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <div className="min-h-[70vh] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-[#0a84ff] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#4fd27f] animate-spin" />
         </div>
       }
     >

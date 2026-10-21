@@ -12,8 +12,8 @@ interface PageProps {
 function TitleSkeleton() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-      <Loader2 className="w-8 h-8 text-[#0a84ff] animate-spin" />
-      <p className="text-xs text-[#8e8e93]">Loading title details...</p>
+      <Loader2 className="w-8 h-8 text-[#4fd27f] animate-spin" />
+      <p className="text-xs text-[#b7a9bc]">Loading title details...</p>
     </div>
   );
 }

@@ -8,12 +8,7 @@ import {
   Bookmark,
   PlayCircle,
   CheckCircle2,
-  Film,
-  Tv,
-  Star,
   Search,
-  PauseCircle,
-  XCircle,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 
@@ -118,204 +113,142 @@ function ListsContent() {
   ];
 
   return (
-    <div className="space-y-6 pb-20 animate-in fade-in duration-300">
-      {/* Title Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-            My Lists
-          </h1>
-          <p className="text-sm text-[#8e8e93] mt-0.5">
-            Auto-derived status based on your watched episodes.
-          </p>
+    <div className="flex flex-col gap-7 pb-20">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <h1 className="font-display font-black text-5xl md:text-[76px] leading-[0.9]">My Lists</h1>
+          <p className="text-sm text-smoke">Series move between lists automatically as you tick off episodes.</p>
         </div>
-
         <Link
           href="/search"
-          className="p-2 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-[rgba(255,255,255,0.08)] text-[#8e8e93] hover:text-white transition-all"
-          title="Search titles to add"
+          className="hidden md:flex h-11 px-5 rounded-[10px] border border-plum-line items-center gap-2 text-sm font-semibold hover:border-green transition-colors"
         >
-          <Search className="w-5 h-5" />
+          <Search className="w-4 h-4" />
+          Add a title
         </Link>
       </div>
 
-      {/* iOS Segmented Control */}
-      <div className="grid grid-cols-3 p-1 rounded-2xl bg-[#1c1c1e] border border-[rgba(255,255,255,0.08)]">
+      <div role="tablist" aria-label="Lists" className="grid grid-cols-3 gap-2">
         {tabs.map((tab) => {
-          const Icon = tab.icon;
           const active = activeTab === tab.id;
           return (
             <button
               key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl text-xs font-semibold transition-all ${
-                active
-                  ? "bg-[#2c2c2e] text-white shadow-sm"
-                  : "text-[#8e8e93] hover:text-white"
+              className={`h-16 rounded-xl border flex flex-col items-center justify-center gap-0.5 transition-colors ${
+                active ? "bg-plum-raised border-lilac" : "border-plum-line hover:border-lilac"
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span className="truncate">{tab.name}</span>
-              {tab.count > 0 && (
-                <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                    active ? "bg-[#0a84ff] text-white" : "bg-white/10 text-[#8e8e93]"
-                  }`}
-                >
-                  {tab.count}
-                </span>
-              )}
+              <span className={`font-display font-extrabold text-2xl md:text-3xl leading-none ${active ? "text-green" : ""}`}>
+                {tab.count}
+              </span>
+              <span className="text-xs md:text-[13px] font-semibold text-smoke truncate max-w-full px-1">{tab.name}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Media Type Filter Pills */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {(
           [
-            { id: "all", label: "All" },
-            { id: "movie", label: "Movies", icon: Film },
-            { id: "tv", label: "Series", icon: Tv },
+            { id: "all", label: "Everything" },
+            { id: "movie", label: "Films" },
+            { id: "tv", label: "Series" },
           ] as const
         ).map((pill) => {
-          const Icon = "icon" in pill ? pill.icon : null;
           const active = filterType === pill.id;
           return (
             <button
               key={pill.id}
+              type="button"
+              aria-pressed={active}
               onClick={() => setFilterType(pill.id)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                active
-                  ? "bg-[#0a84ff] text-white shadow-sm"
-                  : "bg-[#1c1c1e] text-[#8e8e93] border border-[rgba(255,255,255,0.06)] hover:text-white"
+              className={`h-[38px] px-4 rounded-full text-[13px] transition-colors ${
+                active ? "bg-cream text-ink font-bold" : "border border-plum-line font-semibold hover:border-lilac"
               }`}
             >
-              {Icon && <Icon className="w-3 h-3" />}
-              <span>{pill.label}</span>
+              {pill.label}
             </button>
           );
         })}
       </div>
 
-      {/* Grid of Posters */}
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-7">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="ios-card overflow-hidden animate-pulse aspect-[2/3] bg-[#1c1c1e]"
-            />
+            <div key={i} className="aspect-[2/3] rounded-md bg-plum animate-pulse" />
           ))}
         </div>
       ) : currentTabItems.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-7">
           {currentTabItems.map((item) => {
             const { tmdbId, mediaType, minimalSnapshot, override, rating } = item;
             return (
-              <Link
-                key={`${mediaType}-${tmdbId}`}
-                href={`/title/${mediaType}/${tmdbId}`}
-                className="group relative rounded-2xl overflow-hidden bg-[#1c1c1e] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.2)] transition-all duration-200 flex flex-col"
-              >
-                {/* Poster Image */}
-                <div className="relative aspect-[2/3] w-full bg-[#141416] overflow-hidden">
-                  {minimalSnapshot.posterPath ? (
-                    <Image
-                      src={`https://image.tmdb.org/t/p/w342${minimalSnapshot.posterPath}`}
-                      alt={minimalSnapshot.title}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center text-[#8e8e93]">
-                      {mediaType === "movie" ? (
-                        <Film className="w-8 h-8 opacity-40 mb-1" />
-                      ) : (
-                        <Tv className="w-8 h-8 opacity-40 mb-1" />
-                      )}
-                      <span className="text-[11px] font-medium leading-tight line-clamp-2">
+              <li key={`${mediaType}-${tmdbId}`}>
+                <Link href={`/title/${mediaType}/${tmdbId}`} className="group flex flex-col gap-2.5">
+                  <span className="relative block aspect-[2/3] rounded-md overflow-hidden bg-eggplant">
+                    {minimalSnapshot.posterPath ? (
+                      <Image
+                        src={`https://image.tmdb.org/t/p/w342${minimalSnapshot.posterPath}`}
+                        alt={minimalSnapshot.title}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 200px"
+                        className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                      />
+                    ) : (
+                      <span className="absolute inset-0 p-3.5 flex items-end font-display font-black text-3xl leading-[0.88]">
                         {minimalSnapshot.title}
                       </span>
-                    </div>
-                  )}
-
-                  {/* Gradient shadow */}
-                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
-
-                  {/* Media Type Badge */}
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-semibold text-white/90 uppercase tracking-wider border border-white/10">
-                    {mediaType === "movie" ? "Movie" : "Series"}
-                  </div>
-
-                  {/* Rating Badge if user rated */}
-                  {rating && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[11px] font-bold text-[#ffd60a] flex items-center gap-1 border border-white/10">
-                      <Star className="w-3 h-3 fill-[#ffd60a]" />
-                      <span>{rating}</span>
-                    </div>
-                  )}
-
-                  {/* Manual Override Indicator */}
-                  {override && (
-                    <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md text-[10px] font-bold flex items-center gap-1 border border-white/10">
-                      {override === "on_hold" ? (
-                        <>
-                          <PauseCircle className="w-3 h-3 text-[#ff9f0a]" />
-                          <span className="text-[#ff9f0a]">On Hold</span>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="w-3 h-3 text-[#ff453a]" />
-                          <span className="text-[#ff453a]">Dropped</span>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Poster Info (Card shows only the name and release years) */}
-                <div className="p-2.5">
-                  <h3
-                    className="text-xs font-semibold text-white line-clamp-1 group-hover:text-[#0a84ff] transition-colors"
-                    title={minimalSnapshot.title}
-                  >
-                    {minimalSnapshot.title}
-                  </h3>
-                  <p className="text-[11px] text-[#8e8e93] mt-0.5">
-                    {minimalSnapshot.yearRange || "TBA"}
-                  </p>
-                </div>
-              </Link>
+                    )}
+                    <span className="absolute top-2.5 left-2.5 px-[7px] py-1 rounded bg-ink/70 font-mono text-[10px] font-semibold tracking-[0.14em]">
+                      {mediaType === "movie" ? "FILM" : "SERIES"}
+                    </span>
+                    {rating !== null && rating !== undefined && (
+                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-ink/80 font-display font-extrabold text-lg text-green">
+                        {rating}
+                      </span>
+                    )}
+                    {override && (
+                      <span
+                        className={`absolute bottom-2.5 left-2.5 px-2 py-1 rounded bg-ink/85 font-mono text-[10px] font-semibold tracking-[0.1em] ${
+                          override === "on_hold" ? "text-gold" : "text-danger"
+                        }`}
+                      >
+                        {override === "on_hold" ? "ON HOLD" : "DROPPED"}
+                      </span>
+                    )}
+                  </span>
+                  <span className="flex flex-col gap-0.5">
+                    <span className="font-semibold text-[15px] leading-tight line-clamp-2 group-hover:text-green">
+                      {minimalSnapshot.title}
+                    </span>
+                    <span className="font-mono text-xs text-smoke">{minimalSnapshot.yearRange || "TBA"}</span>
+                  </span>
+                </Link>
+              </li>
             );
           })}
-        </div>
+        </ul>
       ) : (
-        /* Empty State */
-        <div className="ios-card p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center mx-auto text-[#8e8e93]">
-            <Film className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-white">No titles in this list</h3>
-            <p className="text-xs text-[#8e8e93] max-w-sm mx-auto mt-1">
-              {activeTab === "want_to_watch"
-                ? "Search for movies or shows and tap 'Want to Watch' to start tracking."
-                : activeTab === "currently_watching"
-                ? "Episodes you check off will automatically move shows here."
-                : "Finished titles and movies you've completed appear here."}
-            </p>
-          </div>
-          <div className="pt-2">
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-semibold transition-all shadow-md"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Search TMDB Database</span>
-            </Link>
-          </div>
+        <div className="rounded-[14px] bg-plum p-10 text-center flex flex-col items-center gap-3">
+          <p className="font-display font-extrabold text-3xl">Nothing here yet</p>
+          <p className="text-sm text-smoke max-w-sm">
+            {activeTab === "want_to_watch"
+              ? "Search for a film or series and tap “Want to watch”."
+              : activeTab === "currently_watching"
+              ? "Tick off an episode of a series and it moves here."
+              : "Finished series and films you’ve seen show up here."}
+          </p>
+          <Link
+            href="/search"
+            className="mt-2 h-11 px-5 rounded-[10px] bg-green text-ink text-sm font-bold flex items-center gap-2 ios-press"
+          >
+            <Search className="w-4 h-4" />
+            Find something to watch
+          </Link>
         </div>
       )}
     </div>
@@ -326,7 +259,7 @@ export default function ListsPage() {
   return (
     <Suspense
       fallback={
-        <div className="py-20 text-center text-[#8e8e93] text-sm animate-pulse">
+        <div className="py-20 text-center text-smoke text-sm animate-pulse">
           Loading library...
         </div>
       }

@@ -2,20 +2,18 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
   Search as SearchIcon,
   X,
   Plus,
   Check,
-  Film,
-  Tv,
   Key,
   Layers,
   CheckSquare,
   Square,
   Loader2,
-  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 
@@ -39,9 +37,22 @@ interface TrackedSummary {
   };
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  want_to_watch: "On your list",
+  currently_watching: "Watching",
+  watched: "Watched",
+};
+
 export default function SearchPage() {
   const { user } = useAuth();
-  const [query, setQuery] = useState("");
+  // ?q= lets the sidebar search box hand its query to this page
+  const urlQuery = useSearchParams().get("q") ?? "";
+  const [query, setQuery] = useState(urlQuery);
+  const [lastUrlQuery, setLastUrlQuery] = useState(urlQuery);
+  if (urlQuery !== lastUrlQuery) {
+    setLastUrlQuery(urlQuery);
+    setQuery(urlQuery);
+  }
   const [filterType, setFilterType] = useState<"all" | "movie" | "tv">("all");
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -283,145 +294,127 @@ export default function SearchPage() {
   const hasTmdbKey = user?.hasTmdbKey ?? false;
 
   return (
-    <div className="space-y-6 pb-20 animate-in fade-in duration-300">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-            Search
-          </h1>
-          <p className="text-sm text-[#8e8e93] mt-0.5">
-            Search millions of movies and series powered by TMDB.
-          </p>
-        </div>
-
+    <div className="flex flex-col gap-7 pb-20">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h1 className="font-display font-black text-5xl md:text-[76px] leading-[0.9]">Find a title</h1>
         {results.length > 0 && (
           <button
+            type="button"
             onClick={() => {
               setIsMultiSelect(!isMultiSelect);
               if (isMultiSelect) setSelectedKeys(new Set());
             }}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              isMultiSelect
-                ? "bg-[#0a84ff] text-white"
-                : "bg-[#1c1c1e] text-[#8e8e93] border border-[rgba(255,255,255,0.08)] hover:text-white"
+            className={`h-10 px-4 rounded-full text-[13px] font-semibold flex items-center gap-2 transition-colors ${
+              isMultiSelect ? "bg-cream text-ink" : "border border-plum-line text-smoke hover:text-cream"
             }`}
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span>{isMultiSelect ? "Cancel Selection" : "Bulk Select"}</span>
+            <Layers className="w-4 h-4" />
+            {isMultiSelect ? "Cancel selection" : "Select several"}
           </button>
         )}
       </div>
 
-      {/* TMDB Key Alert if user hasn't added one yet */}
       {user && !hasTmdbKey && (
-        <div className="p-4 rounded-2xl bg-[#2c1d0a] border border-[#f59e0b]/40 backdrop-blur-xl flex items-start gap-3">
-          <Key className="w-5 h-5 text-[#f59e0b] shrink-0 mt-0.5" />
-          <div className="space-y-1 text-xs">
-            <p className="font-semibold text-[#fef3c7]">TMDB API Key Required</p>
-            <p className="text-[#fde68a]/90 leading-relaxed">
-              To search titles and track episode releases, add your free TMDB API key in Settings.
-            </p>
-            <Link
-              href="/profile"
-              className="inline-block text-[#0a84ff] font-semibold hover:underline pt-1"
-            >
-              Add free TMDB Key in Settings &rarr;
+        <div className="p-4 rounded-xl bg-plum border border-gold/40 flex items-start gap-3">
+          <Key className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+          <div className="flex flex-col gap-1 text-sm">
+            <p className="font-semibold">TMDB key needed</p>
+            <p className="text-smoke">To search and track titles, add your free TMDB API key in Settings.</p>
+            <Link href="/profile" className="text-green font-semibold hover:underline pt-1">
+              Add TMDB key in Settings &rarr;
             </Link>
           </div>
         </div>
       )}
 
-      {/* iOS styled Search Bar with Clear Button */}
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8e8e93]">
-          {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin text-[#0a84ff]" />
-          ) : (
-            <SearchIcon className="w-5 h-5" />
+      <div className="flex flex-col gap-3.5">
+        <div className="relative">
+          <label htmlFor="search-query" className="sr-only">
+            Search films and series
+          </label>
+          <span className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+            {isLoading ? (
+              <Loader2 className="w-6 h-6 animate-spin text-green" />
+            ) : (
+              <SearchIcon className="w-6 h-6 text-green" strokeWidth={2.2} />
+            )}
+          </span>
+          <input
+            id="search-query"
+            type="search"
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search films & series"
+            className="w-full h-16 rounded-[14px] border-2 border-eggplant bg-night pl-14 pr-12 text-lg md:text-[22px] font-semibold text-cream placeholder:text-dim focus:border-green focus:outline-none"
+          />
+          {query && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => {
+                setQuery("");
+                setResults([]);
+              }}
+              className="absolute inset-y-0 right-2 w-11 flex items-center justify-center text-smoke hover:text-cream"
+            >
+              <X className="w-5 h-5" />
+            </button>
           )}
         </div>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search titles, or add a year (e.g. 'Batman 2022')..."
-          className="w-full pl-10 pr-10 py-3 rounded-2xl bg-[#1c1c1e] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all"
-        />
-        {query && (
-          <button
-            onClick={() => {
-              setQuery("");
-              setResults([]);
-            }}
-            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#8e8e93] hover:text-white"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
 
-      {/* Filter Tabs & Bulk Select Bar */}
-      <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1">
-        <div className="flex items-center gap-1.5 p-1 rounded-full bg-[#1c1c1e] border border-[rgba(255,255,255,0.06)]">
+        <div className="flex flex-wrap items-center gap-2">
           {(
             [
-              { id: "all", label: "All" },
-              { id: "movie", label: "Movies", icon: Film },
-              { id: "tv", label: "TV Series", icon: Tv },
+              { id: "all", label: "Everything" },
+              { id: "movie", label: "Films" },
+              { id: "tv", label: "Series" },
             ] as const
           ).map((tab) => {
-            const Icon = "icon" in tab ? tab.icon : null;
             const active = filterType === tab.id;
             return (
               <button
                 key={tab.id}
+                type="button"
+                aria-pressed={active}
                 onClick={() => setFilterType(tab.id)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                  active
-                    ? "bg-[#0a84ff] text-white shadow-sm"
-                    : "text-[#8e8e93] hover:text-white"
+                className={`h-[38px] px-4 rounded-full text-[13px] transition-colors ${
+                  active ? "bg-cream text-ink font-bold" : "border border-plum-line font-semibold hover:border-lilac"
                 }`}
               >
-                {Icon && <Icon className="w-3 h-3" />}
-                <span>{tab.label}</span>
+                {tab.label}
               </button>
             );
           })}
+          {isMultiSelect && results.length > 0 && (
+            <button
+              type="button"
+              onClick={toggleSelectAll}
+              className="h-[38px] px-3 text-[13px] text-green font-semibold hover:underline"
+            >
+              {selectedKeys.size === results.length ? "Deselect all" : "Select all"}
+            </button>
+          )}
+          <span className="ml-auto font-mono text-xs tracking-[0.08em] text-smoke">
+            {results.length > 0 ? `${results.length} RESULTS · ` : ""}TIP: ADD A YEAR, &ldquo;DUNE 1984&rdquo;
+          </span>
         </div>
-
-        {isMultiSelect && results.length > 0 && (
-          <button
-            onClick={toggleSelectAll}
-            className="px-3 py-1.5 text-xs text-[#0a84ff] font-semibold hover:underline flex items-center gap-1"
-          >
-            {selectedKeys.size === results.length ? "Deselect All" : "Select All"}
-          </button>
-        )}
       </div>
 
-      {/* Error Banner */}
       {error && (
-        <div className="p-3.5 rounded-2xl bg-[#2a0e0e] border border-[#ff453a]/40 text-xs text-[#ff9f98]">
+        <div className="p-3.5 rounded-xl bg-plum border border-danger/40 text-sm text-danger">
           <p className="font-semibold">{error}</p>
         </div>
       )}
 
-      {/* Results Grid */}
       {isLoading && results.length === 0 ? (
-        // Skeleton Loaders
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-7">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div
-              key={i}
-              className="ios-card overflow-hidden animate-pulse flex flex-col aspect-[2/3] bg-[#1c1c1e]"
-            >
-              <div className="w-full h-full bg-[#2c2c2e]/50" />
-            </div>
+            <div key={i} className="aspect-[2/3] rounded-md bg-plum animate-pulse" />
           ))}
         </div>
       ) : results.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-7">
           {results.map((item) => {
             const itemKey = `${item.mediaType}-${item.id}`;
             const tracked = trackedMap[itemKey];
@@ -429,146 +422,94 @@ export default function SearchPage() {
             const isAdding = addingId === itemKey;
 
             return (
-              <div
-                key={itemKey}
-                onClick={(e) => {
-                  if (isMultiSelect) {
-                    toggleSelectItem(itemKey, e);
-                  }
-                }}
-                className={`group relative rounded-2xl overflow-hidden bg-[#1c1c1e] border transition-all duration-200 flex flex-col ${
-                  isSelected
-                    ? "border-[#0a84ff] ring-2 ring-[#0a84ff]/40 shadow-lg scale-[0.99]"
-                    : "border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.2)]"
-                }`}
-              >
-                {/* Poster Link */}
+              <li key={itemKey} className="flex flex-col gap-2.5">
                 <Link
                   href={`/title/${item.mediaType}/${item.id}`}
-                  className="block relative aspect-[2/3] w-full bg-[#141416] overflow-hidden"
+                  onClick={(e) => {
+                    if (isMultiSelect) toggleSelectItem(itemKey, e);
+                  }}
+                  className={`group relative block aspect-[2/3] rounded-md overflow-hidden bg-eggplant ${
+                    isSelected ? "ring-[3px] ring-green ring-offset-2 ring-offset-ink" : ""
+                  }`}
                 >
                   {item.posterPath ? (
                     <Image
                       src={`https://image.tmdb.org/t/p/w342${item.posterPath}`}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 50vw, 200px"
+                      className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center text-[#8e8e93]">
-                      {item.mediaType === "movie" ? (
-                        <Film className="w-8 h-8 opacity-40 mb-1" />
-                      ) : (
-                        <Tv className="w-8 h-8 opacity-40 mb-1" />
-                      )}
-                      <span className="text-[11px] font-medium leading-tight line-clamp-2">
-                        {item.title}
-                      </span>
-                    </div>
+                    <span className="absolute inset-0 p-3.5 flex items-end font-display font-black text-3xl leading-[0.88]">
+                      {item.title}
+                    </span>
                   )}
-
-                  {/* Gradient bottom shadow */}
-                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
-
-                  {/* Media Type Badge */}
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-semibold text-white/90 uppercase tracking-wider border border-white/10">
-                    {item.mediaType === "movie" ? "Movie" : "Series"}
-                  </div>
-
-                  {/* Multi-Select Checkbox overlay */}
+                  <span className="absolute top-2.5 left-2.5 px-[7px] py-1 rounded bg-ink/70 font-mono text-[10px] font-semibold tracking-[0.14em]">
+                    {item.mediaType === "movie" ? "FILM" : "SERIES"}
+                  </span>
                   {isMultiSelect && (
-                    <button
-                      onClick={(e) => toggleSelectItem(itemKey, e)}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 backdrop-blur-md text-white border border-white/20"
-                    >
-                      {isSelected ? (
-                        <CheckSquare className="w-4 h-4 text-[#0a84ff]" />
-                      ) : (
-                        <Square className="w-4 h-4 text-white/70" />
-                      )}
-                    </button>
+                    <span className="absolute top-2 right-2 w-8 h-8 rounded-lg bg-ink/80 flex items-center justify-center">
+                      {isSelected ? <CheckSquare className="w-5 h-5 text-green" /> : <Square className="w-5 h-5 text-smoke" />}
+                    </span>
                   )}
                 </Link>
 
-                {/* Info Card Content */}
-                <div className="p-2.5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <Link
-                      href={`/title/${item.mediaType}/${item.id}`}
-                      className="text-xs font-semibold text-white line-clamp-1 hover:text-[#0a84ff] transition-colors"
-                      title={item.title}
-                    >
-                      {item.title}
-                    </Link>
-                    <p className="text-[11px] text-[#8e8e93] mt-0.5">
-                      {item.yearRange || "TBA"}
-                    </p>
-                  </div>
-
-                  {/* Action / Status Pill */}
-                  <div className="mt-2.5">
-                    {tracked ? (
-                      <div className="w-full py-1 px-2 rounded-lg bg-[#32d74b]/15 border border-[#32d74b]/30 text-[#32d74b] text-[10px] font-bold flex items-center justify-center gap-1">
-                        <Check className="w-3 h-3" />
-                        <span className="capitalize">
-                          {tracked.status.replace(/_/g, " ")}
-                        </span>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={(e) => handleQuickAdd(item, e)}
-                        disabled={isAdding}
-                        className="w-full py-1 px-2 rounded-lg bg-[#0a84ff]/20 hover:bg-[#0a84ff]/30 border border-[#0a84ff]/40 text-[#0a84ff] text-[10px] font-semibold flex items-center justify-center gap-1 transition-all disabled:opacity-50"
-                      >
-                        {isAdding ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <Plus className="w-3 h-3" />
-                        )}
-                        <span>Want to Watch</span>
-                      </button>
-                    )}
-                  </div>
+                <div className="flex flex-col gap-0.5">
+                  <Link
+                    href={`/title/${item.mediaType}/${item.id}`}
+                    className="font-semibold text-[15px] leading-tight line-clamp-2 hover:text-green"
+                  >
+                    {item.title}
+                  </Link>
+                  <span className="font-mono text-xs text-smoke">{item.yearRange || "TBA"}</span>
                 </div>
-              </div>
+
+                {tracked ? (
+                  <span className="h-10 rounded-[9px] bg-plum-raised text-[#e2cce8] text-[13px] font-semibold flex items-center justify-center gap-2">
+                    <Check className="w-4 h-4 text-green" strokeWidth={2.8} />
+                    {STATUS_LABELS[tracked.status] ?? "On your list"}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => handleQuickAdd(item, e)}
+                    disabled={isAdding}
+                    className="h-10 rounded-[9px] border border-green text-green text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-green hover:text-ink transition-colors disabled:opacity-60"
+                  >
+                    {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" strokeWidth={2.6} />}
+                    Want to watch
+                  </button>
+                )}
+              </li>
             );
           })}
-        </div>
+        </ul>
       ) : query.trim() ? (
-        // No results state
-        <div className="ios-card p-12 text-center space-y-2">
-          <Film className="w-10 h-10 text-[#8e8e93] mx-auto opacity-30" />
-          <p className="text-base font-semibold text-white">No results found</p>
-          <p className="text-xs text-[#8e8e93] max-w-sm mx-auto">
-            We couldn&apos;t find any titles matching &quot;{query}&quot;. Try checking for typos or searching by the English title.
+        <div className="rounded-[14px] bg-plum p-10 text-center flex flex-col gap-2">
+          <p className="font-display font-extrabold text-3xl">No results</p>
+          <p className="text-sm text-smoke max-w-sm mx-auto">
+            Nothing matches &ldquo;{query}&rdquo;. Check the spelling or try the English title.
           </p>
         </div>
       ) : (
-        // Initial state before search
-        <div className="ios-card p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-[#0a84ff]/10 border border-[#0a84ff]/20 flex items-center justify-center mx-auto text-[#0a84ff]">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-white">Discover Movies & Shows</h3>
-            <p className="text-xs text-[#8e8e93] max-w-sm mx-auto mt-1">
-              Type above to search by name or release year (e.g. &quot;Inception&quot;, &quot;Breaking Bad&quot;, or &quot;Dune 2021&quot;).
-            </p>
-          </div>
+        <div className="rounded-[14px] bg-plum p-10 text-center flex flex-col gap-2">
+          <p className="font-display font-extrabold text-3xl">What are we watching?</p>
+          <p className="text-sm text-smoke max-w-md mx-auto">
+            Search by name, or add a year to narrow it down: &ldquo;Inception&rdquo;, &ldquo;Breaking Bad&rdquo;, &ldquo;Dune 2021&rdquo;.
+          </p>
         </div>
       )}
-
       {/* Floating Bulk Action Bar (when in multi-select mode) */}
       {isMultiSelect && selectedKeys.size > 0 && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-md p-3 rounded-2xl bg-[#1c1c1e]/95 border border-[#0a84ff]/40 backdrop-blur-2xl shadow-2xl flex items-center justify-between gap-3 animate-in slide-in-from-bottom duration-200">
-          <span className="text-xs font-semibold text-white pl-2">
+        <div className="fixed bottom-24 md:bottom-8 left-1/2 md:left-[calc(50%+8rem)] -translate-x-1/2 z-40 w-11/12 max-w-md p-3 rounded-[14px] bg-plum-raised border border-green/40 shadow-2xl flex items-center justify-between gap-3 animate-in slide-in-from-bottom duration-200">
+          <span className="text-xs font-semibold text-cream pl-2">
             {selectedKeys.size} {selectedKeys.size === 1 ? "item" : "items"} selected
           </span>
           <button
             onClick={handleBulkAdd}
             disabled={isBulkAdding}
-            className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50"
           >
             {isBulkAdding ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

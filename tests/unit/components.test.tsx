@@ -11,6 +11,11 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
+const unread = vi.hoisted(() => ({ count: 0 }));
+vi.mock("@/components/layout/use-unread-count", () => ({
+  useUnreadCount: () => unread.count,
+}));
+
 describe("Utility and UI Components", () => {
   it("cn utility merges class names correctly", () => {
     expect(cn("base-class", false && "hidden", true && "active", undefined, null, "extra")).toBe(
@@ -21,20 +26,23 @@ describe("Utility and UI Components", () => {
   it("BottomNav renders all 5 main navigation tabs", () => {
     render(<BottomNav />);
     expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Search")).toBeInTheDocument();
+    expect(screen.getByLabelText("Search")).toBeInTheDocument();
     expect(screen.getByText("Lists")).toBeInTheDocument();
     expect(screen.getByText("Picks")).toBeInTheDocument();
     expect(screen.getByText("Profile")).toBeInTheDocument();
   });
 
-  it("TopHeader renders unread notification badge when unreadCount > 0", () => {
-    const { rerender } = render(<TopHeader unreadCount={0} />);
+  it("TopHeader renders unread notification badge when there are unread notifications", () => {
+    unread.count = 0;
+    const { rerender } = render(<TopHeader />);
     expect(screen.queryByText("0")).not.toBeInTheDocument();
 
-    rerender(<TopHeader unreadCount={4} />);
+    unread.count = 4;
+    rerender(<TopHeader />);
     expect(screen.getByText("4")).toBeInTheDocument();
 
-    rerender(<TopHeader unreadCount={120} />);
+    unread.count = 120;
+    rerender(<TopHeader />);
     expect(screen.getByText("99+")).toBeInTheDocument();
   });
 

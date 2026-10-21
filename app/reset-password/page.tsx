@@ -77,17 +77,17 @@ function ResetPasswordContent() {
     <div className="min-h-[80vh] flex items-center justify-center p-4 animate-in fade-in">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
+          <h1 className="font-display font-black text-5xl leading-[0.9]">
             Set New Password
           </h1>
-          <p className="text-xs text-[#8e8e93]">
+          <p className="text-xs text-[#b7a9bc]">
             Choose a strong password with at least 8 characters.
           </p>
         </div>
 
         <div className="ios-card p-6 md:p-8 space-y-5">
           {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.06)] text-xs font-semibold">
+          <div className="grid grid-cols-2 p-1 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.06)] text-xs font-semibold">
             <button
               type="button"
               onClick={() => {
@@ -96,8 +96,8 @@ function ResetPasswordContent() {
               }}
               className={`py-2 rounded-lg transition-all ${
                 mode === "token"
-                  ? "bg-[#0a84ff] text-white shadow"
-                  : "text-[#8e8e93] hover:text-white"
+                  ? "bg-[#4fd27f] text-ink shadow"
+                  : "text-[#b7a9bc] hover:text-cream"
               }`}
             >
               Email Link Token
@@ -110,8 +110,8 @@ function ResetPasswordContent() {
               }}
               className={`py-2 rounded-lg transition-all ${
                 mode === "recovery"
-                  ? "bg-[#0a84ff] text-white shadow"
-                  : "text-[#8e8e93] hover:text-white"
+                  ? "bg-[#4fd27f] text-ink shadow"
+                  : "text-[#b7a9bc] hover:text-cream"
               }`}
             >
               Recovery Code
@@ -121,7 +121,7 @@ function ResetPasswordContent() {
           {errorMessage && (
             <div
               role="alert"
-              className="p-3.5 rounded-xl bg-[#ff453a]/15 border border-[#ff453a]/30 text-[#ff453a] text-xs font-medium"
+              className="p-3.5 rounded-xl bg-[#ff8a80]/15 border border-[#ff8a80]/30 text-[#ff8a80] text-xs font-medium"
             >
               {errorMessage}
             </div>
@@ -129,11 +129,11 @@ function ResetPasswordContent() {
 
           {isSuccess ? (
             <div className="text-center space-y-3 py-4">
-              <div className="w-12 h-12 rounded-full bg-[#32d74b]/20 text-[#32d74b] flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-full bg-[#4fd27f]/20 text-[#4fd27f] flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h2 className="text-sm font-bold text-white">Password Updated!</h2>
-              <p className="text-xs text-[#8e8e93]">
+              <h2 className="text-sm font-bold text-cream">Password Updated!</h2>
+              <p className="text-xs text-[#b7a9bc]">
                 All other sessions have been revoked. Redirecting to sign in...
               </p>
             </div>
@@ -141,7 +141,7 @@ function ResetPasswordContent() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === "token" ? (
                 <div className="space-y-1.5">
-                  <label htmlFor="reset-token" className="text-xs font-semibold text-white">
+                  <label htmlFor="reset-token" className="text-xs font-semibold text-cream">
                     Reset Token
                   </label>
                   <input
@@ -151,17 +151,17 @@ function ResetPasswordContent() {
                     placeholder="Paste reset token here..."
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white text-xs font-mono focus:outline-none focus:border-[#0a84ff] transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream text-xs font-mono focus:outline-none focus:border-[#4fd27f] transition-all"
                   />
                 </div>
               ) : (
                 <>
                   <div className="space-y-1.5">
-                    <label htmlFor="rec-email" className="text-xs font-semibold text-white">
+                    <label htmlFor="rec-email" className="text-xs font-semibold text-cream">
                       Account Email
                     </label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8e8e93]">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#b7a9bc]">
                         <Mail className="w-4 h-4" />
                       </div>
                       <input
@@ -171,17 +171,17 @@ function ResetPasswordContent() {
                         placeholder="name@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label htmlFor="rec-code" className="text-xs font-semibold text-white">
+                    <label htmlFor="rec-code" className="text-xs font-semibold text-cream">
                       One-Time Recovery Code (XXXX-XXXX-XXXX)
                     </label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8e8e93]">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#b7a9bc]">
                         <KeyRound className="w-4 h-4" />
                       </div>
                       <input
@@ -191,7 +191,7 @@ function ResetPasswordContent() {
                         placeholder="XXXX-XXXX-XXXX"
                         value={recoveryCode}
                         onChange={(e) => setRecoveryCode(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm font-mono tracking-wider focus:outline-none focus:border-[#0a84ff] transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm font-mono tracking-wider focus:outline-none focus:border-[#4fd27f] transition-all"
                       />
                     </div>
                   </div>
@@ -199,11 +199,11 @@ function ResetPasswordContent() {
               )}
 
               <div className="space-y-1.5">
-                <label htmlFor="new-pw" className="text-xs font-semibold text-white">
+                <label htmlFor="new-pw" className="text-xs font-semibold text-cream">
                   New Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8e8e93]">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#b7a9bc]">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -213,7 +213,7 @@ function ResetPasswordContent() {
                     placeholder="At least 8 characters with letter & number"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.08)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.08)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                   />
                 </div>
               </div>
@@ -221,7 +221,7 @@ function ResetPasswordContent() {
               <button
                 type="submit"
                 disabled={isLoading || newPassword.length < 8}
-                className="w-full py-3 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 shadow-lg shadow-[#0a84ff]/20 disabled:opacity-50 mt-2"
+                className="w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 shadow-lg shadow-[#4fd27f]/20 disabled:opacity-50 mt-2"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -233,8 +233,8 @@ function ResetPasswordContent() {
           )}
         </div>
 
-        <div className="text-center text-xs text-[#8e8e93]">
-          <Link href="/login" className="hover:text-white transition-colors inline-flex items-center gap-1">
+        <div className="text-center text-xs text-[#b7a9bc]">
+          <Link href="/login" className="hover:text-cream transition-colors inline-flex items-center gap-1">
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Sign In</span>
           </Link>
@@ -249,7 +249,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <div className="min-h-[70vh] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-[#0a84ff] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#4fd27f] animate-spin" />
         </div>
       }
     >

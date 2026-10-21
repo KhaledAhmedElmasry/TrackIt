@@ -61,20 +61,20 @@ export function FirstRunSetupModal() {
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
     >
-      <div className="w-full max-w-lg rounded-3xl bg-[#161619] border border-[rgba(255,255,255,0.12)] p-6 md:p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-lg rounded-3xl bg-[#160e19] border border-[rgba(255,255,255,0.12)] p-6 md:p-8 shadow-2xl space-y-6">
         {/* Header */}
         <div className="flex items-start gap-3.5">
-          <div className="p-3 rounded-2xl bg-[#0a84ff]/20 text-[#0a84ff] shrink-0">
+          <div className="p-3 rounded-2xl bg-[#4fd27f]/20 text-[#4fd27f] shrink-0">
             <Key className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0a84ff]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#4fd27f]">
               First-Run Setup
             </span>
-            <h2 className="text-xl font-extrabold text-white tracking-tight">
+            <h2 className="text-xl font-extrabold text-cream tracking-tight">
               Connect Your Free TMDB Key
             </h2>
-            <p className="text-xs text-[#8e8e93] mt-1">
+            <p className="text-xs text-[#b7a9bc] mt-1">
               TrackIt uses your personal TMDB developer key to fetch movie and series details.
             </p>
           </div>
@@ -82,18 +82,18 @@ export function FirstRunSetupModal() {
 
         {/* Free Tier Guarantee Callout */}
         <div className="p-3.5 rounded-2xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] space-y-2">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#32d74b]">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#4fd27f]">
             <ShieldCheck className="w-4 h-4" />
             <span>Zero-Cost & AES-256-GCM Encrypted</span>
           </div>
-          <p className="text-[11px] text-[#8e8e93] leading-relaxed">
+          <p className="text-[11px] text-[#b7a9bc] leading-relaxed">
             TMDB API keys are 100% free with no credit card required. Your key is encrypted at rest using AES-256-GCM and never leaves the server in plaintext.
           </p>
           <a
             href="https://www.themoviedb.org/settings/api"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0a84ff] hover:underline pt-1"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4fd27f] hover:underline pt-1"
           >
             <span>Get your free TMDB API key</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -103,7 +103,7 @@ export function FirstRunSetupModal() {
         {/* Form */}
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="tmdb-key" className="text-xs font-semibold text-white">
+            <label htmlFor="tmdb-key" className="text-xs font-semibold text-cream">
               TMDB API Key (v3 auth or v4 token)
             </label>
             <input
@@ -114,13 +114,13 @@ export function FirstRunSetupModal() {
               onChange={(e) => setApiKey(e.target.value)}
               disabled={isLoading || isSuccess}
               required
-              className="w-full px-4 py-3 rounded-xl bg-[#222226] border border-[rgba(255,255,255,0.1)] text-white placeholder-[#8e8e93] text-sm focus:outline-none focus:border-[#0a84ff] transition-all disabled:opacity-50"
+              className="w-full px-4 py-3 rounded-xl bg-[#2c1b33] border border-[rgba(255,255,255,0.1)] text-cream placeholder-[#b7a9bc] text-sm focus:outline-none focus:border-[#4fd27f] transition-all disabled:opacity-50"
             />
           </div>
 
-          {error && <p className="text-xs text-[#ff453a] font-medium">{error}</p>}
+          {error && <p className="text-xs text-[#ff8a80] font-medium">{error}</p>}
           {isSuccess && (
-            <div className="flex items-center gap-2 text-xs text-[#32d74b] font-semibold">
+            <div className="flex items-center gap-2 text-xs text-[#4fd27f] font-semibold">
               <Check className="w-4 h-4" />
               <span>Key successfully encrypted and connected!</span>
             </div>
@@ -130,7 +130,7 @@ export function FirstRunSetupModal() {
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-xs text-[#8e8e93] hover:text-white transition-colors"
+              className="text-xs text-[#b7a9bc] hover:text-cream transition-colors"
             >
               Skip for now
             </button>
@@ -138,7 +138,7 @@ export function FirstRunSetupModal() {
             <button
               type="submit"
               disabled={isLoading || !apiKey.trim() || isSuccess}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all ios-press disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press disabled:opacity-50"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

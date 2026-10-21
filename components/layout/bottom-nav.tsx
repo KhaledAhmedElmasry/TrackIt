@@ -1,34 +1,23 @@
 "use client";
 
 /**
- * Mobile Bottom Tab Bar Component
+ * Phone Bottom Tab Bar (below md)
  *
- * Implements Apple iOS Human Interface Guidelines:
- * - Translucent blurred background with saturated frosted glass effect.
- * - 5 primary tabs: Home, Search, Lists, Recommendations, Profile.
- * - Minimum 44px touch targets.
- * - System safe-area bottom inset accommodation (env(safe-area-inset-bottom)).
- * - Smooth active state transitions and haptic-like press animation.
+ * Home, Lists, a raised Search button in the centre, Picks and Profile.
+ * Respects the home-indicator safe area.
  */
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Film, Sparkles, User } from "lucide-react";
+import { Clapperboard, Home, Layers, Search, User } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
-export interface NavItem {
-  name: string;
-  href: string;
-  icon: typeof Home;
-  ariaLabel: string;
-}
-
-export const NAV_ITEMS: NavItem[] = [
-  { name: "Home", href: "/", icon: Home, ariaLabel: "Go to Home" },
-  { name: "Search", href: "/search", icon: Search, ariaLabel: "Search Movies and TV Shows" },
-  { name: "Lists", href: "/lists", icon: Film, ariaLabel: "View Watch Lists" },
-  { name: "Picks", href: "/recommendations", icon: Sparkles, ariaLabel: "View AI Recommendations" },
-  { name: "Profile", href: "/profile", icon: User, ariaLabel: "Account and Key Settings" },
+const TABS = [
+  { name: "Home", href: "/", icon: Home },
+  { name: "Lists", href: "/lists", icon: Layers },
+  { name: "Search", href: "/search", icon: Search },
+  { name: "Picks", href: "/recommendations", icon: Clapperboard },
+  { name: "Profile", href: "/profile", icon: User },
 ];
 
 export function BottomNav() {
@@ -36,49 +25,39 @@ export function BottomNav() {
 
   return (
     <nav
-      aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-bar border-t border-[rgba(255,255,255,0.08)] pb-safe transition-all"
+      aria-label="Main navigation"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-night border-t border-[#241829] pb-safe"
     >
-      <div className="grid grid-cols-5 h-16 items-center px-1">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+      <div className="grid grid-cols-5 h-16 items-start pt-2">
+        {TABS.map(({ name, href, icon: Icon }) => {
+          const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+          if (href === "/search") {
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-label="Search"
+                aria-current={isActive ? "page" : undefined}
+                className="justify-self-center -mt-7 w-[60px] h-[60px] rounded-full bg-green border-[5px] border-ink flex items-center justify-center ios-press"
+              >
+                <Icon className="w-6 h-6 text-ink" strokeWidth={2.6} />
+              </Link>
+            );
+          }
 
           return (
             <Link
-              key={item.href}
-              href={item.href}
-              aria-label={item.ariaLabel}
+              key={href}
+              href={href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] ios-press transition-colors rounded-xl",
-                isActive
-                  ? "text-[#0A84FF]"
-                  : "text-[#8E8E93] hover:text-[#f5f5f7] active:text-[#f5f5f7]"
+                "flex flex-col items-center gap-1 min-h-[44px] text-[11px] ios-press",
+                isActive ? "text-green font-semibold" : "text-smoke font-medium"
               )}
             >
-              <div className="relative">
-                <Icon
-                  className={cn(
-                    "w-5 h-5 transition-transform duration-200",
-                    isActive ? "scale-110 stroke-[2.25]" : "stroke-[1.75]"
-                  )}
-                />
-                {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0A84FF]" />
-                )}
-              </div>
-              <span
-                className={cn(
-                  "text-[10px] font-medium tracking-tight mt-1 transition-all",
-                  isActive ? "text-[#0A84FF] font-semibold" : "text-[#8E8E93]"
-                )}
-              >
-                {item.name}
-              </span>
+              <Icon className="w-6 h-6" strokeWidth={isActive ? 2.25 : 1.75} />
+              {name}
             </Link>
           );
         })}
@@ -86,4 +65,3 @@ export function BottomNav() {
     </nav>
   );
 }
-
