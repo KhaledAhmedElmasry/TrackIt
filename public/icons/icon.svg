@@ -1,45 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#18181b" />
-      <stop offset="100%" stop-color="#09090b" />
-    </linearGradient>
-    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8" />
-      <stop offset="100%" stop-color="#0a84ff" />
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
-
-  <!-- iOS App Icon Squircle Background -->
-  <rect width="512" height="512" rx="112" fill="url(#bg-grad)" />
-  <rect width="508" height="508" x="2" y="2" rx="110" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4" />
-
-  <!-- Stylized Film Slate / Screen Frame with Track Checkmark -->
-  <g transform="translate(96, 96)">
-    <!-- Movie Ticket / Card outline -->
-    <rect x="0" y="0" width="320" height="320" rx="36" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(255, 255, 255, 0.14)" stroke-width="6" />
-
-    <!-- Film Sprocket notches -->
-    <rect x="28" y="24" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="84" y="24" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="140" y="24" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="196" y="24" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="252" y="24" width="28" height="20" rx="6" fill="#3f3f46" />
-
-    <rect x="28" y="276" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="84" y="276" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="140" y="276" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="196" y="276" width="28" height="20" rx="6" fill="#3f3f46" />
-    <rect x="252" y="276" width="28" height="20" rx="6" fill="#3f3f46" />
-
-    <!-- Center Play / Track Checkmark icon in neon blue -->
-    <path d="M96 160 L144 204 L232 116" fill="none" stroke="url(#accent-grad)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
-    <!-- Floating Tracker indicator dot -->
-    <circle cx="230" cy="118" r="8" fill="#ffffff" />
-  </g>
+  <!-- TrackIt app icon: green film frame with a play notch on ink -->
+  <rect width="512" height="512" rx="112" fill="#0b090c" />
+  <rect x="96" y="136" width="320" height="240" rx="36" fill="none" stroke="#4fd27f" stroke-width="30" />
+  <path d="M96 210H416M96 302H416" stroke="#4fd27f" stroke-width="30" />
+  <path d="M234 238L290 256L234 274Z" fill="#4fd27f" stroke="#4fd27f" stroke-width="10" stroke-linejoin="round" />
 </svg>
-

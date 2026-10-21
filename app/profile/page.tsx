@@ -504,7 +504,7 @@ export default function ProfilePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* TMDB Key Card */}
-          <div className="ios-card p-5 space-y-4 flex flex-col justify-between">
+          <div className="ios-card p-5 flex flex-col gap-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-cream uppercase tracking-wider">
@@ -581,7 +581,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Gemini Key Card */}
-          <div className="ios-card p-5 space-y-4 flex flex-col justify-between">
+          <div className="ios-card p-5 flex flex-col gap-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-cream uppercase tracking-wider flex items-center gap-1.5">
@@ -599,7 +599,7 @@ export default function ProfilePage() {
                 </span>
               </div>
               <p className="text-xs text-[#b7a9bc]">
-                Optional until you request AI watch recommendations in Phase 5.
+                Powers Picks. Gemini suggests titles, and every one is checked against TMDB before it&rsquo;s shown.
               </p>
 
               {keys?.gemini.configured && (
@@ -655,16 +655,13 @@ export default function ProfilePage() {
                 <span>Get a free API key at Google AI Studio</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
-              <p className="text-[11px] leading-relaxed text-dim">
-                Picks are suggested by Gemini, and every title is checked against TMDB before it&rsquo;s shown.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Push Notifications Section */}
-      <section className="space-y-3">
+      <section id="push" className="space-y-3">
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-lilac" />
           <h2 className="text-base font-bold text-cream">Push Notifications (ntfy.sh & Bark)</h2>

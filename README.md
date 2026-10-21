@@ -76,7 +76,6 @@ TrackIt is engineered from the ground up to run **100% on free tiers with zero c
 │       └── env.schema.ts     # Zod schema for runtime environment variables
 ├── public/
 │   ├── icons/                # High-res PWA icons (192x192, 512x512, SVG, Apple touch)
-│   ├── manifest.json         # Standalone PWA manifest fallback
 │   └── sw.js                 # App Shell service worker
 ├── tests/
 │   └── unit/                 # Vitest test suite (errors, env, db, UI components)

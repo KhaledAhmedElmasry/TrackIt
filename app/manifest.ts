@@ -2,36 +2,24 @@ import type { MetadataRoute } from "next";
 
 /**
  * Web App Manifest definition for TrackIt
- * Configures native-like standalone PWA display, Apple dark background, and high-res icons.
+ * Standalone PWA display on the ink background, with rounded ("any") and maskable icons.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "TrackIt - Private Movie & Series Tracker",
+    name: "TrackIt",
     short_name: "TrackIt",
-    description: "Private, fast, and secure movie and TV series tracker with Apple iOS design.",
+    description: "Track every film and episode you watch, keep a watchlist and get alerts when new episodes air.",
     start_url: "/",
     display: "standalone",
     background_color: "#0b090c",
     theme_color: "#0b090c",
     orientation: "portrait-primary",
     icons: [
-      {
-        src: "/icons/icon-192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icons/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icons/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
-      },
+      { src: "/icons/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-maskable-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
+      { src: "/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
     categories: ["entertainment", "utilities"],
     shortcuts: [

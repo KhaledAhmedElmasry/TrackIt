@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Maskable variant: full-bleed background, mark kept inside the central 80% safe zone -->
+  <rect width="512" height="512" fill="#0b090c" />
+  <rect x="116" y="151" width="280" height="210" rx="32" fill="none" stroke="#4fd27f" stroke-width="27" />
+  <path d="M116 216H396M116 296H396" stroke="#4fd27f" stroke-width="27" />
+  <path d="M236 241L284 256L236 271Z" fill="#4fd27f" stroke="#4fd27f" stroke-width="9" stroke-linejoin="round" />
+</svg>

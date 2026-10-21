@@ -8,7 +8,7 @@
  * - Read-only offline experience displays an offline banner with write actions disabled.
  */
 
-const CACHE_NAME = "trackit-shell-v2";
+const CACHE_NAME = "trackit-shell-v3";
 
 // Account, key and export responses must never be persisted in Cache Storage.
 const UNCACHEABLE_API_PREFIXES = ["/api/auth/", "/api/keys", "/api/user/", "/api/cron/"];

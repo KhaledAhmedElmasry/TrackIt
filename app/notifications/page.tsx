@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Bell,
@@ -8,10 +9,6 @@ import {
   CheckCheck,
   ExternalLink,
   Loader2,
-  Smartphone,
-  Copy,
-  Check,
-  Send,
   Trash2,
   CheckSquare,
   Square,
@@ -30,87 +27,9 @@ interface NotificationItem {
 }
 
 export default function NotificationsPage() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [isMarkingAll, setIsMarkingAll] = useState(false);
-
-  // Bark & Push state on phone
-  const [barkKeyInput, setBarkKeyInput] = useState(user?.barkKey || "");
-  const [isSavingBark, setIsSavingBark] = useState(false);
-  const [barkFeedback, setBarkFeedback] = useState<string | null>(null);
-  const [copiedTopic, setCopiedTopic] = useState(false);
-  const [isSendingTest, setIsSendingTest] = useState(false);
-  const [testPushStatus, setTestPushStatus] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (user?.barkKey !== undefined) {
-      queueMicrotask(() => {
-        setBarkKeyInput(user.barkKey || "");
-      });
-    }
-  }, [user?.barkKey]);
-
-  const handleSaveBark = async () => {
-    if (!barkKeyInput.trim()) return;
-    setIsSavingBark(true);
-    setBarkFeedback(null);
-    try {
-      const res = await fetch("/api/user/bark", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ barkKey: barkKeyInput.trim() }),
-      });
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setBarkFeedback("Bark key connected! Native iOS push is now enabled.");
-        await refreshUser();
-      } else {
-        alert(json.error || "Failed to save Bark key");
-      }
-    } catch {
-      alert("Failed to save Bark key");
-    } finally {
-      setIsSavingBark(false);
-    }
-  };
-
-  const handleDeleteBark = async () => {
-    if (!confirm("Remove Bark key?")) return;
-    setIsSavingBark(true);
-    try {
-      const res = await fetch("/api/user/bark", { method: "DELETE" });
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setBarkKeyInput("");
-        setBarkFeedback("Bark key removed.");
-        await refreshUser();
-      } else {
-        alert(json.error || "Failed to remove Bark key");
-      }
-    } catch {
-      alert("Failed to remove Bark key");
-    } finally {
-      setIsSavingBark(false);
-    }
-  };
-
-  const handleSendTestPush = async () => {
-    setIsSendingTest(true);
-    setTestPushStatus(null);
-    try {
-      const res = await fetch("/api/notifications/test-push", { method: "POST" });
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setTestPushStatus("Test alert sent to your phone (Bark / ntfy)!");
-      } else {
-        alert(json.error || "Failed to send test push");
-      }
-    } catch {
-      alert("Failed to send test push");
-    } finally {
-      setIsSendingTest(false);
-    }
-  };
 
   const { data, isLoading, mutate } = useCachedFetch<{ notifications: NotificationItem[]; unreadCount: number }>(
     user ? "/api/notifications" : null,
@@ -241,142 +160,12 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6 pb-20 animate-in fade-in duration-300">
-      {/* Title Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display font-black text-5xl md:text-[64px] leading-[0.9]">
-            Notifications
-          </h1>
-          <p className="text-sm text-[#b7a9bc] mt-0.5">
-            Aired episode updates and system alerts.
-          </p>
-        </div>
-
-        {unreadCount > 0 && (
-          <button
-            onClick={handleMarkAllRead}
-            disabled={isMarkingAll}
-            className="btn-quiet px-3.5 py-1.5 rounded-full bg-[#1f1424] hover:bg-[#2c1b33] border border-plum-line text-xs font-semibold text-[#4fd27f] flex items-center gap-1.5 transition-all disabled:opacity-50"
-          >
-            {isMarkingAll ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <CheckCheck className="w-3.5 h-3.5" />
-            )}
-            <span>Mark all read</span>
-          </button>
-        )}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h1 className="font-display font-black text-5xl md:text-[76px] leading-[0.9]">Notifications</h1>
+        <Link href="/profile#push" className="text-sm font-semibold text-smoke hover:text-cream">
+          Push alert settings &rarr;
+        </Link>
       </div>
-
-      {/* Mobile Push Notification Channels Card */}
-      {user && (
-        <div className="ios-card p-4 sm:p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-lilac" />
-              <h2 className="text-sm sm:text-base font-bold text-cream">
-                Mobile Push Channels (Bark & ntfy.sh)
-              </h2>
-            </div>
-            <button
-              onClick={handleSendTestPush}
-              disabled={isSendingTest}
-              className="btn-outline px-3 py-1.5 rounded-xl bg-transparent hover:bg-green hover:text-ink border border-green text-green text-xs font-bold transition-all ios-press flex items-center gap-1.5 disabled:opacity-40"
-            >
-              {isSendingTest ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-              <span>Test Push</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
-            {/* Bark iOS Setup */}
-            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-plum-line space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-cream">Bark (iOS Push)</span>
-                {user.barkKey ? (
-                  <span className="px-2 py-0.5 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[10px] font-bold border border-[#4fd27f]/30">
-                    Connected
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded-full bg-[#e9b44c]/15 text-[#e9b44c] text-[10px] font-bold border border-[#e9b44c]/30">
-                    Not Configured
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] text-[#b7a9bc]">
-                Receive instant alerts on your iPhone via the Bark app.
-              </p>
-
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="text"
-                  value={barkKeyInput}
-                  onChange={(e) => setBarkKeyInput(e.target.value)}
-                  placeholder="Paste Bark device key..."
-                  className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream text-xs font-mono placeholder:text-dim focus:outline-none focus:border-green"
-                />
-                <button
-                  onClick={handleSaveBark}
-                  disabled={isSavingBark || !barkKeyInput.trim() || barkKeyInput.trim() === user.barkKey}
-                  className="btn-primary px-3 py-1.5 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold shrink-0 transition-all disabled:opacity-40"
-                >
-                  {isSavingBark ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save"}
-                </button>
-                {user.barkKey && (
-                  <button
-                    onClick={handleDeleteBark}
-                    disabled={isSavingBark}
-                    className="btn-danger p-1.5 rounded-xl bg-[#ff8a80]/15 text-[#ff8a80] hover:bg-[#ff8a80]/25 transition-colors shrink-0"
-                    title="Remove Bark key"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-              {barkFeedback && (
-                <p className="text-[10px] text-[#4fd27f] font-medium">{barkFeedback}</p>
-              )}
-            </div>
-
-            {/* ntfy.sh Setup */}
-            <div className="p-3.5 rounded-2xl bg-[#160e19] border border-plum-line space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-cream">ntfy.sh (Free Server)</span>
-                <span className="px-2 py-0.5 rounded-full bg-[#4fd27f]/15 text-[#4fd27f] text-[10px] font-bold border border-[#4fd27f]/30">
-                  Active
-                </span>
-              </div>
-              <p className="text-[11px] text-[#b7a9bc]">
-                Subscribe to your private topic in the ntfy app (iOS/Android).
-              </p>
-
-              <div className="flex items-center gap-2 pt-1">
-                <div className="flex-1 min-w-0 px-3 py-1.5 rounded-xl bg-[#2c1b33] border border-plum-line text-lilac text-xs font-mono truncate select-all">
-                  {user.ntfyTopic}
-                </div>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(user.ntfyTopic);
-                    setCopiedTopic(true);
-                    setTimeout(() => setCopiedTopic(false), 2000);
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-plum-raised hover:bg-plum-line text-cream text-xs font-semibold shrink-0 flex items-center gap-1 transition-all"
-                >
-                  {copiedTopic ? <Check className="w-3 h-3 text-[#4fd27f]" /> : <Copy className="w-3 h-3" />}
-                  <span>{copiedTopic ? "Copied" : "Copy"}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {testPushStatus && (
-            <p className="text-xs text-[#4fd27f] font-medium pt-1 flex items-center gap-1.5">
-              <Check className="w-4 h-4" />
-              <span>{testPushStatus}</span>
-            </p>
-          )}
-        </div>
-      )}
 
       {/* Notifications List */}
       {notifications.length > 0 && (
@@ -411,14 +200,27 @@ export default function NotificationsPage() {
               </button>
             </>
           ) : (
-            <button
-              type="button"
-              onClick={() => setIsSelecting(true)}
-              className="btn-quiet h-10 px-4 rounded-full border border-plum-line text-[13px] font-semibold flex items-center gap-1.5 hover:border-lilac hover:bg-plum transition-colors"
-            >
-              <CheckSquare className="w-4 h-4" />
-              Select
-            </button>
+            <>
+              {unreadCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleMarkAllRead}
+                  disabled={isMarkingAll}
+                  className="btn-quiet h-10 px-4 rounded-full border border-plum-line text-[13px] font-semibold flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  {isMarkingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCheck className="w-4 h-4" />}
+                  Mark all read
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsSelecting(true)}
+                className="btn-quiet h-10 px-4 rounded-full border border-plum-line text-[13px] font-semibold flex items-center gap-1.5 hover:border-lilac hover:bg-plum transition-colors"
+              >
+                <CheckSquare className="w-4 h-4" />
+                Select
+              </button>
+            </>
           )}
         </div>
       )}
