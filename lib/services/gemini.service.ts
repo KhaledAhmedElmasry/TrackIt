@@ -3,9 +3,12 @@
  *
  * Implements:
  * - Isolated Gemini API caller using the user's decrypted Gemini key.
- * - Free tier model: gemini-1.5-flash / gemini-2.0-flash with structured JSON output schema.
- * - Compact prompt: sends only anonymized title names, TMDB IDs, and user star ratings (no personal data).
- * - Hallucination guard: validates every single returned TMDB ID against TMDB API!
+ * - Compact prompt: sends only title names, years, list status and the ratings the user
+ *   actually gave (no personal data).
+ * - Title guard: every pick is matched against TMDB by title and year, so a wrong or
+ *   invented TMDB id can never surface an unrelated film.
+ * - Honesty guard: reasons may only cite titles from the user's history and never quote a
+ *   rating the user did not give; otherwise the reason is rebuilt from real data.
  * - Cooldown enforcement to respect free-tier RPM and RPD quotas.
  */
 
@@ -30,12 +33,67 @@ export interface RecommendationResult {
   generatedAt: Date;
 }
 
+interface RawRecommendation {
+  title?: string;
+  year?: number;
+  mediaType?: string;
+  tmdbId?: number;
+  predictedRating?: number;
+  basedOn?: string[];
+  reason?: string;
+}
+
 const CANDIDATE_GEMINI_MODELS = [
   "gemini-3.5-flash-lite",
   "gemini-3.8-flash",
   "gemini-flash-latest",
 ];
 const RECOMMENDATION_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes cooldown
+// Bump when the generation logic changes so stale cached picks are regenerated
+const RECOMMENDATIONS_CACHE_VERSION = 2;
+const MAX_RECOMMENDATIONS = 8;
+
+/** Lowercase, strip accents, punctuation and a leading article, for title comparison. */
+export function normalizeTitle(title: string): string {
+  return title
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/^(the|a|an) /, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function titlesMatch(a: string, b: string): boolean {
+  const x = normalizeTitle(a);
+  const y = normalizeTitle(b);
+  return x.length > 0 && (x === y || x.startsWith(`${y} `) || y.startsWith(`${x} `));
+}
+
+function yearOf(yearRange: string | undefined): number | null {
+  const match = yearRange?.match(/\d{4}/);
+  return match ? Number(match[0]) : null;
+}
+
+/**
+ * True when every "N/10" rating quoted in the reason is one the user really gave,
+ * attached to a title they really rated. Rating-free reasons always pass.
+ */
+export function reasonIsHonest(reason: string, ratedTitles: Array<{ title: string; rating: number }>): boolean {
+  const claims = [...reason.matchAll(/(\d+(?:\.\d+)?)\s*\/\s*10\b/g)].map((m) => Number(m[1]));
+  if (claims.length === 0) return true;
+  const normalizedReason = normalizeTitle(reason);
+  return claims.every((value) =>
+    ratedTitles.some((item) => item.rating === value && normalizedReason.includes(normalizeTitle(item.title)))
+  );
+}
+
+function joinTitles(titles: string[]): string {
+  if (titles.length <= 1) return titles[0] ?? "";
+  return `${titles.slice(0, -1).join(", ")} and ${titles[titles.length - 1]}`;
+}
 
 export class GeminiService {
   /**
@@ -51,98 +109,89 @@ export class GeminiService {
     const userObjectId = typeof userId === "string" ? new ObjectId(userId) : userId;
     const db = await getDb();
 
-    // Check cached recommendations in user document or recommendations collection
     const user = await db.collection("users").findOne({ _id: userObjectId });
     const cached = user?.recommendationsCache as
-      | { items: AiRecommendationItem[]; generatedAt: Date }
+      | { items: AiRecommendationItem[]; generatedAt: Date; version?: number }
       | undefined;
+    const cacheIsCurrent = cached?.version === RECOMMENDATIONS_CACHE_VERSION && cached.items?.length > 0;
 
-    if (!forceRefresh && cached && cached.items?.length > 0) {
-      return {
-        recommendations: cached.items,
-        generatedAt: new Date(cached.generatedAt),
-      };
+    if (!forceRefresh && cacheIsCurrent) {
+      return { recommendations: cached.items, generatedAt: new Date(cached.generatedAt) };
     }
 
-    // Cooldown check if refreshed recently
-    if (cached?.generatedAt) {
-      const timeSince = Date.now() - new Date(cached.generatedAt).getTime();
-      if (timeSince < RECOMMENDATION_COOLDOWN_MS && !forceRefresh) {
-        return {
-          recommendations: cached.items,
-          generatedAt: new Date(cached.generatedAt),
-        };
-      }
+    // Cooldown applies to explicit refreshes too, to protect the free Gemini quota
+    if (cacheIsCurrent && Date.now() - new Date(cached.generatedAt).getTime() < RECOMMENDATION_COOLDOWN_MS) {
+      throw new ValidationError("New picks were made a moment ago. Try again in a couple of minutes.");
     }
 
-    // Gather user's library: watched or currently watching or rated
     const library = await db
       .collection<TrackedItemDocument>("tracked_items")
       .find({ userId: userObjectId })
       .toArray();
 
-    const watchedOrRated = library.filter(
-      (item) =>
-        item.status === "watched" ||
-        item.status === "currently_watching" ||
-        (item.rating && item.rating > 0)
-    );
+    const isRated = (item: TrackedItemDocument) => typeof item.rating === "number";
+    const history = library
+      .filter((item) => item.status === "watched" || item.status === "currently_watching" || isRated(item))
+      // Rated titles first (highest first), then the most recently updated
+      .sort(
+        (a, b) =>
+          Number(isRated(b)) - Number(isRated(a)) ||
+          (b.rating ?? 0) - (a.rating ?? 0) ||
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
 
-    if (watchedOrRated.length < 3) {
+    if (history.length < 3) {
       throw new ValidationError(
         "Please track or rate at least 3 movies or TV series before requesting recommendations."
       );
     }
 
-    // Prepare compact summary of user tastes and habits (strictly no personal information)
-    const trackedIdsSet = new Set(library.map((item) => `${item.mediaType}:${item.tmdbId}`));
+    const trackedIds = new Set(library.map((item) => `${item.mediaType}:${item.tmdbId}`));
+    const trackedTitles = new Set(library.map((item) => normalizeTitle(item.minimalSnapshot?.title || "")));
+    const ratedTitles = library
+      .filter(isRated)
+      .map((item) => ({ title: item.minimalSnapshot?.title || "", rating: item.rating as number }));
+    const historyTitles = new Map(
+      history.map((item) => [normalizeTitle(item.minimalSnapshot?.title || ""), item.minimalSnapshot?.title || ""])
+    );
 
-    const totalMovies = library.filter((i) => i.mediaType === "movie" && i.status === "watched").length;
-    const totalTv = library.filter((i) => i.mediaType === "tv").length;
-    const ratedItems = library.filter((i) => typeof i.rating === "number" && i.rating > 0);
-    const avgRating = ratedItems.length > 0
-      ? (ratedItems.reduce((acc, curr) => acc + (curr.rating || 0), 0) / ratedItems.length).toFixed(2)
-      : "N/A";
-
-    const userHabits = {
-      watchedMoviesCount: totalMovies,
-      trackedSeriesCount: totalTv,
-      userAverageRatingScale0to10: avgRating,
-      primaryFormatPreference: totalMovies > totalTv ? "movies" : "tv series",
-    };
-
-    const compactProfile = watchedOrRated.slice(0, 30).map((item) => ({
-      tmdbId: item.tmdbId,
-      mediaType: item.mediaType,
+    const profile = history.slice(0, 40).map((item) => ({
       title: item.minimalSnapshot?.title || `Title ${item.tmdbId}`,
-      status: item.status,
-      rating: item.rating !== undefined && item.rating !== null ? `${item.rating}/10` : "unrated",
+      year: yearOf(item.minimalSnapshot?.yearRange),
+      type: item.mediaType === "movie" ? "film" : "series",
+      status: item.status === "watched" ? "finished" : item.status === "currently_watching" ? "watching" : "saved",
+      // Only ratings the user actually gave; null means the user never rated it
+      userRating: isRated(item) ? item.rating : null,
     }));
+    const otherTracked = library
+      .filter((item) => !history.includes(item))
+      .slice(0, 60)
+      .map((item) => item.minimalSnapshot?.title)
+      .filter(Boolean);
 
-    const systemPrompt = `You are an expert film and television recommendation engine.
-Analyze the user's viewing history, 0-10 decimal ratings, and watch habits below.
-Recommend 6 to 10 outstanding movies and TV series tailored precisely to their likeness and taste.
+    const prompt = `You are a film and TV recommendation engine.
 
-CRITICAL RULES:
-1. NEVER recommend any title that is already in the user's list (do NOT recommend any tmdbId listed below).
-2. ONLY recommend real movies and TV series with accurate TMDB (The Movie Database) integer IDs.
-3. Compute an expected predicted rating from 0.00 to 10.00 (e.g. 8.75 or 9.40) reflecting how much this user will like the title based on their watch habits and previous ratings.
-4. Provide a concise, 1-sentence reason for each recommendation explicitly connecting it to their likeness and habits (e.g. "Given your 9.5/10 rating on X and preference for thrillers, this delivers...").
-5. Output MUST be valid JSON adhering strictly to this schema:
-{
-  "recommendations": [
-    {
-      "tmdbId": 12345,
-      "mediaType": "movie",
-      "title": "Exact Title",
-      "predictedRating": 9.25,
-      "reason": "Because you rated X 9.5/10 and frequently watch sci-fi thrillers, this matches your taste..."
-    }
-  ]
-}
-Do NOT include markdown formatting or backticks around the JSON.`;
+The user's history is below. "userRating" is the 0-10 score the user gave; null means they never rated it.
 
-    const userPrompt = `User Watch Habits:\n${JSON.stringify(userHabits, null, 2)}\n\nUser Viewing History and 0-10 Ratings:\n${JSON.stringify(compactProfile, null, 2)}`;
+Recommend 10 films or series they have not seen that fit their taste.
+
+Rules:
+1. Never recommend anything in the history or in "alreadyTracked".
+2. Only real, released titles. Give the exact original English title and the release year (first air year for series).
+3. "basedOn": 1 to 3 titles copied exactly from the history that this pick is based on.
+4. "reason": one short sentence explaining the connection by naming titles from "basedOn" and what they share (genre, tone, creator, cast, themes).
+   NEVER mention any rating or score in the reason, and never claim the user rated something.
+5. "predictedRating": how much this user is likely to enjoy it, 0.0 to 10.0.
+
+Return JSON only, in this exact shape:
+{"recommendations":[{"title":"Exact Title","year":2010,"mediaType":"movie","predictedRating":8.7,"basedOn":["Title From History"],"reason":"..."}]}
+"mediaType" is "movie" or "tv".
+
+History:
+${JSON.stringify(profile)}
+
+alreadyTracked:
+${JSON.stringify(otherTracked)}`;
 
     // Call Gemini Free Tier REST endpoint with automatic candidate fallback
     let rawResponseText = "";
@@ -156,12 +205,7 @@ Do NOT include markdown formatting or backticks around the JSON.`;
           method: "POST",
           headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKey },
           body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
-              },
-            ],
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
               temperature: 0.4,
               responseMimeType: "application/json",
@@ -183,8 +227,7 @@ Do NOT include markdown formatting or backticks around the JSON.`;
         }
 
         const geminiJson = await geminiRes.json();
-        rawResponseText =
-          geminiJson.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+        rawResponseText = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
         lastError = null;
         break;
       } catch (err) {
@@ -200,65 +243,81 @@ Do NOT include markdown formatting or backticks around the JSON.`;
       throw lastError;
     }
 
-    // Parse structured JSON
-    let parsed: {
-      recommendations?: Array<{
-        tmdbId: number;
-        mediaType: "movie" | "tv";
-        title: string;
-        predictedRating?: number;
-        reason: string;
-      }>;
-    } = {};
-
+    let rawRecs: RawRecommendation[] = [];
     try {
-      // Clean potential code fences if any leaked
-      const cleaned = rawResponseText
-        .replace(/^```json\s*/i, "")
-        .replace(/```\s*$/i, "")
-        .trim();
-      parsed = JSON.parse(cleaned);
+      const cleaned = rawResponseText.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
+      rawRecs = (JSON.parse(cleaned) as { recommendations?: RawRecommendation[] }).recommendations || [];
     } catch {
       throw new ExternalServiceError("Gemini generated an invalid JSON response. Please try again.");
     }
 
-    const rawRecs = parsed.recommendations || [];
-    const verifiedRecs: AiRecommendationItem[] = [];
-
-    // --- Strict TMDB Hallucination Guard ---
-    // Validate every single returned TMDB ID against the TMDB API
-    for (const rec of rawRecs) {
-      if (!rec.tmdbId || !rec.mediaType || !["movie", "tv"].includes(rec.mediaType)) {
-        continue;
-      }
-
-      // Check if user already tracks this title
-      if (trackedIdsSet.has(`${rec.mediaType}:${rec.tmdbId}`)) {
-        continue;
-      }
-
-      try {
-        const tmdbData = await TmdbService.getTitleDetails(rec.tmdbId, rec.mediaType, tmdbKey);
-        if (tmdbData && tmdbData.id) {
-          verifiedRecs.push({
-            tmdbId: tmdbData.id,
-            mediaType: tmdbData.mediaType,
-            title: tmdbData.title,
-            reason: rec.reason || "Recommended based on your recent viewing history and habits.",
-            predictedRating:
-              typeof rec.predictedRating === "number" && !isNaN(rec.predictedRating)
-                ? Math.min(10, Math.max(0, Math.round(rec.predictedRating * 100) / 100))
-                : undefined,
-            posterPath: tmdbData.posterPath,
-            yearRange: tmdbData.yearRange,
-          });
+    // --- Title guard: find the TMDB entry whose title and year match what Gemini meant ---
+    // Lookups run in parallel; a wrong or invented TMDB id from the model is never trusted.
+    const lookups = await Promise.all(
+      rawRecs.slice(0, 12).map(async (rec) => {
+        const mediaType = rec.mediaType === "movie" || rec.mediaType === "tv" ? rec.mediaType : null;
+        if (!rec.title || !mediaType || trackedTitles.has(normalizeTitle(rec.title))) return null;
+        try {
+          const query = rec.year ? `${rec.title} ${rec.year}` : rec.title;
+          const { results } = await TmdbService.searchMulti(query, tmdbKey, mediaType);
+          const hit = results.find(
+            (r) =>
+              titlesMatch(r.title, rec.title!) &&
+              (!rec.year || r.releaseYear === null || Math.abs(r.releaseYear - rec.year) <= 1)
+          );
+          if (!hit) {
+            console.warn(`Discarded unverifiable recommendation: ${rec.title} (${rec.year ?? "?"})`);
+            return null;
+          }
+          const match: AiRecommendationItem = {
+            tmdbId: hit.id,
+            mediaType: hit.mediaType,
+            title: hit.title,
+            reason: "",
+            posterPath: hit.posterPath,
+            yearRange: hit.yearRange,
+          };
+          return { rec, match };
+        } catch (err) {
+          console.warn(`TMDB lookup failed for "${rec.title}":`, err instanceof Error ? err.message : err);
+          return null;
         }
-      } catch {
-        // ID was invalid or not found on TMDB -> safely discarded
-        console.warn(`Gemini hallucinated invalid TMDB ID: ${rec.tmdbId} (${rec.title})`);
-      }
+      })
+    );
 
-      if (verifiedRecs.length >= 8) break;
+    const verifiedRecs: AiRecommendationItem[] = [];
+    const seen = new Set<string>();
+
+    for (const lookup of lookups) {
+      if (verifiedRecs.length >= MAX_RECOMMENDATIONS) break;
+      if (!lookup) continue;
+      const { rec, match } = lookup;
+
+      const key = `${match.mediaType}:${match.tmdbId}`;
+      if (trackedIds.has(key) || seen.has(key)) continue;
+      seen.add(key);
+
+      // --- Honesty guard: only cite real history and real ratings ---
+      const basedOn = (rec.basedOn || [])
+        .map((title) => historyTitles.get(normalizeTitle(title)))
+        .filter((title): title is string => Boolean(title))
+        .slice(0, 3);
+      const reason = (rec.reason || "").trim();
+      const citesHistory = basedOn.length > 0 && basedOn.some((title) => normalizeTitle(reason).includes(normalizeTitle(title)));
+
+      match.reason =
+        reason && citesHistory && reasonIsHonest(reason, ratedTitles)
+          ? reason
+          : basedOn.length > 0
+          ? `Because you watched ${joinTitles(basedOn)}.`
+          : "Picked from your watch history.";
+
+      match.predictedRating =
+        typeof rec.predictedRating === "number" && !isNaN(rec.predictedRating)
+          ? Math.min(10, Math.max(0, Math.round(rec.predictedRating * 10) / 10))
+          : undefined;
+
+      verifiedRecs.push(match);
     }
 
     if (verifiedRecs.length === 0) {
@@ -268,7 +327,6 @@ Do NOT include markdown formatting or backticks around the JSON.`;
     }
 
     const now = new Date();
-    // Cache verified results in user document
     await db.collection("users").updateOne(
       { _id: userObjectId },
       {
@@ -276,16 +334,13 @@ Do NOT include markdown formatting or backticks around the JSON.`;
           recommendationsCache: {
             items: verifiedRecs,
             generatedAt: now,
+            version: RECOMMENDATIONS_CACHE_VERSION,
           },
           updatedAt: now,
         },
       }
     );
 
-    return {
-      recommendations: verifiedRecs,
-      generatedAt: now,
-    };
+    return { recommendations: verifiedRecs, generatedAt: now };
   }
 }
-
