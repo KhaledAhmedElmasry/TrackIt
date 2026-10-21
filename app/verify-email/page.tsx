@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -42,7 +43,7 @@ function VerifyEmailContent() {
           refreshUser();
         } else {
           setIsSuccess(false);
-          setMessage(json.error?.message || "Invalid or expired verification link.");
+          setMessage(apiErrorMessage(json, "Invalid or expired verification link."));
         }
       })
       .catch(() => {

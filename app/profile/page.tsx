@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 import { clearCache } from "@/lib/client/cache";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 interface KeySummary {
   configured: boolean;
@@ -101,7 +102,7 @@ export default function ProfilePage() {
         await refreshUser();
         setUsernameFeedback(json.message || "Username saved successfully!");
       } else {
-        setUsernameError(json.error || "Failed to update username");
+        setUsernameError(apiErrorMessage(json, "Failed to update username"));
       }
     } catch {
       setUsernameError("Failed to update username");
@@ -138,7 +139,7 @@ export default function ProfilePage() {
         await refreshUser();
         setBarkFeedback("Bark key saved! Test notification will now alert Bark.");
       } else {
-        alert(json.error || "Failed to save Bark key");
+        alert(apiErrorMessage(json, "Failed to save Bark key"));
       }
     } catch {
       alert("Failed to save Bark key");
@@ -159,7 +160,7 @@ export default function ProfilePage() {
         await refreshUser();
         setBarkFeedback("Bark key removed.");
       } else {
-        alert(json.error || "Failed to remove Bark key");
+        alert(apiErrorMessage(json, "Failed to remove Bark key"));
       }
     } catch {
       alert("Failed to remove Bark key");
@@ -184,7 +185,7 @@ export default function ProfilePage() {
       if (res.ok && json.success) {
         setTestPushFeedback("Test notification dispatched to your device!");
       } else {
-        alert(json.error || "Failed to send test push");
+        alert(apiErrorMessage(json, "Failed to send test push"));
       }
     } catch {
       alert("Failed to send test push");
@@ -223,7 +224,7 @@ export default function ProfilePage() {
       if (res.ok && json.success) {
         setImportStatus(json.message);
       } else {
-        setImportError(json.error || "Failed to import file");
+        setImportError(apiErrorMessage(json, "Failed to import file"));
       }
     } catch (err) {
       setImportError((err as Error).message || "Invalid JSON backup file");
@@ -284,7 +285,7 @@ export default function ProfilePage() {
         setEditingKeyType(null);
         setInputKey("");
       } else {
-        setKeyError(json.error?.message || "Failed to save key");
+        setKeyError(apiErrorMessage(json, "Failed to save key"));
       }
     } catch {
       setKeyError("Network error. Please try again.");
@@ -342,7 +343,7 @@ export default function ProfilePage() {
         router.push("/signup");
         router.refresh();
       } else {
-        setDeleteError(json.error?.message || "Incorrect password.");
+        setDeleteError(apiErrorMessage(json, "Incorrect password."));
       }
     } catch {
       setDeleteError("Network error. Please try again.");

@@ -25,6 +25,7 @@ import {
   User,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function SignupPage() {
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        setErrorMessage(json.error?.message || "Failed to create account. Please try again.");
+        setErrorMessage(apiErrorMessage(json, "Failed to create account. Please try again."));
         return;
       }
 

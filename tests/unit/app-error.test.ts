@@ -66,6 +66,17 @@ describe("Application Error Classes and Handler", () => {
     }
   });
 
+  it("handleApiError uses the first validation issue as the readable message", async () => {
+    const schema = z.object({ password: z.string().regex(/[0-9]/, "Password must contain at least one number") });
+    const parseResult = schema.safeParse({ password: "password" });
+
+    expect(parseResult.success).toBe(false);
+    if (!parseResult.success) {
+      const body = await handleApiError(parseResult.error).json();
+      expect(body.error.message).toBe("Password must contain at least one number");
+    }
+  });
+
   it("handleApiError should mask unexpected internal errors in production", async () => {
     const originalEnv = process.env.NODE_ENV;
     (process.env as Record<string, string | undefined>).NODE_ENV = "production";

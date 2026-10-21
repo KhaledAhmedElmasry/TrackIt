@@ -11,7 +11,9 @@
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, Mail, KeyRound, Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Lock, Mail, KeyRound, Loader2, Check, CheckCircle2, ArrowLeft } from "lucide-react";
+import { apiErrorMessage } from "@/lib/client/api-error";
+import { clearCache } from "@/lib/client/cache";
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -28,6 +30,14 @@ function ResetPasswordContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Same rules the API enforces (lib/validations/auth.schema.ts)
+  const passwordRules = [
+    { label: "8+ characters", met: newPassword.length >= 8 },
+    { label: "A letter", met: /[A-Za-z]/.test(newPassword) },
+    { label: "A number", met: /[0-9]/.test(newPassword) },
+  ];
+  const passwordValid = passwordRules.every((rule) => rule.met);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,10 +68,12 @@ function ResetPasswordContent() {
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        setErrorMessage(json.error?.message || "Failed to reset password.");
+        setErrorMessage(apiErrorMessage(json, "Failed to reset password."));
         return;
       }
 
+      // A reset signs out every device, so drop the cached signed-in profile too
+      clearCache();
       setIsSuccess(true);
       setTimeout(() => {
         router.push("/login");
@@ -210,17 +222,30 @@ function ResetPasswordContent() {
                     id="new-pw"
                     type="password"
                     required
-                    placeholder="At least 8 characters with letter & number"
+                    autoComplete="new-password"
+                    aria-describedby="new-pw-rules"
+                    placeholder="Choose a new password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#2c1b33] border border-plum-line text-cream placeholder:text-dim text-sm focus:outline-none focus:border-[#4fd27f] transition-all"
                   />
                 </div>
+                <ul id="new-pw-rules" className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px]">
+                  {passwordRules.map((rule) => (
+                    <li
+                      key={rule.label}
+                      className={`flex items-center gap-1 ${rule.met ? "text-green" : "text-smoke"}`}
+                    >
+                      <Check className={`w-3 h-3 ${rule.met ? "opacity-100" : "opacity-30"}`} strokeWidth={3} />
+                      {rule.label}
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               <button
                 type="submit"
-                disabled={isLoading || newPassword.length < 8}
+                disabled={isLoading || !passwordValid}
                 className="btn-primary w-full py-3 rounded-xl bg-[#4fd27f] hover:bg-[#3fbf6d] text-ink text-xs font-bold transition-all ios-press flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
               >
                 {isLoading ? (

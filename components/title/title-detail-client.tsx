@@ -25,6 +25,7 @@ import { TrackedItemDocument } from "@/lib/models/types";
 import { isEpisodeInRange } from "@/lib/utils/ranges";
 import { useAuth } from "@/components/auth/auth-context";
 import { cacheKey, getCached, setCached } from "@/lib/client/cache";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 interface CollectionPart {
   id: number;
@@ -164,7 +165,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error?.message || json.error || "Failed to load title details");
+        throw new Error(apiErrorMessage(json, "Failed to load title details"));
       }
 
       setDetails(json.data.details);
@@ -430,7 +431,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
         setIsRatingModalOpen(false);
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to update rating");
+        alert(apiErrorMessage(json, "Failed to update rating"));
       }
     } catch {
       alert("Failed to update rating");
@@ -567,7 +568,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
         alert(`Marked ${selectedParts.length} franchise movie${selectedParts.length === 1 ? "" : "s"} as watched!`);
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to mark selected movies");
+        alert(apiErrorMessage(json, "Failed to mark selected movies"));
       }
     } catch {
       alert("Failed to mark selected movies");
@@ -603,7 +604,7 @@ export function TitleDetailClient({ params }: TitleDetailClientProps) {
         }
         await loadTitle();
       } else {
-        alert(json.error || "Failed to mark collection");
+        alert(apiErrorMessage(json, "Failed to mark collection"));
       }
     } catch {
       alert("Failed to mark collection");

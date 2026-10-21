@@ -10,6 +10,7 @@
 import React, { useState } from "react";
 import { Mail, Check, AlertTriangle, Loader2 } from "lucide-react";
 import { useAuth } from "./auth-context";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 export function UnverifiedBanner() {
   const { user } = useAuth();
@@ -33,7 +34,7 @@ export function UnverifiedBanner() {
         setStatusMessage("Verification link sent! Please check your inbox or spam.");
       } else {
         setIsSuccess(false);
-        setStatusMessage(json.error?.message || "Failed to resend verification email.");
+        setStatusMessage(apiErrorMessage(json, "Failed to resend verification email."));
       }
     } catch {
       setIsSuccess(false);

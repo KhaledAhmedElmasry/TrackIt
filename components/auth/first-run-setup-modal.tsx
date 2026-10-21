@@ -12,6 +12,7 @@
 import React, { useState } from "react";
 import { Key, ShieldCheck, ExternalLink, Loader2, Check } from "lucide-react";
 import { useAuth } from "./auth-context";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 export function FirstRunSetupModal() {
   const { user, refreshUser } = useAuth();
@@ -46,7 +47,7 @@ export function FirstRunSetupModal() {
         await refreshUser();
         setTimeout(() => setIsOpen(false), 1200);
       } else {
-        setError(json.error?.message || "Failed to save key");
+        setError(apiErrorMessage(json, "Failed to save key"));
       }
     } catch {
       setError("Network error. Please try again.");

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 import { useCachedFetch } from "@/lib/client/cache";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 interface SearchResultItem {
   id: number;
@@ -195,7 +196,7 @@ export default function SearchPage() {
         void refreshLibrary();
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to add title");
+        alert(apiErrorMessage(json, "Failed to add title"));
       }
     } catch {
       alert("Failed to track title. Check network connection.");
@@ -268,7 +269,7 @@ export default function SearchPage() {
         setIsMultiSelect(false);
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to bulk add items");
+        alert(apiErrorMessage(json, "Failed to bulk add items"));
       }
     } catch {
       alert("Bulk add failed. Check network connection.");

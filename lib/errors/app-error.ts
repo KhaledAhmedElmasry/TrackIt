@@ -102,7 +102,8 @@ export function handleApiError(error: unknown): NextResponse {
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: "Request validation failed",
+          // Surface the first problem in plain words so forms can show it directly
+          message: formattedErrors[0]?.message || "Request validation failed",
           details: formattedErrors,
         },
       },

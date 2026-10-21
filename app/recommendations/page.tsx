@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
 import { useCachedFetch } from "@/lib/client/cache";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 interface RecommendationItem {
   tmdbId: number;
@@ -52,7 +53,7 @@ export default function RecommendationsPage() {
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error || "Failed to generate recommendations");
+        throw new Error(apiErrorMessage(json, "Failed to generate recommendations"));
       }
 
       mutate(() => ({

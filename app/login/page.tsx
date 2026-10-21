@@ -15,6 +15,7 @@ import { Logo } from "@/components/brand/logo";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, Loader2, ArrowRight, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-context";
+import { apiErrorMessage } from "@/lib/client/api-error";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function LoginPage() {
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        setErrorMessage(json.error?.message || "Invalid credentials. Please try again.");
+        setErrorMessage(apiErrorMessage(json, "Invalid credentials. Please try again."));
         return;
       }
 
